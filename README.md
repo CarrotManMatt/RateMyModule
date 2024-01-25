@@ -8,4 +8,5 @@ providing a dynamic and user-friendly platform for honest reviews.
 - Delilah Lawes (dxl288@student.bham.ac.uk)
 - Matthew Norton (mxn282@student.bham.ac.uk)
 - Charles Wilson (cxw304@student.bham.ac.uk)
+- Thomas Rose (txr244@student.bham.ac.uk)
 - (insert the list of teammates)
