@@ -1,0 +1,182 @@
+[tool.poetry]
+name = "RateMyModule"
+version = "0.0.1"
+license = "GPL-3.0-or-later"
+description = "Enhanced student feedback for university modules; a dynamic and user-friendly platform for honest reviews."
+authors = [
+    "Ryan Bendall",
+    "Matthew Norton <matt@carrotmanmatt.com>",
+    "Arthur Crymble",
+    "Conor Galvin",
+    "Charles Wilson",
+    "Thomas Rose",
+    "Delilah Lawes <dxl288@student.bham.ac.uk>"
+]
+readme = "README.md"
+repository = "https://git.cs.bham.ac.uk/team-projects-2023-24/team55.git"
+keywords = ["university modules", "student", "feedback", "anonymous", "RateMyModule"]
+classifiers = [
+    "Private :: Do Not Upload",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+    "Topic :: Internet"
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "~4.2"  # NOTE: Django is pinned below version 5.0 because the django-stubs package is not yet compatable with Django 5.0 (see https://github.com/typeddjango/django-stubs/issues/1493 for the tracked issue)
+django-allauth = "^0.60"
+django-environ = "^0.11"
+django-admin-rangefilter = "^0.12"
+classproperties = {git = "https://github.com/hottwaj/classproperties.git"}
+setuptools = "^69.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6"
+mypy = "~1.7"
+django-stubs = {extras = ["compatible-mypy"], version = "~4.2"}
+ruff = "^0.1"
+pymarkdownlnt = "^0.9"
+
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+exclude = "(core/settings\\.py$)|(venv/)"
+extra_checks = true
+warn_unused_configs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_any_unimported = true
+disallow_any_decorated = true
+disallow_any_explicit = true
+disallow_subclassing_any = true
+disallow_untyped_decorators = true
+disallow_incomplete_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["environ"]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "core.settings"
+
+
+[tool.ruff]
+select = [
+    "E",
+    "F",
+    "W",
+    "C",
+    "I",
+    "N",
+    "D",
+    "UP",
+    "YTT",
+    "ANN",
+    "ASYNC",
+    "S",
+    "BLE",
+    "FBT",
+    "B",
+    "A",
+    "COM",
+    "DTZ",
+    "T",
+    "DJ",
+    "EM",
+    "G",
+    "INP",
+    "PIE",
+    "PT",
+    "Q",
+    "RSE",
+    "RET",
+    "SLF",
+    "SLOT",
+    "SIM",
+    "TID",
+    "TCH",
+    "ARG",
+    "PTH",
+    "TD",
+    "FIX",
+    "ERA",
+    "PGH",
+    "PL",
+    "TRY",
+    "FLY",
+    "PERF",
+    "RUF"
+]
+ignore = [
+    "N818",
+    "N806",
+    "D203",
+    "D212",
+    "ANN101",
+    "ANN102",
+    "ANN401",
+    "S101",
+    "S311",
+    "COM812",
+    "Q003",
+    "TD002",
+    "TD003",
+    "PLR0911",
+    "PLR0915",
+    "TRY400"
+]
+line-length = 95
+fixable = ["I001", "TCH", "F401", "RUF100"]
+target-version ="py312"
+task-tags = [
+    "TODO",
+    "FIXME",
+    "HACK",
+    "BUG",
+    "NOBUG",
+    "REQ",
+    "IDEA",
+    "NOTE",
+    "ISSUE"
+]
+extend-exclude = [
+    "ratemymodule/**/migrations/",
+    "venv/",
+    ".vscode",
+    ".idea",
+    ".mypy_cache",
+    ".ruff_cache",
+    "__pycache__"
+]
+
+[tool.ruff.flake8-pytest-style]
+parametrize-values-type = "tuple"
+
+[tool.ruff.flake8-self]
+extend-ignore-names = ["_base_manager", "_default_manager",  "_meta", "_get_wrap_line_width"]
+
+[tool.ruff.mccabe]
+max-complexity = 18
+
+[tool.ruff.pycodestyle]
+ignore-overlong-task-comments = true
+max-doc-length = 95
+
+[tool.ruff.pylint]
+allow-magic-value-types = ["str", "bytes", "int"]
+max-args = 7
+max-branches = 19
+
+[tool.ruff.pyupgrade]
+keep-runtime-typing = true

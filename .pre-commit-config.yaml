@@ -1,0 +1,70 @@
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/python-poetry/poetry
+    rev: 1.7.1
+    hooks:
+    - id: poetry-check
+      name: check poetry config in pyproject.toml is valid
+      args: [--no-interaction]
+    - id: poetry-check
+      name: check poetry.lock file is valid
+      args: [--lock, --no-interaction]
+
+  - repo: local
+    hooks:
+      - id: django-makemigrations-check
+        name: check django models are consistent with migrations
+        entry: poetry run python manage.py
+        args: [makemigrations, --check, --dry-run]
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: django-check
+        name: check for major errors in django project
+        entry: poetry run python manage.py
+        args: [check]
+        language: system
+        types: [python]
+        pass_filenames: false
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-yaml
+      - id: check-toml
+      - id: check-xml
+      - id: check-symlinks
+      - id: check-merge-conflict
+      - id: check-vcs-permalinks
+      - id: destroyed-symlinks
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-ast
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: fix-encoding-pragma
+        args: [--remove]
+      - id: mixed-line-ending
+        args: [--fix, auto]
+      - id: name-tests-test
+        args: [--django]
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, jhipster-archive]
+      - id: pretty-format-json
+        args: [--autofix]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: python-no-eval
+      - id: python-no-log-warn
+      - id: python-use-type-annotations
