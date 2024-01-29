@@ -67,7 +67,7 @@ However, this [`__all__` declaration](https://stackoverflow.com/a/64130/14403974
 should be empty, as Django apps should not export any objects directly.
 
 * [`core`](core): The core [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
-that includes the configuration for the [project](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)'s 
+that includes the configuration for the [project](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)'s
 webserver as a whole
 * [`ratemymodule`](ratemymodule): The primary [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
 that defines the database models & request independent [CRUD](https://codecademy.com/article/what-is-crud)
@@ -110,7 +110,7 @@ Contains common utility functions & classes used by the definition of [models](h
 within [`models/__init__.py`](ratemymodule/models/__init__.py)
 * [`admin/__init__.py`](ratemymodule/admin/__init__.py): Defines how to display the [models](https://docs.djangoproject.com/en/4.2/topics/db/models),
 inside this [Django project](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications),
-on the [automatic admin UI](https://docs.djangoproject.com/en/4.2/ref/contrib/admin/) pages
+on the [automatic admin UI](https://docs.djangoproject.com/en/4.2/ref/contrib/admin) pages
 * [`migrations/`](ratemymodule/migrations): Contains auto-generated [database migrations](https://docs.djangoproject.com/en/4.2/topics/migrations)
 ([one migration per file](https://docs.djangoproject.com/en/4.2/topics/migrations#migration-files)).
 These are used by [Django's database engine](https://docs.djangoproject.com/en/4.2/ref/databases)
@@ -134,7 +134,7 @@ to provide metadata about the `web` [Django app](https://docs.djangoproject.com/
 * [`tests/`](web/tests): Collection of [unit-tests](https://wikipedia.org/wiki/Unit_testing)
 to ensure all functionality defined within the `web` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
 works as expected. (See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
-  * [`templates/ratemymodule/`](web/templates/ratemymodule): Contains [HTML](https://en.wikipedia.org/wiki/HTML)-style
+  * [`templates/ratemymodule/`](web/templates/ratemymodule): Contains [HTML](https://wikipedia.org/wiki/HTML)-style
   [Django templates](https://docs.djangoproject.com/en/4.2/topics/templates)
   that are populated with the necessary [context data](https://docs.djangoproject.com/en/4.2/topics/class-based-views/generic-display#adding-extra-context),
   then sent as the final [HTML response](https://docs.djangoproject.com/en/4.2/ref/template-response)
@@ -156,7 +156,7 @@ to provide metadata about the `api_htmx` [Django app](https://docs.djangoproject
 * [`tests/`](api_htmx/tests): Collection of [unit-tests](https://wikipedia.org/wiki/Unit_testing)
 to ensure all functionality defined within the `api_htmx` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
 works as expected. (See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
-* [`templates/ratemymodule/`](api_htmx/templates/ratemymodule): Contains [HTML](https://en.wikipedia.org/wiki/HTML)-style
+* [`templates/ratemymodule/`](api_htmx/templates/ratemymodule): Contains [HTML](https://wikipedia.org/wiki/HTML)-style
 [Django templates](https://docs.djangoproject.com/en/4.2/topics/templates)
 that are populated with the necessary [context data](https://docs.djangoproject.com/en/4.2/topics/class-based-views/generic-display#adding-extra-context),
 then sent as the final [HTML response](https://docs.djangoproject.com/en/4.2/ref/template-response)
@@ -204,7 +204,7 @@ Instructions for installing [Python 3.12](https://launchpad.net/~deadsnakes/+arc
 from the [deadsnakes repository](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa)
 can be found [here](https://makeuseof.com/install-python-ubuntu#use-deadsnakes-ppa-to-install-python-3-12-on-ubuntu).
 
-If you are running an [Arch Linux](https://archlinux.org/)-based [distribution](https://wikipedia.org/wiki/Linux_distribution)
+If you are running an [Arch Linux](https://archlinux.org)-based [distribution](https://wikipedia.org/wiki/Linux_distribution)
 you can install [Python 3.12](https://aur.archlinux.org/packages/python312) from the [AUR](https://wiki.archlinux.org/title/AUR).
 
 In all other [Linux distributions](https://wikipedia.org/wiki/Linux_distribution)
