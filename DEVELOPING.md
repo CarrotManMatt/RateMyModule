@@ -280,3 +280,8 @@ then navigate to the [`Languages & Frameworks > Django` page](https://jetbrains.
 9. Mark the following directories as [`Templates`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
 `api_htmx/templates/` & `web/templates/`
 10. Click the `Apply` button in the bottom-right corner to save your changes
+11. Open [Pycharm's settings pop-up](https://jetbrains.com/help/pycharm/settings-preferences-dialog.html)
+(`Ctrl+Alt+S`),
+then navigate to the [`Editor > Code Style` page](https://jetbrains.com/help/pycharm/2023.3/settings-code-style.html#line-separators)
+12. Set `Line Seperator` to be `Unix & macOS (\n)`, from the dropdown menu
+13. Click the `Apply` button in the bottom-right corner to save your changes
