@@ -9,12 +9,28 @@ from collections.abc import MutableSequence
 import django
 from django.conf import settings
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
 from core.views import AdminDocsRedirectView
 
 urlpatterns: MutableSequence[URLResolver | URLPattern] = [
+    django.urls.path(  # TODO: Verify domain once CI/CD pipeline is set up  # noqa: FIX002
+        r".well-known/microsoft-identity-association.json",
+        lambda _: JsonResponse(
+            {
+                "associatedApplications": [
+                    {
+                        "applicationId": (
+                            settings.SOCIALACCOUNT_PROVIDERS["microsoft"]["APP"]["client_id"]  # type: ignore[index]
+                        )
+                    }
+                ]
+            }
+        ),
+        name="microsoft-oauth-domain-verification"
+    ),
     django.urls.path(
         r"admin/doc/",
         django.urls.include("django.contrib.admindocs.urls")
