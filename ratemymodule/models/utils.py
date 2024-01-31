@@ -4,7 +4,8 @@ from collections.abc import Sequence
 
 __all__: Sequence[str] = ("AttributeDeleter", "CustomBaseModel")
 
-from collections.abc import Iterable
+from collections.abc import Iterable, MutableMapping, MutableSet
+from collections.abc import Set as ImmutableSet
 from typing import Final, Never
 
 from django.core.exceptions import FieldDoesNotExist
@@ -58,7 +59,7 @@ class CustomBaseModel(Model):
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         """Initialize a new model instance, capturing any proxy field values."""
-        proxy_fields: dict[str, object] = {
+        proxy_fields: MutableMapping[str, object] = {
             field_name: kwargs.pop(field_name)
             for field_name
             in set(kwargs.keys()) & self.get_proxy_field_names()
@@ -83,7 +84,7 @@ class CustomBaseModel(Model):
         (or equivalent for non-SQL backends), respectively.
         Normally, they should not be set.
         """
-        unexpected_kwargs: set[str] = set()
+        unexpected_kwargs: MutableSet[str] = set()
 
         field_name: str
         for field_name in set(kwargs.keys()) - self.get_proxy_field_names():
@@ -117,7 +118,7 @@ class CustomBaseModel(Model):
     update.alters_data: bool = True  # type: ignore[attr-defined, misc]
 
     @classmethod
-    def get_proxy_field_names(cls) -> set[str]:
+    def get_proxy_field_names(cls) -> ImmutableSet[str]:
         """
         Return the set of extra names of properties that can be saved to the database.
 
