@@ -12,7 +12,7 @@ providing a dynamic and user-friendly platform for honest reviews.
 - Delilah Lawes (dxl288@student.bham.ac.uk)
 - Matthew Norton (mxn282@student.bham.ac.uk)
 - Charles Wilson (cxw304@student.bham.ac.uk)
-- Thomas Rose (txr244@student.bham.ac.uk)
+- Thomas Rose (txr244@student.bham.ac.uk) (yes I can)
 - Ryan Bendall (rxb299@student.bham.ac.uk)
 - Arthur Crymble (axc1277@student.bham.ac.uk)
 
