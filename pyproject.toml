@@ -1,15 +1,14 @@
 [tool.poetry]
-name = "RateMyModule"
+name = "rate-my-module"
 version = "0.0.1"
 license = "GPL-3.0-or-later"
 description = "Enhanced student feedback for university modules; a dynamic and user-friendly platform for honest reviews."
 authors = [
-    "Ryan Bendall",
+    "Ryan Bendall <rxb299@student.bham.ac.uk>",
     "Matthew Norton <matt@carrotmanmatt.com>",
-    "Arthur Crymble",
-    "Conor Galvin",
-    "Charles Wilson",
-    "Thomas Rose",
+    "Arthur Crymble <axc1277@student.bham.ac.uk>",
+    "Charles Wilson <cxw304@student.bham.ac.uk>",
+    "Thomas Rose <txr244@student.bham.ac.uk>",
     "Delilah Lawes <dxl288@student.bham.ac.uk>"
 ]
 readme = "README.md"
@@ -37,8 +36,14 @@ setuptools = "^69.0"
 pre-commit = "^3.6"
 mypy = "~1.7"
 django-stubs = {extras = ["compatible-mypy"], version = "~4.2"}
-ruff = "^0.1"
+ruff = "^0.2"
 pymarkdownlnt = "^0.9"
+
+[tool.poetry.group.deploy]
+optional = true
+
+[tool.poetry.group.deploy.dependencies]
+gunicorn = "^21.0"
 
 
 [tool.mypy]

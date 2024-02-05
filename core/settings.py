@@ -51,8 +51,7 @@ raw_log_level: str
 if env("PRODUCTION"):
     # TODO(Matthew Norton): Add default `ALLOWED_HOSTS` & `ALLOWED_ORIGINS` once our group is given a domain from the Team Project module coordinators  # noqa: FIX002
     production_env: Env = EnvClass(  # type: ignore[no-any-unimported]
-        ALLOWED_HOSTS=(list, []),
-        ALLOWED_ORIGINS=(list, []),
+        ALLOWED_HOSTS=(list, ["team55.bham.team", "team55.dev.bham.team"]),
         LOG_LEVEL=(str, "WARNING")
     )
 
@@ -62,13 +61,14 @@ if env("PRODUCTION"):
     DEBUG = False
 
     ALLOWED_HOSTS = production_env("ALLOWED_HOSTS")
-    ALLOWED_ORIGINS = production_env("ALLOWED_ORIGINS")
-    CSRF_TRUSTED_ORIGINS = ALLOWED_ORIGINS.copy()
 
 else:
     development_env: Env = EnvClass(  # type: ignore[no-any-unimported]
         DEBUG=(bool, True),
-        ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
+        ALLOWED_HOSTS=(
+            list,
+            ["localhost", "127.0.0.1", "[::1]", ".localhost", "team55.dev.bham.team"]
+        ),
         LOG_LEVEL=(str, "INFO")
     )
 

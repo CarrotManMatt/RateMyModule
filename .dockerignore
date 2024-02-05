@@ -1,0 +1,17 @@
+.git
+.github
+.dockerignore
+.idea
+codeStyleConfig.xml
+CONTRIBUTING.md
+Dockerfile
+*.env
+*.example
+!.env
+poetry.lock
+pyproject.toml
+tests
+.pre-commit-config.yaml
+DEVELOPING.md
+manage.py
+docs/
