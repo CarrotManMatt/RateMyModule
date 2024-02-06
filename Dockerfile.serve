@@ -39,6 +39,6 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /app
 
-COPY api_htmx/ core/ ratemymodule/ web/ .env core.d[b] LICENSE ./
+COPY api_htmx/ core/ ratemymodule/ web/ .en[v] core.d[b] LICENSE ./
 
 ENTRYPOINT ["entrypoint.sh"]
