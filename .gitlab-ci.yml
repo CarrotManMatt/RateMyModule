@@ -15,7 +15,7 @@ check-updated-tag:
     before_script:
         - echo "installing yq"
         - python -m pip install pip --upgrade && python -m pip install yq==3.2.3
-        - apt-get update -y && apt-get install jq=1.6-2.1 -y
+        - sudo apt-get update -y && sudo apt-get install jq=1.6-2.1 -y
 
     script:
         - echo "ensuring version matches tag"
