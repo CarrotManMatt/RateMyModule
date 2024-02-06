@@ -63,8 +63,8 @@ build-stable-docker-image:
 
     script:
         - echo "building docker image stable version:$CI_COMMIT_TAG"
-        - docker build --cache-from $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG Dockerfile.serve
-        - docker build --cache-from $CI_REGISTRY_IMAGE:migrator-stable --tag $CI_REGISTRY_IMAGE:migrator-stable --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_TAG Dockerfile.migrate
+        - docker build --cache-from $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG -f Dockerfile.serve .
+        - docker build --cache-from $CI_REGISTRY_IMAGE:migrator-stable --tag $CI_REGISTRY_IMAGE:migrator-stable --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_TAG -f Dockerfile.migrate .
         - echo "pushing built images to GitLab repository"
         - docker push $CI_REGISTRY_IMAGE:stable
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
