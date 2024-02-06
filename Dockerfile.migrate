@@ -32,6 +32,10 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /app
 
-COPY api_htmx/ core/ ratemymodule/ web/ .en[v] core.d[b] core.sqlit[e] sqlite3.d[b] LICENSE manage.py ./
+COPY LICENSE .en[v] core.d[b] core.sqlit[e] sqlite3.d[b] manage.py ./
+COPY core/ ./core
+COPY api_htmx/ ./api_htmx
+COPY ratemymodule/ ./ratemymodule/
+COPY web/ ./web/
 
-ENTRYPOINT ["poetry", "run", "python", "manage.py", "migrate", "--no-input"]
+ENTRYPOINT ["./manage.py", "migrate", "--no-input"]
