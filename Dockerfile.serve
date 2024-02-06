@@ -8,7 +8,8 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_NO_INTERACTION=true \
     POETRY_VERSION=1.7.1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_VIRTUALENVS_CREATE=true
+    POETRY_VIRTUALENVS_CREATE=true \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
 RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential
 
