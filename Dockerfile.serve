@@ -7,10 +7,8 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DEFAULT_TIMEOUT=100 \
     POETRY_NO_INTERACTION=true \
     POETRY_VERSION=1.7.1 \
-    POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_VIRTUALENVS_CREATE=true \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+    POETRY_VIRTUALENVS_CREATE=true
 
 RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential
 
@@ -31,7 +29,7 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 WORKDIR /app
 
-RUN printf '#!/bin/sh\n\npoetry run manage.py collectstatic --no-input\npoetry run gunicorn core.wsgi:APPLICATION --bind=0.0.0.0:8000\n' > /app/entrypoint.sh
+RUN printf '#!/bin/sh\n\nmanage.py collectstatic --no-input\ngunicorn core.wsgi:APPLICATION --bind=0.0.0.0:8000\n' > /app/entrypoint.sh
 
 WORKDIR /
 
