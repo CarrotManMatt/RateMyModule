@@ -20,8 +20,8 @@ check-updated-tag:
         - apt-get install jq -y
 
     script:
-        - echo "ensuring version matches tag"
-        - tomlq --compact-output --raw-output '.tool.poetry.version' pyproject.toml | grep -q '$CI_COMMIT_TAG'
+        - echo "ensuring version matches tag:$CI_COMMIT_TAG"
+        - tomlq --compact-output --raw-output '.tool.poetry.version' pyproject.toml | grep -q $CI_COMMIT_TAG
 
 build-latest-docker-image:
     stage: build
