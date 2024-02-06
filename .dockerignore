@@ -3,16 +3,10 @@
 .dockerignore
 .idea
 codeStyleConfig.xml
-CONTRIBUTING.md
 Dockerfile
-.deploy-tools/
 *.env
 *.example
 !.env
-tests
 .pre-commit-config.yaml
 .gitlab-ci.yaml
 .gitlab-ci.yml
-DEVELOPING.md
-manage.py
-docs/

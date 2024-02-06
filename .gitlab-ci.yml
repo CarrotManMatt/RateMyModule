@@ -31,13 +31,18 @@ build-latest-docker-image:
         - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
         - echo "pulling most recent latest image for caching"
         - docker pull $CI_REGISTRY_IMAGE:latest || true
+        - docker pull $CI_REGISTRY_IMAGE:migrator-latest || true
 
     script:
         - echo "building docker image latest version"
-        - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+        - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA Dockerfile.serve
+        - echo "building docker image migrator-latest version"
+        - docker build --cache-from $CI_REGISTRY_IMAGE:migrator-latest --tag $CI_REGISTRY_IMAGE:migrator-latest --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA Dockerfile.migrate
         - echo "pushing built images to GitLab repository"
         - docker push $CI_REGISTRY_IMAGE:latest
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        - docker push $CI_REGISTRY_IMAGE:migrator-latest
+        - docker push $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA
 
 build-stable-docker-image:
     stage: build
@@ -54,11 +59,16 @@ build-stable-docker-image:
         - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
         - echo "pulling most recent stable image for caching"
         - docker pull $CI_REGISTRY_IMAGE:stable || true
+        - docker pull $CI_REGISTRY_IMAGE:migrator-stable || true
 
     script:
         - echo "building docker image stable version:$CI_COMMIT_TAG"
-        - docker build --cache-from $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG .
+        - docker build --cache-from $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG Dockerfile.serve
+        - docker build --cache-from $CI_REGISTRY_IMAGE:migrator-stable --tag $CI_REGISTRY_IMAGE:migrator-stable --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_TAG Dockerfile.migrate
         - echo "pushing built images to GitLab repository"
         - docker push $CI_REGISTRY_IMAGE:stable
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+        - docker push $CI_REGISTRY_IMAGE:migrator-stable
+        - docker push $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA
+        - docker push $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_TAG
