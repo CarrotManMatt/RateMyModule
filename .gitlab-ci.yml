@@ -35,9 +35,9 @@ build-latest-docker-image:
 
     script:
         - echo "building docker image latest version"
-        - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA Dockerfile.serve
+        - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA -f Dockerfile.serve .
         - echo "building docker image migrator-latest version"
-        - docker build --cache-from $CI_REGISTRY_IMAGE:migrator-latest --tag $CI_REGISTRY_IMAGE:migrator-latest --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA Dockerfile.migrate
+        - docker build --cache-from $CI_REGISTRY_IMAGE:migrator-latest --tag $CI_REGISTRY_IMAGE:migrator-latest --tag $CI_REGISTRY_IMAGE:migrator-$CI_COMMIT_SHA -f Dockerfile.migrate .
         - echo "pushing built images to GitLab repository"
         - docker push $CI_REGISTRY_IMAGE:latest
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
