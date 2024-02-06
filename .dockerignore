@@ -5,13 +5,14 @@
 codeStyleConfig.xml
 CONTRIBUTING.md
 Dockerfile
+.deploy-tools/
 *.env
 *.example
 !.env
-poetry.lock
-pyproject.toml
 tests
 .pre-commit-config.yaml
+.gitlab-ci.yaml
+.gitlab-ci.yml
 DEVELOPING.md
 manage.py
 docs/
