@@ -14,7 +14,7 @@ check-updated-tag:
 
     before_script:
         - echo "installing yq"
-        - pip install yq==0.9.17
+        - python -m pip install pip --upgrade --yes && python -m pip install yq==0.9.17 --yes
         - apt update -y && apt install jq=1.6-2.1 -y
 
     script:
