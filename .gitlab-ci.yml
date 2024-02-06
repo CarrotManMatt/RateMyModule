@@ -13,16 +13,14 @@ check-updated-tag:
         - python
 
     before_script:
+        - sudo apt-get update -y
+        - sudo pip install --upgrade pip
         - echo "installing yq"
-        - pip install pip --upgrade && pip install yq==3.2.3
-        - sudo apt-get update -y && sudo apt-get install jq -y
+        - sudo pip install yq==3.2.3
+        - sudo apt-get install jq -y
 
     script:
         - echo "ensuring version matches tag"
-        - echo $PATH
-        - ls /usr/local/bin
-        - ls /usr/bin
-        - which python
         - tomlq --compact-output --raw-output '.tool.poetry.version' pyproject.toml | grep -q '$CI_COMMIT_TAG'
 
 build-latest-docker-image:
