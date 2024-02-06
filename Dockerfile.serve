@@ -31,7 +31,7 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 WORKDIR /app
 
-RUN printf '#!/bin/sh\n\nmanage.py collectstatic --no-input\ngunicorn core.wsgi:APPLICATION --bind=0.0.0.0:8000\n' > /app/entrypoint.sh
+RUN printf '#!/bin/sh\n\npoetry run manage.py collectstatic --no-input\npoetry run gunicorn core.wsgi:APPLICATION --bind=0.0.0.0:8000\n' > /app/entrypoint.sh
 
 WORKDIR /
 
@@ -41,4 +41,4 @@ WORKDIR /app
 
 COPY api_htmx/ core/ ratemymodule/ web/ .en[v] core.d[b] LICENSE ./
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]

@@ -35,4 +35,4 @@ WORKDIR /app
 
 COPY api_htmx/ core/ ratemymodule/ web/ .en[v] core.d[b] core.sqlit[e] sqlite3.d[b] LICENSE manage.py ./
 
-ENTRYPOINT ["manage.py", "migrate", "--no-input"]
+ENTRYPOINT ["poetry", "run", "python", "manage.py", "migrate", "--no-input"]

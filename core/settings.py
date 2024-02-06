@@ -210,7 +210,7 @@ LOGGING = {
 
 ROOT_URLCONF = "core.urls"
 # noinspection PyUnresolvedReferences
-STATIC_ROOT = "staticfiles/"
+STATIC_ROOT = "/static/"
 STATIC_URL = "static/"
 SECRET_KEY = env("SECRET_KEY").strip()  # NOTE: Security Warning - The secret key is used for important secret stuff (keep the one used in production a secret!)
 CSRF_COOKIE_SECURE = True
