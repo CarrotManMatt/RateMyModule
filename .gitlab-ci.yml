@@ -13,11 +13,11 @@ check-updated-tag:
         - python
 
     before_script:
-        - sudo apt-get update -y
-        - sudo pip install --upgrade pip
+        - apt-get update -y
+        - pip install --upgrade pip
         - echo "installing yq"
-        - sudo pip install yq==3.2.3
-        - sudo apt-get install jq -y
+        - pip install yq==3.2.3
+        - apt-get install jq -y
 
     script:
         - echo "ensuring version matches tag"
