@@ -2,7 +2,6 @@ stages:
     - check
     - test
     - build
-    - deploy
 
 check-updated-tag:
     image: python:3
@@ -45,16 +44,6 @@ build-latest-docker-image:
         - docker push $CI_REGISTRY_IMAGE:latest
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
-deploy-latest-docker-image:
-    stage: deploy
-
-    rules:
-        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-    script:
-        - echo "deploying latest version:$CI_COMMIT_SHA"
-        - "curl -H 'Authorization: Bearer xtv1S-2BiZX4FYi{^s~(' https://webhook.site/5107495f-d4df-499e-b688-79a2ea15ad63 -I -s | head -n 1|cut -d$' ' -f2 | grep -q 200"
-
 build-stable-docker-image:
     stage: build
     tags:
@@ -78,13 +67,3 @@ build-stable-docker-image:
         - docker push $CI_REGISTRY_IMAGE:stable
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-
-deploy-stable-docker-image:
-    stage: deploy
-
-    rules:
-        - if: $CI_COMMIT_TAG
-
-    script:
-        - echo "deploying stable version:$CI_COMMIT_TAG"
-        - "curl -H 'Authorization: Bearer x7>*+w^i0pX-)+DH6uiJ' https://webhook.site/5107495f-d4df-499e-b688-79a2ea15ad63 -I -s | head -n 1|cut -d$' ' -f2 | grep -q 200"
