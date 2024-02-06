@@ -53,8 +53,8 @@ deploy-latest-docker-image:
 
     script:
         - "TOKEN_PREFIX='Authorization: Bearer '"
-        - echo "deploying latest version:$CI_COMMIT_TAG"
-        - curl -H $"$TOKEN_PREFIX$DEPLOY_LATEST_TOKEN" https://webhook.site/03f9f6fc-632b-44d7-a57c-5aa0cc7cebb4  -I -s | head -n 1|cut -d$' ' -f2 | grep -q 200
+        - echo "deploying latest version:$CI_COMMIT_SHA"
+        - curl -H $"$TOKEN_PREFIX$DEPLOY_LATEST_TOKEN$CI_COMMIT_SHA" https://webhook.site/03f9f6fc-632b-44d7-a57c-5aa0cc7cebb4  -I -s | head -n 1|cut -d$' ' -f2 | grep -q 200
 
 build-stable-docker-image:
     stage: build
@@ -89,4 +89,4 @@ deploy-stable-docker-image:
     script:
         - "TOKEN_PREFIX='Authorization: Bearer '"
         - echo "deploying stable version:$CI_COMMIT_TAG"
-        - curl -H $"$TOKEN_PREFIX$DEPLOY_STABLE_TOKEN" https://webhook.site/03f9f6fc-632b-44d7-a57c-5aa0cc7cebb4  -I -s | head -n 1|cut -d$' ' -f2 | grep -q 200
+        - curl -H $"$TOKEN_PREFIX$DEPLOY_STABLE_TOKEN$CI_COMMIT_TAG" https://webhook.site/03f9f6fc-632b-44d7-a57c-5aa0cc7cebb4  -I -s | head -n 1|cut -d$' ' -f2 | grep -q 200
