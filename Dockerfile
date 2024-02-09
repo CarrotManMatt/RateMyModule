@@ -44,6 +44,7 @@ RUN chmod +x manage.py
 
 COPY core/ ./core
 COPY api_htmx/ ./api_htmx
+COPY api_rest/ ./api_rest
 COPY ratemymodule/ ./ratemymodule/
 COPY web/ ./web/
 
