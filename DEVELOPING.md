@@ -78,6 +78,10 @@ sent to this [Django project](https://docs.djangoproject.com/en/4.2/ref/applicat
 - [`api_htmx`](api_htmx): The [HTMX](https://htmx.org) API [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
 that defines how to respond to [HTMX](https://htmx.org) [AJAX](https://wikipedia.org/wiki/Ajax_(programming))
 [requests](https://docs.djangoproject.com/en/4.2/topics/http) from web-based users
+- [`api_rest`](api_rest): The [REST](https://wikipedia.org/wiki/REST) API [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
+that defines how to respond to [JSON](https://json.org) [API](https://wikipedia.org/wiki/API)
+[requests](https://docs.djangoproject.com/en/4.2/topics/http) from [third-party API](https://wikipedia.org/wiki/Open_API)
+users
 
 ### Core
 
@@ -91,7 +95,8 @@ entry point, which defines how to traverse to every other [app's individual URL 
 used within the `core` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications).
 These must all be [lazily loaded](https://docs.djangoproject.com/en/4.2/topics/performance/#understanding-laziness)
 because they are imported before any of the [Django apps](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
-have been set up (I.e. **Do not import any objects from any of the [Django apps](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)**)
+have been set up.
+(I.e. **Do not import any objects from any of the [Django apps](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)**)
 - [`views.py`](core/views.py): Contains any simplistic [views](https://docs.djangoproject.com/en/4.2/topics/http/views)
 used directly within [`core/urls.py`](core/urls.py)
 - [`wsgi.py`](core/wsgi.py): Defines how WSGI webservers can process incoming [web requests](https://docs.djangoproject.com/en/4.2/topics/http)
@@ -118,7 +123,8 @@ to ensure that the database matches the model definitions
 specified within [`models/__init__.py`](ratemymodule/models/__init__.py)
 - [`tests/`](ratemymodule/tests): Collection of [unit-tests](https://wikipedia.org/wiki/Unit_testing)
 to ensure all functionality defined within the `ratemymodule` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
-works as expected. (See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
+works as expected.
+(See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
 - [`apps.py`](ratemymodule/apps.py): Contains the [configuration classes](https://docs.djangoproject.com/en/4.2/ref/applications#application-configuration)
 to provide metadata about the `ratemymodule` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
 
@@ -133,7 +139,8 @@ to provide metadata about the `web` [Django app](https://docs.djangoproject.com/
 [URL dispatcher](https://docs.djangoproject.com/en/4.2/topics/http/urls)
 - [`tests/`](web/tests): Collection of [unit-tests](https://wikipedia.org/wiki/Unit_testing)
 to ensure all functionality defined within the `web` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
-works as expected. (See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
+works as expected.
+(See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
 - [`templates/ratemymodule/`](web/templates/ratemymodule): Contains [HTML](https://wikipedia.org/wiki/HTML)-style
 [Django templates](https://docs.djangoproject.com/en/4.2/topics/templates)
 that are populated with the necessary [context data](https://docs.djangoproject.com/en/4.2/topics/class-based-views/generic-display#adding-extra-context),
@@ -155,12 +162,27 @@ to provide metadata about the `api_htmx` [Django app](https://docs.djangoproject
 - [`urls.py/`](api_htmx/urls.py): Contains the list of URLs available to the HTMX API [URL dispatcher](https://docs.djangoproject.com/en/4.2/topics/http/urls)
 - [`tests/`](api_htmx/tests): Collection of [unit-tests](https://wikipedia.org/wiki/Unit_testing)
 to ensure all functionality defined within the `api_htmx` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
-works as expected. (See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
+works as expected.
+(See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
 - [`templates/ratemymodule/`](api_htmx/templates/ratemymodule): Contains [HTML](https://wikipedia.org/wiki/HTML)-style
 [Django templates](https://docs.djangoproject.com/en/4.2/topics/templates)
 that are populated with the necessary [context data](https://docs.djangoproject.com/en/4.2/topics/class-based-views/generic-display#adding-extra-context),
 then sent as the final [HTML response](https://docs.djangoproject.com/en/4.2/ref/template-response)
 to an [HTMX API](https://htmx.org/docs#ajax) [request](https://docs.djangoproject.com/en/4.2/topics/http)
+
+### REST API
+
+- [`views/`](api_rest/views): Contains files that in-turn contain collections of [views](https://docs.djangoproject.com/en/4.2/topics/http/views)
+to respond to [HTTP requests](https://docs.djangoproject.com/en/4.2/topics/http)
+associated with the [REST API](https://wikipedia.org/wiki/REST)
+- [`apps.py`](api_rest/apps.py): Contains the [configuration classes](https://docs.djangoproject.com/en/4.2/ref/applications#application-configuration)
+to provide metadata about the `api_rest` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
+- [`urls.py/`](api_rest/urls.py): Contains the list of URLs available to the [REST API](https://wikipedia.org/wiki/REST)
+[URL dispatcher](https://docs.djangoproject.com/en/4.2/topics/http/urls)
+- [`tests/`](api_rest/tests): Collection of [unit-tests](https://wikipedia.org/wiki/Unit_testing)
+to ensure all functionality defined within the `api_rest` [Django app](https://docs.djangoproject.com/en/4.2/ref/applications#projects-and-applications)
+works as expected.
+(See [Django's testing documentation](https://docs.djangoproject.com/en/4.2/topics/testing))
 
 ## Setting Up Pycharm
 
@@ -294,9 +316,9 @@ then navigate to the [`Languages & Frameworks > Django` page](https://jetbrains.
 5. Click the `Apply` button in the bottom-right corner to save your changes
 6. Navigate to the [`Project: {project name} > Project Structure` settings page](https://jetbrains.com/help/pycharm/project-structure-dialog.html)
 7. Mark the following directories as [`Sources`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
-`api_htmx/`, `core/`, `ratemymodule/` & `web/`
+`api_htmx/`, `api_rest/`, core/`, `ratemymodule/` & `web/`
 8. Mark the following directories as [`Tests`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
-`api_htmx/tests/`, `ratemymodule/tests/` & `web/tests/`
+`api_htmx/tests/`, `api_rest/tests/`, `ratemymodule/tests/` & `web/tests/`
 9. Mark the following directories as [`Templates`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
 `api_htmx/templates/` & `web/templates/`
 10. Click the `Apply` button in the bottom-right corner to save your changes
