@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RateMyModule{% endblock %}</title>
+    <!-- Add any common CSS or JavaScript files here -->
+</head>
+<body>
+<header>
+    <!-- Navigation and other common header elements -->
+</header>
+
+<main>
+    {% block content %}
+        <!-- This block will be overridden by child templates -->
+    {% endblock %}
+</main>
+
+<footer>
+    <p>You are accessing an experimental web application developed by participants of the Team Project 2024 module.</p>
+</footer>
+</body>
+</html>

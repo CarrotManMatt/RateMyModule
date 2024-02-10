@@ -8,8 +8,9 @@ from collections.abc import MutableSequence
 
 import django
 from django.urls import URLPattern, URLResolver
-from django.views import defaults as default_views
+
+from web.views import HomeView
 
 urlpatterns: MutableSequence[URLResolver | URLPattern] = [
-    django.urls.path(r"", default_views.server_error, name="home"),
+    django.urls.path(r"", HomeView.as_view(), name="home"),
 ]

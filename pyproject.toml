@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rate-my-module"
-version = "0.0.1"
+version = "0.1.0"
 license = "GPL-3.0-or-later"
 description = "Enhanced student feedback for university modules; a dynamic and user-friendly platform for honest reviews."
 authors = [
