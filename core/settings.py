@@ -40,8 +40,7 @@ EnvClass: type[Env] = MyPyEnv if IMPORTED_BY_MYPY_OR_CHECK_OR_MIGRATE else FileA
 EnvClass.read_env(BASE_DIR / ".env")
 env: Env = EnvClass(  # type: ignore[no-any-unimported]
     PRODUCTION=(bool, True),
-    ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=(int, 1),
-    USE_X_FORWARDED_HOST=(bool, False)
+    ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=(int, 1)
 )
 
 
@@ -52,7 +51,7 @@ raw_log_level: str
 if env("PRODUCTION"):
     # TODO(Matthew Norton): Add default `ALLOWED_HOSTS` & `ALLOWED_ORIGINS` once our group is given a domain from the Team Project module coordinators  # noqa: FIX002
     production_env: Env = EnvClass(  # type: ignore[no-any-unimported]
-        ALLOWED_HOSTS=(list, ["team55.bham.team", "team55.dev.bham.team"]),
+        ALLOWED_HOSTS=(list, ["team55.bham.team", "team55.dev.bham.team", "ratemymodule"]),
         LOG_LEVEL=(str, "WARNING")
     )
 
@@ -68,7 +67,14 @@ else:
         DEBUG=(bool, True),
         ALLOWED_HOSTS=(
             list,
-            ["localhost", "127.0.0.1", "[::1]", ".localhost", "team55.dev.bham.team"]
+            [
+                "localhost",
+                "127.0.0.1",
+                "[::1]"
+                ".localhost",
+                "team55.dev.bham.team",
+                "ratemymodule"
+            ]
         ),
         LOG_LEVEL=(str, "INFO")
     )
@@ -218,7 +224,6 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SITE_ID = 1
 WSGI_APPLICATION = "core.wsgi.APPLICATION"
-USE_X_FORWARDED_HOST = env("USE_X_FORWARDED_HOST")
 
 
 # Application definition
