@@ -40,7 +40,8 @@ EnvClass: type[Env] = MyPyEnv if IMPORTED_BY_MYPY_OR_CHECK_OR_MIGRATE else FileA
 EnvClass.read_env(BASE_DIR / ".env")
 env: Env = EnvClass(  # type: ignore[no-any-unimported]
     PRODUCTION=(bool, True),
-    ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=(int, 1)
+    ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=(int, 1),
+    USE_X_FORWARDED_HOST=(bool, False)
 )
 
 
@@ -61,7 +62,6 @@ if env("PRODUCTION"):
     DEBUG = False
 
     ALLOWED_HOSTS = production_env("ALLOWED_HOSTS")
-    USE_X_FORWARDED_HOST = True
 
 else:
     development_env: Env = EnvClass(  # type: ignore[no-any-unimported]
@@ -218,6 +218,7 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SITE_ID = 1
 WSGI_APPLICATION = "core.wsgi.APPLICATION"
+USE_X_FORWARDED_HOST = env("USE_X_FORWARDED_HOST")
 
 
 # Application definition
