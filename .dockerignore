@@ -10,3 +10,6 @@ Dockerfile
 .pre-commit-config.yaml
 .gitlab-ci.yaml
 .gitlab-ci.yml
+dev_docs/
+docs/
+DEVELOPING.md

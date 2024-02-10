@@ -19,4 +19,4 @@ providing a dynamic and user-friendly platform for honest reviews.
 ## Development
 
 A full guide on how to get started with developing in this repository is available
-in [DEVELOPING.md](DEVELOPING.md).
+in [`start_here.md`](dev_docs/start_here.md), within the [developer documentation](dev_docs).
