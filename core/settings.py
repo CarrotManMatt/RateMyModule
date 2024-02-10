@@ -61,6 +61,7 @@ if env("PRODUCTION"):
     DEBUG = False
 
     ALLOWED_HOSTS = production_env("ALLOWED_HOSTS")
+    USE_X_FORWARDED_HOST = True
 
 else:
     development_env: Env = EnvClass(  # type: ignore[no-any-unimported]
