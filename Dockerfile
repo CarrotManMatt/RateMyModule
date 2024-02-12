@@ -12,7 +12,6 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
 RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential
-
 RUN pip install poetry
 
 WORKDIR /app
@@ -23,23 +22,17 @@ RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --n
 
 FROM python:3.12-slim as runtime
 
-ENV LANG=C.UTF-8
-
-ENV VIRTUAL_ENV=/app/.venv \
+ENV LANG=C.UTF-8 \
+    VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
-
 RUN printf '#!/bin/sh\n\n./manage.py migrate --no-input\n./manage.py collectstatic --no-input\ngunicorn core.wsgi:APPLICATION --bind=0.0.0.0:8000\n' > /app/entrypoint.sh
-
 WORKDIR /
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-
 WORKDIR /app
-
 COPY LICENSE .en[v] core.d[b] core.sqlit[e] sqlite3.d[b] manage.py ./
-
 RUN chmod +x manage.py
 
 COPY core/ ./core
