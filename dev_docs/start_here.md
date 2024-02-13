@@ -5,6 +5,7 @@
 - [Getting Started](#getting-started)
 - [Running The Development Server Locally](running_the_development_server_locally.md)
 - [Git Commit Messages](#git-commit-messages)
+- [Adding New Django Aspects](adding_new_django_aspects.md)
 - [Licence](#licence)
 - [Project Structure](project_structure.md)
 - [Setting Up Pycharm](setting_up_pycharm.md)

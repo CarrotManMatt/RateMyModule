@@ -39,7 +39,7 @@ git config --global core.autocrlf input
 
 This project requires [Python 3.12](https://python.org/downloads/release/python-3121)
 specifically.
-You have to use this version, even if you already have a lower version (E.g. Python 3.11),
+You have to use this version, even if you already have a lower version (E.g. Python 3.11)
 already installed.
 
 If you already have [Python 3.12](https://python.org/downloads/release/python-3121) installed,
