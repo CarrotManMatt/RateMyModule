@@ -58,6 +58,12 @@ using [this online key-gen tool (Djecrety)](https://djecrety.ir)
 Someone in your team is likely to have already set up the [external OAUTH providers](https://docs.allauth.org/en/latest/socialaccount/providers),
 so **check with your team as to where the existing values for these environment variables
 are stored!**
+5. Set the [environment variable](https://wikipedia.org/wiki/Environment_variable) `PRODUCTION` to `False`
+6. When [`DEBUG`](https://docs.djangoproject.com/en/4.2/ref/settings#debug) is set to `True`
+any [emails](https://docs.djangoproject.com/en/4.2/topics/email)
+(E.g. [email address verification messages](https://docs.allauth.org/en/latest/account/views.html#email-verification))
+will be sent to the console,
+this means that you **don't** need to set any of [the `EMAIL_` environment variables](https://docs.djangoproject.com/en/4.2/topics/email#smtp-backend)
 
 ## Manually Running The Development Server From The Terminal
 

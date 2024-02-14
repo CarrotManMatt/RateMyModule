@@ -6,10 +6,12 @@ __all__: Sequence[str] = ("AttributeDeleter", "CustomBaseModel")
 
 from collections.abc import Iterable, MutableMapping, MutableSet
 from collections.abc import Set as ImmutableSet
-from typing import Final, Never
+from typing import Final, Never, override
 
 from django.core.exceptions import FieldDoesNotExist
+from django.db import models
 from django.db.models import Model
+from django.utils.translation import gettext_lazy as _
 
 
 class AttributeDeleter:
@@ -36,29 +38,21 @@ class CustomBaseModel(Model):
     the database (see https://docs.djangoproject.com/en/4.2/topics/db/models/#abstract-base-classes).
     """
 
+    date_time_created = models.DateTimeField(_("Date & Time Created"), auto_now_add=True)
+
     class Meta:
         """Metadata options about this model."""
 
         abstract = True
 
+    @override
     def save(self, *, force_insert: bool = False, force_update: bool = False, using: str | None = None, update_fields: Iterable[str] | None = None) -> None:  # type: ignore[override] # noqa: E501
-        """
-        Save the current instance to the database, only after the model has been cleaned.
-
-        Cleaning the model ensures all data in the database is valid, even if the data was not
-        added via a ModelForm (E.g. data is added using the ORM API).
-
-        The 'force_insert' and 'force_update' parameters can be used
-        to insist that the "save" must be an SQL insert or update
-        (or equivalent for non-SQL backends), respectively.
-        Normally, they should not be set.
-        """
         self.full_clean()
 
         return super().save(force_insert, force_update, using, update_fields)
 
+    @override
     def __init__(self, *args: object, **kwargs: object) -> None:
-        """Initialize a new model instance, capturing any proxy field values."""
         proxy_fields: MutableMapping[str, object] = {
             field_name: kwargs.pop(field_name)
             for field_name

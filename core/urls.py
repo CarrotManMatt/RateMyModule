@@ -16,7 +16,7 @@ from django.views.generic import RedirectView
 from core.views import AdminDocsRedirectView
 
 urlpatterns: MutableSequence[URLResolver | URLPattern] = [
-    django.urls.path(  # TODO: Verify domain once CI/CD pipeline is set up  # noqa: FIX002
+    django.urls.path(
         r".well-known/microsoft-identity-association.json",
         lambda _: JsonResponse(
             {

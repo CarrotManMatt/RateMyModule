@@ -8,4 +8,6 @@ from django.views.generic import TemplateView
 
 
 class HomeView(TemplateView):
-    template_name: str = "ratemymodule/home.html"
+    """Main Dashboard view, for users to look at the most recent posts about uni modules."""
+
+    template_name = "ratemymodule/home.html"

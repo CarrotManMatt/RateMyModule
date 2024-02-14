@@ -130,7 +130,7 @@ then navigate to the [`Languages & Frameworks > Django` page](https://jetbrains.
 5. Click the `Apply` button in the bottom-right corner to save your changes
 6. Navigate to the [`Project: {project name} > Project Structure` settings page](https://jetbrains.com/help/pycharm/project-structure-dialog.html)
 7. Mark the following directories as [`Sources`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
-`api_htmx/`, `api_rest/`, core/`, `ratemymodule/` & `web/`
+`api_htmx/`, `api_rest/`, `core/`, `ratemymodule/` & `web/`
 8. Mark the following directories as [`Tests`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
 `api_htmx/tests/`, `api_rest/tests/`, `ratemymodule/tests/` & `web/tests/`
 9. Mark the following directories as [`Templates`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):

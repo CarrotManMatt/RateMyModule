@@ -26,16 +26,19 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.12"
 django = "~4.2"  # NOTE: Django is pinned below version 5.0 because the django-stubs package is not yet compatable with Django 5.0 (see https://github.com/typeddjango/django-stubs/issues/1493 for the tracked issue)
-django-allauth = "^0.60"
+django-allauth = "^0.61"
 django-environ = "^0.11"
 django-admin-rangefilter = "^0.12"
+confusable_homoglyphs = "^3.3"
+tldextract = "^5.1"
 classproperties = {git = "https://github.com/hottwaj/classproperties.git"}
-setuptools = "^69.0"
+setuptools = "^69.1"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.6"
 mypy = "~1.7"
 django-stubs = {extras = ["compatible-mypy"], version = "~4.2"}
+django-stubs-ext = "~4.2"
 ruff = "^0.2"
 pymarkdownlnt = "^0.9"
 
@@ -69,7 +72,12 @@ strict_equality = true
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = ["environ"]
+module = [
+    "confusable_homoglyphs",
+    "environ",
+    "allauth.account.models",
+    "allauth.socialaccount.models"
+]
 ignore_missing_imports = true
 
 [tool.django-stubs]
@@ -77,6 +85,19 @@ django_settings_module = "core.settings"
 
 
 [tool.ruff]
+line-length = 95
+target-version ="py312"
+extend-exclude = [
+    "ratemymodule/**/migrations/",
+    "venv/",
+    ".vscode",
+    ".idea",
+    ".mypy_cache",
+    ".ruff_cache",
+    "__pycache__"
+]
+
+[tool.ruff.lint]
 select = [
     "E",
     "F",
@@ -123,6 +144,7 @@ select = [
     "PERF",
     "RUF"
 ]
+fixable = ["I001", "TCH", "F401", "RUF100"]
 ignore = [
     "N818",
     "N806",
@@ -139,11 +161,9 @@ ignore = [
     "TD003",
     "PLR0911",
     "PLR0915",
-    "TRY400"
+    "TRY400",
+    "UP040"  # NOTE: Mypy does not currently support PEP 695 type aliases, so they should not be used
 ]
-line-length = 95
-fixable = ["I001", "TCH", "F401", "RUF100"]
-target-version ="py312"
 task-tags = [
     "TODO",
     "FIXME",
@@ -155,35 +175,27 @@ task-tags = [
     "NOTE",
     "ISSUE"
 ]
-extend-exclude = [
-    "ratemymodule/**/migrations/",
-    "venv/",
-    ".vscode",
-    ".idea",
-    ".mypy_cache",
-    ".ruff_cache",
-    "__pycache__"
-]
 
-[tool.ruff.flake8-pytest-style]
+
+[tool.ruff.lint.flake8-pytest-style]
 parametrize-values-type = "tuple"
 
-[tool.ruff.flake8-self]
+[tool.ruff.lint.flake8-self]
 extend-ignore-names = ["_base_manager", "_default_manager",  "_meta", "_get_wrap_line_width"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 18
 
-[tool.ruff.pycodestyle]
+[tool.ruff.lint.pycodestyle]
 ignore-overlong-task-comments = true
 max-doc-length = 95
 
-[tool.ruff.pylint]
+[tool.ruff.lint.pylint]
 allow-magic-value-types = ["str", "bytes", "int"]
 max-args = 7
 max-branches = 19
 
-[tool.ruff.pyupgrade]
+[tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
 
 

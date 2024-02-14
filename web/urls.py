@@ -5,12 +5,15 @@ from collections.abc import Sequence
 __all__: Sequence[str] = ("urlpatterns",)
 
 from collections.abc import MutableSequence
+from typing import Final
 
 import django
 from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
 from web.views import HomeView
+
+app_name: Final[str] = "ratemymodule"
 
 view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(r"", HomeView.as_view(), name="home")

@@ -13,3 +13,12 @@ class RateMyModuleConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "ratemymodule"
     verbose_name = "RateMyModule"
+
+    def ready(self) -> None:
+        """
+        Ensure the signal handlers within this app are loaded and waiting for signals.
+
+        This ready function should be called whenever this config class is imported.
+        """
+        from ratemymodule.models import signals
+        signals.ready()

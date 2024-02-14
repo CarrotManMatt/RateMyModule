@@ -15,9 +15,15 @@ from pathlib import Path
 from typing import Final
 
 import django.urls
+import django_stubs_ext
 from environ import Env, FileAwareEnv, ImproperlyConfigured
 
 from core.utils import MyPyEnv, reverse_url_with_get_params_lazy
+
+# Monkeypatching Django, so stubs will work for all generics,
+# see: https://github.com/typeddjango/django-stubs
+django_stubs_ext.monkeypatch()
+
 
 # NOTE: Build paths inside the project like this: BASE_DIR / "subdir"
 BASE_DIR: Path = Path(__file__).resolve().parent.parent
@@ -35,21 +41,26 @@ IMPORTED_BY_MYPY_OR_CHECK_OR_MIGRATE: Final[bool] = (
     or "migrate" in sys.argv
     or "makemigrations" in sys.argv
 )
+
 EnvClass: type[Env] = MyPyEnv if IMPORTED_BY_MYPY_OR_CHECK_OR_MIGRATE else FileAwareEnv  # type: ignore[no-any-unimported]
 
 EnvClass.read_env(BASE_DIR / ".env")
 env: Env = EnvClass(  # type: ignore[no-any-unimported]
     PRODUCTION=(bool, True),
-    ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=(int, 1)
+    ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=(int, 1),
+    EMAIL_PORT=(int, 25),
+    EMAIL_HOST_USER=(str, ""),
+    EMAIL_HOST_PASSWORD=(str, ""),
+    EMAIL_USE_TLS=(bool, False),
+    EMAIL_USE_SSL=(bool, False)
 )
 
 
-# Production Vs Development settings
+# Production Vs Development Settings
 
 raw_log_level: str
 
 if env("PRODUCTION"):
-    # TODO(Matthew Norton): Add default `ALLOWED_HOSTS` & `ALLOWED_ORIGINS` once our group is given a domain from the Team Project module coordinators  # noqa: FIX002
     production_env: Env = EnvClass(  # type: ignore[no-any-unimported]
         ALLOWED_HOSTS=(list, ["team55.bham.team", "team55.dev.bham.team", "ratemymodule"]),
         LOG_LEVEL=(str, "WARNING")
@@ -84,6 +95,11 @@ else:
     DEBUG = development_env("DEBUG")
 
     ALLOWED_HOSTS = development_env("ALLOWED_HOSTS")
+
+    if DEBUG:
+        debug_env: Env = EnvClass(EMAIL_TO_CONSOLE=(bool, True))  # type: ignore[no-any-unimported]
+        if debug_env("EMAIL_TO_CONSOLE"):
+            EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # Environment Variables Validation
@@ -179,7 +195,7 @@ if not re.match(r"\A[0-9A-Za-z.~_-]{40}\Z", env("OAUTH_MICROSOFT_SECRET").strip(
     raise ImproperlyConfigured(INVALID_OAUTH_MICROSOFT_SECRET_MESSAGE)
 
 
-# Logging settings
+# Logging Settings
 
 # noinspection SpellCheckingInspection
 LOGGING = {
@@ -285,8 +301,7 @@ SIGNUP_URL = reverse_url_with_get_params_lazy(
 
 # Auth Model Settings
 
-# TODO(Matthew Norton): Add user model  # noqa: FIX002
-# AUTH_USER_MODEL = "ratemymodule.User"  # noqa: ERA001
+AUTH_USER_MODEL = "ratemymodule.User"
 
 
 # Authentication Configuration Settings (mainly for allauth & its associated packages)
@@ -296,6 +311,7 @@ ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USER_DISPLAY = lambda user: str(user)  # noqa: E731
 ACCOUNT_USERNAME_MIN_LENGTH = 5
+ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = env("ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS")
 ACCOUNT_EMAIL_REQUIRED = True
@@ -331,8 +347,25 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+# Email Settings
 
-# Template settings
+# noinspection PyUnboundLocalVariable
+if "EMAIL_BACKEND" not in locals() or "smtp" in EMAIL_BACKEND.lower():
+    EMAIL_HOST = env("EMAIL_HOST")
+
+    if not 0 <= env("EMAIL_PORT") <= 65353:
+        INVALID_EMAIL_PORT_MESSAGE: Final[str] = (
+            "EMAIL_PORT must be a valid port number between & including 0 - 65353."
+        )
+    EMAIL_PORT = env("EMAIL_PORT")
+
+    EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+    EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+    EMAIL_USE_SSL = env("EMAIL_USE_SSL")
+
+
+# Template Settings
 
 # noinspection PyUnresolvedReferences
 TEMPLATES = [
@@ -363,7 +396,7 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# Internationalization, Language & Time settings
+# Internationalization, Language & Time Settings
 
 LANGUAGE_CODE = "en-gb"
 TIME_ZONE = "Europe/London"
