@@ -8,10 +8,10 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_NO_INTERACTION=true \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_VIRTUALENVS_CREATE=true \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+    POETRY_CACHE_DIR=/tmp/poetry_cache \
+    POETRY_HOME=/opt/poetry
 
 RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential
-RUN export POETRY_HOME=/opt/poetry
 RUN python3 -m venv $POETRY_HOME
 RUN $POETRY_HOME/bin/pip install poetry==1.7.1
 
