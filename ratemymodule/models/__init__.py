@@ -94,7 +94,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
     # noinspection SpellCheckingInspection
     emailaddress_set: RelatedManager[EmailAddress]  # type: ignore[no-any-unimported]
     made_post_set: RelatedManager["Post"]
-    # made_report_set: RelatedManager[Report]
+    made_report_set: RelatedManager["Report"]
 
     USERNAME_FIELD: Final[str] = "email"
     EMAIL_FIELD: Final[str] = "email"
@@ -299,8 +299,7 @@ class Post(CustomBaseModel):
         verbose_name=_("Topic Tags")
     )
 
-    # TODO: Uncomment the following Manager type-annotation once the `Report` model is defined
-    # report_set: RelatedManager[Report]
+    report_set: RelatedManager["Report"]
     liked_user_set: RelatedManager[User]
     disliked_user_set: RelatedManager[User]
 
@@ -358,13 +357,58 @@ class Post(CustomBaseModel):
         # ).first().student_type
         raise NotImplementedError
 
-    # TODO: Uncomment the following method once the `Report` model is defined
-    # def report(self, reporter: User, report_type: Report.Type) -> None:
-    #     """Report this post by the given user."""
-    #     Report.objects.create(post=self, reporter=reporter, type=report_type)
+    def report(self, reporter: User, reason: "Report.Reasons") -> None:
+        """Report this post by the given user."""
+        Report.objects.create(post=self, reporter=reporter, reason=reason)
 
     @override
     def __str__(self) -> str:
         # TODO: Update the string representation once the `Module` model is defined
         # return f"Post by {self.user.username} for module {self.module.name}"
         raise NotImplementedError
+
+
+class Report(CustomBaseModel):
+    """Model class for reports, that users can make about posts."""
+
+    class Reasons(models.TextChoices):
+        """Enum of reason codes & display values of each reason."""
+
+        HATE = "HAT", _("Hate Speech or Language")
+        IDENTIFYING_INFO = "IDE", _("Identifying Information")
+        ASSIGNMENT_ANSWERS = "ANS", _("Assignment Answers")
+        SPAM = "SPM", _("SPAM")
+        BULLYING = "BUL", _("Bullying or Harassment")
+        FALSE_INFO = "FLS", _("False Information")
+        SEXUAL = "SEX", _("Sexual Content")
+
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name="report_set",
+        verbose_name=_("Post")
+    )
+    reporter = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="made_report_set",
+        verbose_name=_("User")
+    )
+    reason = models.CharField(
+        choices=Reasons.choices,
+        max_length=3,
+        verbose_name=_("Reason")
+    )
+    solved = models.BooleanField(
+        _("Is_Solved"),
+        default=False
+    )
+
+    class Meta:
+        """Metadata options about this model."""
+
+        verbose_name = _("Report")
+
+    @override
+    def __str__(self) -> str:
+        return f"Report by {self.reporter} for {self.reason} on post {self.post}"
