@@ -35,21 +35,21 @@ git config --global core.autocrlf true
 git config --global core.autocrlf input
 ```
 
-## 3. Install [Python 3.12](https://python.org/downloads/release/python-3121)
+## 3. Install [Python 3.12](https://python.org/downloads/release/python-3122)
 
-This project requires [Python 3.12](https://python.org/downloads/release/python-3121)
+This project requires [Python 3.12](https://python.org/downloads/release/python-3122)
 specifically.
 You have to use this version, even if you already have a lower version (E.g. Python 3.11)
 already installed.
 
-If you already have [Python 3.12](https://python.org/downloads/release/python-3121) installed,
+If you already have [Python 3.12](https://python.org/downloads/release/python-3122) installed,
 you can skip this step.
 
-### Installing [Python 3.12](https://python.org/downloads/release/python-3121) on [Windows](https://wikipedia.org/wiki/Microsoft_Windows)
+### Installing [Python 3.12](https://python.org/downloads/release/python-3122) on [Windows](https://wikipedia.org/wiki/Microsoft_Windows)
 
-The [Windows](https://wikipedia.org/wiki/Microsoft_Windows) installer can be downloaded [here](https://python.org/ftp/python/3.12.1/python-3.12.1-amd64.exe).
+The [Windows](https://wikipedia.org/wiki/Microsoft_Windows) installer can be downloaded [here](https://python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe).
 
-### Installing [Python 3.12](https://python.org/downloads/release/python-3121) on [Linux](https://wikipedia.org/wiki/Linux)
+### Installing [Python 3.12](https://python.org/downloads/release/python-3122) on [Linux](https://wikipedia.org/wiki/Linux)
 
 If you are running an [Ubuntu](https://ubuntu.com)-based [distribution](https://wikipedia.org/wiki/Linux_distribution)
 you can add the [deadsnakes third-party repository](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa),
@@ -63,12 +63,12 @@ If you are running an [Arch Linux](https://archlinux.org)-based [distribution](h
 you can install [Python 3.12](https://aur.archlinux.org/packages/python312) from the [AUR](https://wiki.archlinux.org/title/AUR).
 
 In all other [Linux distributions](https://wikipedia.org/wiki/Linux_distribution)
-you will need to install [Python 3.12](https://python.org/downloads/release/python-3121)
+you will need to install [Python 3.12](https://python.org/downloads/release/python-3122)
 from source.
-Make sure that you install [Python 3.12](https://python.org/downloads/release/python-3121)
+Make sure that you install [Python 3.12](https://python.org/downloads/release/python-3122)
 under a different alias, so that it does not conflict with your pre-installed Python version
 (E.g. `python312` instead of ~~`python3`~~).
-A good set of installation instructions can be found [here](https://aruljohn.com/blog/install-python#download-python-3121-source).
+A good set of installation instructions can be found [here](https://aruljohn.com/blog/install-python#download-python-3122-source).
 
 ## 4. Install [Poetry](https://python-poetry.org)
 
@@ -104,7 +104,7 @@ then navigate to the `Project: {project name} > Python Interpreter` page
 3. Because you have already installed [Poetry]([Poetry](https://python-poetry.org))
 you should see the `Poetry Environment` option, select this
 4. Choose `New Poetry Environment` (**not ~~`Existing environment`~~**)
-5. Select [Python 3.12](https://python.org/downloads/release/python-3121)
+5. Select [Python 3.12](https://python.org/downloads/release/python-3122)
 from the `Base interpreter:` drop-down menu
 6. **Uncheck** `Install packages from pyproject.toml`
 7. Click `OK` to create the new [Python virtual environment](https://realpython.com/python-virtual-environments-a-primer#what-is-a-python-virtual-environment)
