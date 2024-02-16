@@ -14,21 +14,22 @@ repos:
 
   - repo: local
     hooks:
-      - id: django-makemigrations-check
-        name: check django models are consistent with migrations
-        entry: poetry run python manage.py
-        args: [makemigrations, --check, --dry-run]
+      - id: django-check
+        name: check for major errors in django project
+        entry: .local-pre-commit-scripts/django-check.bash
         language: system
         types: [python]
         pass_filenames: false
 
-      - id: django-check
-        name: check for major errors in django project
-        entry: poetry run python manage.py
-        args: [check]
-        language: system
-        types: [python]
-        pass_filenames: false
+  - repo: https://github.com/ecugol/pre-commit-hooks-django
+    rev: v0.4.0
+    hooks:
+      - id: check-absent-migrations
+
+  - repo: https://github.com/jackdewinter/pymarkdown
+    rev: v0.9.17
+    hooks:
+      - id: pymarkdown
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

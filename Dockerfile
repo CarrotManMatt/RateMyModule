@@ -6,19 +6,20 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     POETRY_NO_INTERACTION=true \
-    POETRY_VERSION=1.7.1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_VIRTUALENVS_CREATE=true \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
 RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential
-RUN pip install poetry
+RUN export POETRY_HOME=/opt/poetry
+RUN python3 -m venv $POETRY_HOME
+RUN $POETRY_HOME/bin/pip install poetry==1.7.1
 
 WORKDIR /app
 
 COPY poetry.lock pyproject.toml README.md ./
 
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root --no-interaction --with deploy
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR $POETRY_HOME/bin/poetry install --without dev --no-root --no-interaction --with deploy
 
 FROM python:3.12-slim as runtime
 

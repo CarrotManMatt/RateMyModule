@@ -23,13 +23,13 @@ for your chosen operating system.
 2. Configure your [OS-dependent line separators](https://wikipedia.org/wiki/Newline#Representation)
 with the following commands:
 
-### On [Windows](https://wikipedia.org/wiki/Microsoft_Windows):
+### On [Windows](https://wikipedia.org/wiki/Microsoft_Windows)
 
 ```shell
 git config --global core.autocrlf true
 ```
 
-### On [Linux](https://wikipedia.org/wiki/Linux):
+### On [Linux](https://wikipedia.org/wiki/Linux)
 
 ```shell
 git config --global core.autocrlf input

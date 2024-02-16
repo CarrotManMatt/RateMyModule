@@ -58,7 +58,8 @@ using [this online key-gen tool (Djecrety)](https://djecrety.ir)
 Someone in your team is likely to have already set up the [external OAUTH providers](https://docs.allauth.org/en/latest/socialaccount/providers),
 so **check with your team as to where the existing values for these environment variables
 are stored!**
-5. Set the [environment variable](https://wikipedia.org/wiki/Environment_variable) `PRODUCTION` to `False`
+5. Set the [environment variable](https://wikipedia.org/wiki/Environment_variable) `PRODUCTION`
+to `False`
 6. When [`DEBUG`](https://docs.djangoproject.com/en/4.2/ref/settings#debug) is set to `True`
 any [emails](https://docs.djangoproject.com/en/4.2/topics/email)
 (E.g. [email address verification messages](https://docs.allauth.org/en/latest/account/views.html#email-verification))
@@ -80,4 +81,4 @@ poetry run python manage.py runserver localhost:8000
 ```
 
 You can then view the running [web pages](https://wikipedia.org/wiki/Web_page) from the [URL](https://wikipedia.org/wiki/URL):
-http://localhost:8000
+[http://localhost:8000](http://localhost:8000)

@@ -15,6 +15,8 @@ __all__: Sequence[str] = (
 )
 
 import json
+import random
+import string
 from collections.abc import Callable, Collection, Mapping
 from pathlib import Path
 from typing import TypeVar
@@ -47,7 +49,54 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
             )
         except ImproperlyConfigured:
             value: str
-            if cast in (str, tuple, list, urlparse, None):
+            if var == "OAUTH_GOOGLE_CLIENT_ID":
+                # noinspection SpellCheckingInspection
+                value = (
+                    f"{"".join(random.choices(string.digits, k=12))}-"
+                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=32))}"
+                    f".apps.googleusercontent.com"
+                )
+            elif var == "OAUTH_MICROSOFT_CLIENT_ID":
+                value = (
+                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=8))}-"
+                    f"{"".join(random.choices(string.digits, k=4))}-"
+                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=4))}-"
+                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=4))}-"
+                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=12))}"
+                )
+            elif var == "OAUTH_GOOGLE_SECRET":
+                value = (
+                    f"{"".join(random.choices(string.ascii_uppercase, k=6))}-"
+                    f"{
+                        "".join(
+                            random.choices(
+                                (
+                                    string.digits
+                                    + string.ascii_uppercase
+                                    + string.ascii_lowercase
+                                ),
+                                k=28
+                            )
+                        )
+                    }"
+                )
+            elif var == "OAUTH_MICROSOFT_SECRET":
+                value = (
+                    f"{
+                        "".join(
+                            random.choices(
+                                (
+                                    string.digits
+                                    + string.ascii_uppercase
+                                    + string.ascii_lowercase
+                                    + ".~_-"
+                                ),
+                                k=40
+                            )
+                        )
+                    }"
+                )
+            elif cast in (str, tuple, list, urlparse, None):
                 value = "value"
             elif cast in (bool, int, float, json.loads):
                 value = "0"
