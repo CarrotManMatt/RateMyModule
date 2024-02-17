@@ -2,7 +2,18 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("BaseTag", "ToolTag", "TopicTag", "OtherTag", "Post", "User")
+__all__: Sequence[str] = (
+    "User",
+    "University",
+    "Course",
+    "Module",
+    "BaseTag",
+    "ToolTag",
+    "TopicTag",
+    "OtherTag",
+    "Post",
+    "Report"
+)
 
 from collections.abc import Set as ImmutableSet
 from datetime import datetime
@@ -11,6 +22,7 @@ from typing import TYPE_CHECKING, Final, override
 from allauth.account.models import EmailAddress
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinLengthValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -82,13 +94,13 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         help_text=_("The set of posts this user has disliked."),
         blank=True
     )
-    # enrolled_course_set = models.ManyToManyField(
-    #     "ratemymodule.Course",
-    #     related_name="enrolled_users",
-    #     verbose_name=_("Enrolled Courses"),
-    #     help_text=_("The set of courses this user has enrolled in."),
-    #     blank=False
-    # )
+    enrolled_course_set = models.ManyToManyField(
+        "ratemymodule.Course",
+        related_name="enrolled_users",
+        verbose_name=_("Enrolled Courses"),
+        help_text=_("The set of courses this user has enrolled in."),
+        blank=False
+    )
 
     objects = UserManager()
     # noinspection SpellCheckingInspection
@@ -108,9 +120,14 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
     def date_time_joined(self, __value: datetime) -> None:
         self.date_time_created = __value
 
-    # @property
-    # def university(self) -> University:
-    #     return self.enrolled_course_set.first().university
+    @property
+    def university(self) -> "University":
+        """Shortcut accessor to the university this user is a student at."""
+        first_enrolled_course: Course | None = self.enrolled_course_set.first()
+        if not first_enrolled_course:
+            raise Course.DoesNotExist
+
+        return first_enrolled_course.university
 
     class Meta:
         """Metadata options about this model."""
@@ -145,14 +162,14 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
             self.is_staff = True
 
         # TODO: Also signal when adding new course to user & vice-versa
-        # if self.enrolled_course_set.exclude(university=self.university).exists():
-        #     raise ValidationError(
-        #         {
-        #             "university":
-        #                 "This user is linked to courses across multiple universities."
-        #         },
-        #         code="invalid"
-        #     )
+        if self.enrolled_course_set.exclude(university=self.university).exists():
+            raise ValidationError(
+                {
+                    "university":
+                        "This user is linked to courses across multiple universities."
+                },
+                code="invalid"
+            )
 
         # TODO: University email validator upon signup
         # TODO: Validate like & unlike a post (no conflicts)
@@ -177,6 +194,113 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         """Remove like and dislike from a given post, for this user."""
         self.liked_post_set.remove(post)
         self.disliked_post_set.remove(post)
+
+
+class University(CustomBaseModel):
+    """Model class for universities that have many courses."""
+
+    name = models.CharField(
+        max_length=60,
+        unique=True,
+        verbose_name=_("Name"),
+        validators=[MinLengthValidator(2)]
+    )
+    short_name = models.CharField(
+        max_length=5,
+        unique=False,
+        verbose_name=_("Short Name"),
+        validators=[MinLengthValidator(2)]
+    )
+    email_domain = models.CharField(
+        max_length=253,
+        unique=True,
+        verbose_name=_("Email Domain")
+    )
+    founding_date = models.DateField(
+        verbose_name=_("Date Founded"),
+        help_text=_("Date format DD/MM/YYYY")
+    )
+
+    course_set: RelatedManager["Course"]
+
+    class Meta:
+        """Metadata options about this model."""
+
+        verbose_name = _("University")
+
+    @override
+    def __str__(self) -> str:
+        return self.name
+
+
+class Course(CustomBaseModel):
+    """Model class for Courses that users can be enrolled in."""
+
+    name = models.CharField(
+        max_length=60,
+        verbose_name=_("Name")
+    )
+    student_type = models.CharField(
+        max_length=60,
+        verbose_name=_("Student Type")
+    )
+    university = models.ForeignKey(
+        University,
+        related_name="course_set",
+        verbose_name=_("University"),
+        on_delete=models.PROTECT,
+        help_text=_("The university that this course is taught at")
+    )
+
+    module_set: RelatedManager["Module"]
+
+    class Meta:
+        """Metadata options about this model."""
+
+        verbose_name = _("Course")
+
+    @override
+    def __str__(self) -> str:
+        return self.name
+
+
+class Module(CustomBaseModel):
+    """Model class for modules that can have posts made about them."""
+
+    name = models.CharField(
+        max_length=60,
+        verbose_name=_("Name"),
+    )
+    year_started = models.DateField(
+        verbose_name=_("Year Started"),
+        help_text=_("Date format DD/MM/YYYY")
+    )
+    code = models.CharField(
+        max_length=60,
+        unique=True,
+        verbose_name=_("Reference Code"),
+        help_text=_("The unique reference code of this module within its university")
+    )
+    course_set = models.ManyToManyField(
+        Course,
+        related_name="module_set",
+        verbose_name=_("Attached Courses"),
+        help_text=_("The set of courses that can include this module"),
+    )
+
+    class Meta:
+        """Metadata options about this model."""
+
+        verbose_name = _("Module")
+
+    @override
+    def get_absolute_url(self) -> str:
+        # TODO: Implement function to get absolute URL
+        raise NotImplementedError
+
+    @override
+    def __str__(self) -> str:
+        return self.name
 
 
 class BaseTag(CustomBaseModel):
@@ -240,15 +364,14 @@ class Post(CustomBaseModel):
         FOUR = 4, "4"
         FIVE = 5, "5"
 
-    # TODO: Uncomment the following once the `Module` model is created
-    # module = models.ForeignKey(
-    #     "ratemymodule.Module",
-    #     on_delete=models.PROTECT,
-    #     related_name="post_set",
-    #     verbose_name=_("Module")
-    # )
+    module = models.ForeignKey(
+        Module,
+        on_delete=models.PROTECT,
+        related_name="post_set",
+        verbose_name=_("Module")
+    )
     user = models.ForeignKey(
-        "ratemymodule.User",
+        User,
         on_delete=models.CASCADE,
         related_name="made_post_set",
         verbose_name=_("User")
@@ -351,11 +474,14 @@ class Post(CustomBaseModel):
     @property
     def student_type(self) -> str:
         """The formatted type of student that wrote this post."""
-        # TODO: Uncomment the following property once the `Module` models is defined
-        # return self.module.course_set.filter(
-        #     pk__in=self.user.courses.values_list("pk", flat=True)
-        # ).first().student_type
-        raise NotImplementedError
+        first_course: Course | None = self.module.course_set.filter(
+            pk__in=self.user.enrolled_course_set.values_list("pk", flat=True)
+        ).first()
+
+        if not first_course:
+            raise Course.DoesNotExist
+
+        return first_course.student_type
 
     def report(self, reporter: User, reason: "Report.Reasons") -> None:
         """Report this post by the given user."""
@@ -363,9 +489,7 @@ class Post(CustomBaseModel):
 
     @override
     def __str__(self) -> str:
-        # TODO: Update the string representation once the `Module` model is defined
-        # return f"Post by {self.user.username} for module {self.module.name}"
-        raise NotImplementedError
+        return f"Post by a {self.student_type} for {self.module}"
 
 
 class Report(CustomBaseModel):
