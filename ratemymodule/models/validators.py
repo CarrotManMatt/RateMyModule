@@ -7,19 +7,22 @@ __all__: Sequence[str] = (
     "FreeEmailValidator",
     "ExampleEmailValidator",
     "PreexistingEmailTLDValidator",
-    "ConfusableEmailValidator"
+    "ConfusableEmailValidator",
+    "UnicodePropertiesRegexValidator"
 )
 
 import re as regex
 from collections.abc import Callable, Collection
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, override
 
+import regex as full_regex
 import tldextract
 from confusable_homoglyphs import confusables
 from django.contrib import auth
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator
 from django.utils import deconstruct
+from django.utils.translation import gettext_lazy as _
 
 if TYPE_CHECKING:
     from . import User
@@ -98,17 +101,22 @@ class FreeEmailValidator:
             return
 
         if value.rpartition("@")[2] in self.free_email_domains:
-            INVALID_EMAIL_MESSAGE: Final[str] = (
-                "Registration using free email addresses is prohibited. "
-                "Please supply a different email address."
+            raise ValidationError(
+                {
+                    "email": _(
+                        "Registration using free email addresses is prohibited. "
+                        "Please supply a different email address."
+                    )
+                },
+                code="invalid"
             )
-            raise ValidationError(INVALID_EMAIL_MESSAGE, code="invalid")
 
     def __eq__(self, other: object) -> bool:
         """Check whether this validator is the same as another given validator."""
         if not hasattr(other, "free_email_domains"):
             return NotImplemented
 
+        # noinspection PyUnresolvedReferences
         return bool(self.free_email_domains == other.free_email_domains)
 
 
@@ -135,11 +143,15 @@ class ExampleEmailValidator:
             return
 
         if tldextract.extract(value.rpartition("@")[2]).domain in self.example_email_domains:
-            INVALID_EMAIL_MESSAGE: Final[str] = (
-                "Registration using unresolvable example email addresses is prohibited. "
-                "Please supply a different email address."
+            raise ValidationError(
+                {
+                    "email": _(
+                        "Registration using unresolvable example email addresses "
+                        "is prohibited. Please supply a different email address."
+                    )
+                },
+                code="invalid"
             )
-            raise ValidationError(INVALID_EMAIL_MESSAGE, code="invalid")
 
 
 @deconstructible
@@ -161,16 +173,18 @@ class PreexistingEmailTLDValidator:
 
         local: str
         domain: str
-        local, _, domain = value.rpartition("@")
+        local, __, domain = value.rpartition("@")
 
-        email_already_exists: bool = get_user_model().objects.exclude(email=value).filter(
-            email__icontains=f"{local}@{tldextract.extract(domain).domain}"
-        ).exists()
-        if email_already_exists:
-            INVALID_EMAIL_MESSAGE: Final[str] = (
-                "That Email Address is already in use by another user."
+        EMAIL_ALREADY_EXISTS: Final[bool] = (
+            get_user_model().objects.exclude(email=value).filter(
+                email__icontains=f"{local}@{tldextract.extract(domain).domain}"
+            ).exists()
+        )
+        if EMAIL_ALREADY_EXISTS:
+            raise ValidationError(
+                {"email": _("That Email Address is already in use by another user.")},
+                code="unique"
             )
-            raise ValidationError(INVALID_EMAIL_MESSAGE, code="unique")
 
 
 @deconstructible
@@ -193,11 +207,31 @@ class ConfusableEmailValidator:
 
         local: str
         domain: str
-        local, _, domain = value.rpartition("@")
+        local, __, domain = value.rpartition("@")
 
         if confusables.is_dangerous(local) or confusables.is_dangerous(domain):
-            INVALID_EMAIL_MESSAGE: Final[str] = (
-                "This email address cannot be registered. "
-                "Please supply a different email address."
+            raise ValidationError(
+                {
+                    "email": _(
+                        "This email address cannot be registered. "
+                        "Please supply a different email address."
+                    )
+                },
+                code="invalid"
             )
-            raise ValidationError(INVALID_EMAIL_MESSAGE, code="invalid")
+
+
+@deconstructible
+class UnicodePropertiesRegexValidator(RegexValidator):
+    """Validator that validates a given string against a regex that includes unicode props."""
+
+    # noinspection PyShadowingNames
+    @override
+    def __init__(self, regex: str, message: str | None = None, *, code: str | None = None, inverse_match: bool | None = None, flags: regex.RegexFlag | None = None) -> None:  # noqa: E501
+        super().__init__(
+            regex=full_regex.compile(regex),  # type: ignore[arg-type]
+            message=message,
+            code=code,
+            inverse_match=inverse_match,
+            flags=flags
+        )

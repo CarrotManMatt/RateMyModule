@@ -19,7 +19,7 @@ import random
 import string
 from collections.abc import Callable, Collection, Mapping
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, override
 from urllib.parse import urlparse
 
 import django.urls
@@ -33,7 +33,8 @@ T = TypeVar("T")
 class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
     """Custom implementation of `Env` class that will not raise an error for invalid keys."""
 
-    def get_value(self, var: str, cast: Callable[[object], T] | None = None, default: T | environ.NoValue = Env.NOTSET, parse_default: bool = False) -> T:  # type: ignore[no-any-unimported] # noqa: FBT001,FBT002,E501
+    @override  # type: ignore[misc]
+    def get_value(self, var: str, cast: Callable[[object], T] | None = None, default: T | environ.NoValue = Env.NOTSET, parse_default: bool = False) -> T:  # type: ignore[no-any-unimported] # noqa: E501
         """
         Return value for given environment variable.
 

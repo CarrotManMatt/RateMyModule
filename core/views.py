@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 __all__: Sequence[str] = ("AdminDocsRedirectView",)
 
-from typing import Final
+from typing import Final, override
 
 import django.urls
 from django.views.generic import RedirectView
@@ -13,6 +13,7 @@ from django.views.generic import RedirectView
 class AdminDocsRedirectView(RedirectView):
     """Helper redirect view for the "docs/" url to" doc/" (with any included subpath)."""
 
+    @override
     # noinspection SpellCheckingInspection
     def get_redirect_url(self, *reverse_args: object, subpath: str = "", **reverse_kwargs: object) -> str:  # noqa: E501
         """

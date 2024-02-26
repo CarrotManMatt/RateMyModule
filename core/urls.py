@@ -42,6 +42,7 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     ),
     django.urls.path(r"admin/", admin.site.urls, name="admin"),
     django.urls.path(r"api/htmx/", django.urls.include("api_htmx.urls")),
+    django.urls.path(r"api/rest/", django.urls.include("api_rest.urls")),
     django.urls.path(r"", django.urls.include("web.urls")),
     django.urls.path(
         r"",

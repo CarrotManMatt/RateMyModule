@@ -2,16 +2,19 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("UserManager",)
+__all__: Sequence[str] = ("UserManager", "UniversityModuleManager", "UserModuleManager")
+
 
 from typing import TYPE_CHECKING, Final, override
 
+from django.apps import apps
 from django.contrib.auth.models import UserManager as DjangoUserManager
+from django.db.models import Manager, QuerySet
 
 from .utils import AttributeDeleter
 
 if TYPE_CHECKING:
-    from . import User
+    from . import Module, University, User
 
 
 class UserManager(DjangoUserManager["User"]):
@@ -35,11 +38,7 @@ class UserManager(DjangoUserManager["User"]):
         return user
 
     @override
-    def create_user(self, username: str, email: str | None = None, password: str | None = None, **extra_fields: object) -> "User": # noqa: E501
-        if username:
-            NON_EMPTY_USERNAME_MESSAGE: Final[str] = "Argument `username` cannot be provided."
-            raise ValueError(NON_EMPTY_USERNAME_MESSAGE)
-
+    def create_user(self, email: str | None = None, password: str | None = None, **extra_fields: object) -> "User":  # type: ignore[override] # noqa: E501
         if email is None:
             EMAIL_IS_NONE_MESSAGE: Final[str] = "Email address cannot be `None`."
             raise ValueError(EMAIL_IS_NONE_MESSAGE)
@@ -65,3 +64,31 @@ class UserManager(DjangoUserManager["User"]):
             raise ValueError(INVALID_IS_SUPERUSER_MESSAGE)
 
         return self._create_user(email, password, **extra_fields)
+
+
+class UniversityModuleManager(Manager["Module"]):
+    @override
+    def __init__(self, university: "University") -> None:
+        self.university: University = university
+
+        super().__init__()
+
+    @override
+    def get_queryset(self) -> QuerySet["Module"]:
+        return apps.get_model(app_label="ratemymodule", model_name="Module").objects.filter(  # type: ignore[no-any-return]
+            course_set__pk__in=self.university.course_set.all()
+        ).distinct()
+
+
+class UserModuleManager(Manager["Module"]):
+    @override
+    def __init__(self, user: "User") -> None:
+        self.user: User = user
+
+        super().__init__()
+
+    @override
+    def get_queryset(self) -> QuerySet["Module"]:
+        return apps.get_model(app_label="ratemymodule", model_name="User").objects.filter(  # type: ignore[no-any-return]
+            course_set__pk__in=self.user.enrolled_course_set.all()
+        ).distinct()

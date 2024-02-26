@@ -15,20 +15,26 @@ __all__: Sequence[str] = (
     "Report"
 )
 
+import datetime
+from collections.abc import Iterable
 from collections.abc import Set as ImmutableSet
-from datetime import datetime
-from typing import TYPE_CHECKING, Final, override
+from typing import Final, override
 
 from allauth.account.models import EmailAddress
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinLengthValidator, MinValueValidator
+from django.core.validators import (
+    MaxValueValidator,
+    MinLengthValidator,
+    MinValueValidator,
+    RegexValidator,
+)
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_stubs_ext.db.models.manager import RelatedManager
 
-from .managers import UserManager
+from .managers import UniversityModuleManager, UserManager, UserModuleManager
 from .utils import AttributeDeleter, CustomBaseModel
 from .validators import (
     ConfusableEmailValidator,
@@ -36,11 +42,11 @@ from .validators import (
     FreeEmailValidator,
     HTML5EmailValidator,
     PreexistingEmailTLDValidator,
+    UnicodePropertiesRegexValidator,
 )
 
-if TYPE_CHECKING:
-    from django.contrib.contenttypes.fields import GenericForeignKey
-    from django.db.models import ForeignObjectRel
+EARLIEST_TEACHING_YEAR: Final[int] = 1096
+LATEST_TEACHING_YEAR: Final[int] = 3000
 
 
 class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
@@ -51,29 +57,45 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         attribute_name="normalize_username"
     )
 
+    password = models.CharField(
+        verbose_name=_("Password"),
+        max_length=128,
+        error_messages={
+            "null": _("Password is a required field."),
+            "blank": _("Password is a required field.")
+        }
+    )
     email = models.EmailField(
         verbose_name=_("Email Address"),
         max_length=255,
         unique=True,
-        validators=[
+        validators=(
             HTML5EmailValidator(),
             FreeEmailValidator(),
             ConfusableEmailValidator(),
             PreexistingEmailTLDValidator(),
             ExampleEmailValidator()
-        ],
+        ),
         error_messages={
             "unique": _("A user with that Email Address already exists."),
             "max_length": _("The Email Address must be at most 255 digits.")
         }
     )
+    is_superuser = models.BooleanField(
+        verbose_name=_("Is Superuser?"),
+        default=False,
+        help_text=_(
+            "Designates that this user has all permissions without "
+            "explicitly assigning them."
+        )
+    )
     is_staff = models.BooleanField(
-        _("Is Admin?"),
+        verbose_name=_("Is Staff?"),
         default=False,
         help_text=_("Designates whether the user can log into the admin site.")
     )
     is_active = models.BooleanField(
-        _("Is Active?"),
+        verbose_name=_("Is Active?"),
         default=True,
         help_text=_(
             "Designates whether this user should be treated as active. "
@@ -82,24 +104,24 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
     )
     liked_post_set = models.ManyToManyField(
         "ratemymodule.Post",
-        related_name="liked_by_users",
+        related_name="liked_user_set",
         verbose_name=_("Liked Posts"),
         help_text=_("The set of posts this user has liked."),
         blank=True
     )
     disliked_post_set = models.ManyToManyField(
         "ratemymodule.Post",
-        related_name="disliked_by_users",
+        related_name="disliked_user_set",
         verbose_name=_("Disliked Posts"),
         help_text=_("The set of posts this user has disliked."),
         blank=True
     )
     enrolled_course_set = models.ManyToManyField(
         "ratemymodule.Course",
-        related_name="enrolled_users",
+        related_name="enrolled_user_set",
         verbose_name=_("Enrolled Courses"),
         help_text=_("The set of courses this user has enrolled in."),
-        blank=False
+        blank=True
     )
 
     objects = UserManager()
@@ -108,79 +130,108 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
     made_post_set: RelatedManager["Post"]
     made_report_set: RelatedManager["Report"]
 
-    USERNAME_FIELD: Final[str] = "email"
-    EMAIL_FIELD: Final[str] = "email"
+    USERNAME_FIELD = "email"
+    EMAIL_FIELD = "email"
 
     @property
-    def date_time_joined(self) -> datetime:
+    def date_time_joined(self) -> datetime.datetime:
         """Shortcut accessor to the time this `User` object was created."""
         return self.date_time_created
 
     @date_time_joined.setter
-    def date_time_joined(self, __value: datetime) -> None:
+    def date_time_joined(self, __value: datetime.datetime) -> None:
         self.date_time_created = __value
 
     @property
     def university(self) -> "University":
         """Shortcut accessor to the university this user is a student at."""
-        first_enrolled_course: Course | None = self.enrolled_course_set.first()
-        if not first_enrolled_course:
-            raise Course.DoesNotExist
-
-        return first_enrolled_course.university
+        return (
+            University.objects.alias(
+                full_email_domain=models.Value(self.email.rpartition("@")[2])
+            ).get(
+                full_email_domain__endswith=models.F("email_domain")
+            )
+        )
 
     class Meta:
         """Metadata options about this model."""
 
         verbose_name = _("User")
+        constraints = (
+            models.CheckConstraint(
+                name="ensure_superusers_are_staff",
+                check=~models.Q(is_superuser=True, is_staff=False)
+            ),
+        )
 
     @override
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
-        password_field: models.Field[object, object] | ForeignObjectRel | GenericForeignKey = (
-            self._meta.get_field("password")
-        )
-        if isinstance(password_field, models.Field):
-            password_field.error_messages = {
-                "null": _("Password is a required field."),
-                "blank": _("Password is a required field.")
-            }
-        is_superuser_field: models.Field[object, object] | ForeignObjectRel | GenericForeignKey = (  # noqa: E501
-            self._meta.get_field("is_superuser")
-        )
-        if isinstance(is_superuser_field, models.Field):
-            is_superuser_field.verbose_name = _("Is Superuser?")
+        self.module_set: UserModuleManager = UserModuleManager(self)
 
     @override
     def __str__(self) -> str:
         return self.email
 
     @override
-    def clean(self) -> None:
+    def save(self, *, force_insert: bool = False, force_update: bool = False, using: str | None = None, update_fields: Iterable[str] | None = None) -> None:  # type: ignore[override]  # noqa: E501
         if self.is_superuser:
             self.is_staff = True
 
-        # TODO: Also signal when adding new course to user & vice-versa
-        if self.enrolled_course_set.exclude(university=self.university).exists():
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields
+        )
+
+        self.liked_post_set.add(*self.made_post_set.all())
+        self.disliked_post_set.through.objects.filter(post__user=self).delete()  # type: ignore[attr-defined]
+
+    @override
+    def clean(self) -> None:
+        EMAIL_MATCHES_A_UNIVERSITY_DOMAIN: Final[bool] = (
+            University.objects.alias(
+                full_email_domain=models.Value(self.email.rpartition("@")[2])
+            ).filter(
+                full_email_domain__endswith=models.F("email_domain")
+            ).exists()
+        )
+        if not EMAIL_MATCHES_A_UNIVERSITY_DOMAIN:
             raise ValidationError(
                 {
-                    "university":
-                        "This user is linked to courses across multiple universities."
+                    "email": _(
+                        "Your email address must be linked to a university registered account."
+                    )
                 },
                 code="invalid"
             )
 
-        # TODO: University email validator upon signup
-        # TODO: Validate like & unlike a post (no conflicts)
-        # TODO: Validate courses not empty
+        if self.pk:
+            if not self.is_staff and not self.enrolled_course_set.exists():
+                raise ValidationError(
+                    {"enrolled_course_set": _("This field is required.")},
+                    code="required"
+                )
+
+            if self.enrolled_course_set.exclude(university=self.university).exists():
+                raise ValidationError(
+                    {
+                        "enrolled_course_set": _(
+                            "A user cannot be enrolled in courses "
+                            "across multiple universities."
+                        )
+                    },
+                    code="invalid"
+                )
 
     @classmethod
     @override
     def get_proxy_field_names(cls) -> ImmutableSet[str]:
         return super().get_proxy_field_names() | {"date_time_joined"}
 
-    def like_post(self, post: "Post") -> None:  # TODO: Also signals
+    def like_post(self, post: "Post") -> None:
         """Like a given post, by this user, ensuring it's not disliked at the same time."""
         self.unlike_post(post=post)
         self.liked_post_set.add(post)
@@ -203,22 +254,38 @@ class University(CustomBaseModel):
         max_length=60,
         unique=True,
         verbose_name=_("Name"),
-        validators=[MinLengthValidator(2)]
+        validators=(
+            MinLengthValidator(2),
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+        )
     )
     short_name = models.CharField(
         max_length=5,
         unique=False,
         verbose_name=_("Short Name"),
-        validators=[MinLengthValidator(2)]
+        validators=(
+            MinLengthValidator(2),
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡'-]+\Z")
+        )
     )
     email_domain = models.CharField(
         max_length=253,
         unique=True,
-        verbose_name=_("Email Domain")
+        verbose_name=_("Email Domain"),
+        validators=(
+            MinLengthValidator(4),
+            RegexValidator(
+                r"\A((?!-))((xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.)+(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})\Z"
+            )
+        )
     )
     founding_date = models.DateField(
         verbose_name=_("Date Founded"),
-        help_text=_("Date format DD/MM/YYYY")
+        help_text=_("Date format DD/MM/YYYY"),
+        validators=(
+            MinValueValidator(datetime.date(year=EARLIEST_TEACHING_YEAR, month=1, day=1)),
+            MaxValueValidator(datetime.date(year=LATEST_TEACHING_YEAR, month=1, day=1))
+        )
     )
 
     course_set: RelatedManager["Course"]
@@ -227,6 +294,32 @@ class University(CustomBaseModel):
         """Metadata options about this model."""
 
         verbose_name = _("University")
+        verbose_name_plural = _("Universities")
+        constraints = (
+            models.CheckConstraint(
+                name="ensure_email_domain_adheres_to_regex",
+                check=models.Q(
+                    email_domain__regex=r"\A((?!-))((xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.)+(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})\Z"
+                )
+            ),
+        )
+
+    @override
+    def save(self, *, force_insert: bool = False, force_update: bool = False, using: str | None = None, update_fields: Iterable[str] | None = None) -> None:  # type: ignore[override]  # noqa: E501
+        self.email_domain = self.email_domain.lower()
+
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields
+        )
+
+    @override
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.module_set: UniversityModuleManager = UniversityModuleManager(self)
 
     @override
     def __str__(self) -> str:
@@ -238,11 +331,19 @@ class Course(CustomBaseModel):
 
     name = models.CharField(
         max_length=60,
-        verbose_name=_("Name")
+        verbose_name=_("Name"),
+        validators=(
+            MinLengthValidator(3),
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+        )
     )
     student_type = models.CharField(
         max_length=60,
-        verbose_name=_("Student Type")
+        verbose_name=_("Student Type"),
+        validators=(
+            MinLengthValidator(3),
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+        )
     )
     university = models.ForeignKey(
         University,
@@ -253,15 +354,22 @@ class Course(CustomBaseModel):
     )
 
     module_set: RelatedManager["Module"]
+    enrolled_user_set: RelatedManager["User"]
 
     class Meta:
         """Metadata options about this model."""
 
         verbose_name = _("Course")
+        constraints = (
+            models.UniqueConstraint(
+                fields=("name", "university"),
+                name="unique_university_course_name"
+            ),
+        )
 
     @override
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name} - {self.university}"
 
 
 class Module(CustomBaseModel):
@@ -270,22 +378,35 @@ class Module(CustomBaseModel):
     name = models.CharField(
         max_length=60,
         verbose_name=_("Name"),
-    )
-    year_started = models.DateField(
-        verbose_name=_("Year Started"),
-        help_text=_("Date format DD/MM/YYYY")
+        validators=(
+            MinLengthValidator(3),
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+        )
     )
     code = models.CharField(
         max_length=60,
         unique=True,
         verbose_name=_("Reference Code"),
-        help_text=_("The unique reference code of this module within its university")
+        help_text=_("The unique reference code of this module within its university"),
+        validators=(
+            MinLengthValidator(2),
+            UnicodePropertiesRegexValidator(r"\A[\p{L}0-9!?¿¡' &()-]+\Z")
+        )
+    )
+    year_started = models.DateField(
+        verbose_name=_("Year Started"),
+        help_text=_("Date format DD/MM/YYYY"),
+        validators=(
+            MinValueValidator(datetime.date(year=EARLIEST_TEACHING_YEAR, month=1, day=1)),
+            MaxValueValidator(datetime.date(year=LATEST_TEACHING_YEAR, month=1, day=1))
+        )
     )
     course_set = models.ManyToManyField(
         Course,
         related_name="module_set",
         verbose_name=_("Attached Courses"),
         help_text=_("The set of courses that can include this module"),
+        blank=False
     )
 
     class Meta:
@@ -294,13 +415,51 @@ class Module(CustomBaseModel):
         verbose_name = _("Module")
 
     @override
+    def clean(self) -> None:
+        if self.pk:
+            if self.course_set.exclude(university=self.university).exists():
+                raise ValidationError(
+                    _("A module cannot be linked to courses across multiple universities."),
+                    code="invalid"
+                )
+
+            if self.university.module_set.filter(name=self.name).exists():
+                raise ValidationError(
+                    {
+                        "name": _("A module with this name already exists at %(university)s.")
+                    },
+                    code="unique",
+                    params={"university": self.university}
+                )
+
+            if self.university.module_set.filter(code=self.code).exists():
+                raise ValidationError(
+                    {
+                        "code": _("A module with this code already exists at %(university)s.")
+                    },
+                    code="unique",
+                    params={"university": self.university}
+                )
+
+    @property
+    def university(self) -> University:
+        """Shortcut accessor to the university this module belongs to."""
+        first_enrolled_course: Course | None = self.course_set.first()
+        if not first_enrolled_course:
+            raise Course.DoesNotExist
+
+        return first_enrolled_course.university
+
+    # noinspection PyOverrides
+    @override  # type: ignore[misc]
     def get_absolute_url(self) -> str:
+        """Return the canonical URL for a given `Module` object instance."""
         # TODO: Implement function to get absolute URL
         raise NotImplementedError
 
     @override
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name} - {self.university}"
 
 
 class BaseTag(CustomBaseModel):
@@ -310,14 +469,32 @@ class BaseTag(CustomBaseModel):
         max_length=60,
         unique=True,
         verbose_name=_("Tag Name"),
-        validators=[MinLengthValidator(2)]
+        validators=(
+            MinLengthValidator(2),
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+        )
     )
     is_verified = models.BooleanField(default=False, verbose_name=_("Is Verified?"))
+
+    post_set: RelatedManager["Post"]
 
     class Meta:
         """Metadata options about this model."""
 
         abstract = True
+
+    @override
+    def clean(self) -> None:
+        TAG_NAME_EXISTS: Final[bool] = (
+            TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
+        )
+        if TAG_NAME_EXISTS:
+            raise ValidationError(
+                {"name": _("A tag with this name already exists.")},
+                code="unique"
+            )
 
     @override
     def __str__(self) -> str:
@@ -351,18 +528,22 @@ class ToolTag(BaseTag):
         verbose_name = _("Tool Tag")
 
 
+# NOTE: Choices classes need to be defined outside of their respective models, so that they can be referenced within the model's Meta constraints list
+class _Ratings(models.IntegerChoices):
+    """Enum of post star rating numbers."""
+
+    ZERO = 0, "0"
+    ONE = 1, "1"
+    TWO = 2, "2"
+    THREE = 3, "3"
+    FOUR = 4, "4"
+    FIVE = 5, "5"
+
+
 class Post(CustomBaseModel):
     """Core model class for posts that can be made by users about modules."""
 
-    class Rating(models.IntegerChoices):
-        """Enum of star rating numbers."""
-
-        ZERO = 0, "0"
-        ONE = 1, "1"
-        TWO = 2, "2"
-        THREE = 3, "3"
-        FOUR = 4, "4"
-        FIVE = 5, "5"
+    Ratings: type[_Ratings] = _Ratings
 
     module = models.ForeignKey(
         Module,
@@ -378,27 +559,38 @@ class Post(CustomBaseModel):
     )
 
     overall_rating = models.IntegerField(
-        choices=Rating.choices,
+        choices=Ratings.choices,
         verbose_name=_("Overall Rating")
     )
     difficulty_rating = models.IntegerField(
-        choices=Rating.choices,
+        choices=Ratings.choices,
+        null=True,
+        blank=True,
         verbose_name=_("Difficulty Rating")
     )
     assessment_rating = models.IntegerField(
-        choices=Rating.choices,
+        choices=Ratings.choices,
+        null=True,
+        blank=True,
         verbose_name=_("Assessment Rating")
     )
     teaching_rating = models.IntegerField(
-        choices=Rating.choices,
+        choices=Ratings.choices,
+        null=True,
+        blank=True,
         verbose_name=_("Teaching Rating")
     )
-    content = models.TextField(verbose_name=_("Content"))
+    content = models.TextField(
+        verbose_name=_("Content"),
+        null=False,
+        blank=True,
+        validators=(RegexValidator(r"\A\Z|\A.{3,}\Z"),)
+    )
     academic_year_start = models.PositiveSmallIntegerField(
-        validators=[
-            MinValueValidator(1000),
-            MaxValueValidator(3000)
-        ],
+        validators=(
+            MinValueValidator(EARLIEST_TEACHING_YEAR),
+            MaxValueValidator(LATEST_TEACHING_YEAR)
+        ),
         verbose_name=_("Academic Year Start")
     )
     hidden = models.BooleanField(default=False, verbose_name=_("Is Hidden?"))
@@ -430,6 +622,52 @@ class Post(CustomBaseModel):
         """Metadata options about this model."""
 
         verbose_name = _("Post")
+        constraints = (
+            models.UniqueConstraint(
+                fields=("user", "module"),
+                name="unique_post_creator_with_module"
+            ),
+            *(
+                models.CheckConstraint(
+                    name=f"ensure_{rating_field}_valid_choice",
+                    check=models.Q(**{f"{rating_field}__in": _Ratings.values})
+                )
+                for rating_field
+                in (
+                    "overall_rating",
+                    "difficulty_rating",
+                    "assessment_rating",
+                    "teaching_rating"
+                )
+            )
+        )
+
+    @override
+    def save(self, *, force_insert: bool = False, force_update: bool = False, using: str | None = None, update_fields: Iterable[str] | None = None) -> None:  # type: ignore[override]  # noqa: E501
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields
+        )
+
+        if self.user not in self.liked_user_set.all():
+            self.liked_user_set.add(self.user)
+
+        if self.user in self.disliked_user_set.all():
+            self.disliked_user_set.remove(self.user)
+
+    @override
+    def clean(self) -> None:
+        if self.module not in self.user.module_set.all():
+            raise ValidationError(
+                {
+                    "module": _(
+                        "You cannot create posts about modules that you have not taken."
+                    )
+                },
+                code="invalid"
+            )
 
     @classmethod
     @override
@@ -437,21 +675,21 @@ class Post(CustomBaseModel):
         return super().get_proxy_field_names() | {"date_time_posted"}
 
     @property
-    def date_time_posted(self) -> datetime:
+    def date_time_posted(self) -> datetime.datetime:
         """Shortcut accessor to the time this `Post` object was created."""
         return self.date_time_created
 
     @date_time_posted.setter
-    def date_time_posted(self, __value: datetime) -> None:
+    def date_time_posted(self, __value: datetime.datetime) -> None:
         self.date_time_created = __value
 
     @property
-    def liked_count(self) -> int:
+    def likes_count(self) -> int:
         """The number of likes this post has."""
         return self.liked_user_set.count()
 
     @property
-    def disliked_count(self) -> int:
+    def dislikes_count(self) -> int:
         """The number of dislikes this post has."""
         return self.disliked_user_set.count()
 
@@ -479,32 +717,40 @@ class Post(CustomBaseModel):
         ).first()
 
         if not first_course:
+            if self.user.is_staff:
+                return "an administrator"
+
             raise Course.DoesNotExist
 
         return first_course.student_type
 
-    def report(self, reporter: User, reason: "Report.Reasons") -> None:
+    def report(self, reporter: User, reason: "_Reasons") -> None:
         """Report this post by the given user."""
         Report.objects.create(post=self, reporter=reporter, reason=reason)
 
     @override
     def __str__(self) -> str:
-        return f"Post by a {self.student_type} for {self.module}"
+        # TODO: Not a unique identifier in admin interface
+        return f"Post by {self.student_type} for {self.module}"
+
+
+# NOTE: Choices classes need to be defined outside of their respective models, so that they can be referenced within the model's Meta constraints list
+class _Reasons(models.TextChoices):
+    """Enum of report reason codes & display values of each reason."""
+
+    HATE = "HAT", _("Hate Speech or Language")
+    IDENTIFYING_INFO = "IDE", _("Identifying Information")
+    ASSIGNMENT_ANSWERS = "ANS", _("Assignment Answers")
+    SPAM = "SPM", _("SPAM")
+    BULLYING = "BUL", _("Bullying or Harassment")
+    FALSE_INFO = "FLS", _("False Information")
+    SEXUAL = "SEX", _("Sexual Content")
 
 
 class Report(CustomBaseModel):
     """Model class for reports, that users can make about posts."""
 
-    class Reasons(models.TextChoices):
-        """Enum of reason codes & display values of each reason."""
-
-        HATE = "HAT", _("Hate Speech or Language")
-        IDENTIFYING_INFO = "IDE", _("Identifying Information")
-        ASSIGNMENT_ANSWERS = "ANS", _("Assignment Answers")
-        SPAM = "SPM", _("SPAM")
-        BULLYING = "BUL", _("Bullying or Harassment")
-        FALSE_INFO = "FLS", _("False Information")
-        SEXUAL = "SEX", _("Sexual Content")
+    Reasons: type[_Reasons] = _Reasons
 
     post = models.ForeignKey(
         Post,
@@ -516,14 +762,14 @@ class Report(CustomBaseModel):
         User,
         on_delete=models.CASCADE,
         related_name="made_report_set",
-        verbose_name=_("User")
+        verbose_name=_("Reporter")
     )
     reason = models.CharField(
         choices=Reasons.choices,
         max_length=3,
         verbose_name=_("Reason")
     )
-    solved = models.BooleanField(
+    is_solved = models.BooleanField(
         _("Is_Solved"),
         default=False
     )
@@ -532,6 +778,20 @@ class Report(CustomBaseModel):
         """Metadata options about this model."""
 
         verbose_name = _("Report")
+        constraints = (
+            models.CheckConstraint(
+                name="ensure_reason_valid_choice",
+                check=models.Q(reason__in=_Reasons.values)
+            ),
+        )
+
+    @override
+    def clean(self) -> None:
+        if self.reporter == self.post.user:
+            raise ValidationError(
+                {"post": _("You cannot report your own posts.")},
+                code="invalid"
+            )
 
     @override
     def __str__(self) -> str:

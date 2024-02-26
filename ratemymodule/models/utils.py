@@ -49,7 +49,7 @@ class CustomBaseModel(Model):
     def save(self, *, force_insert: bool = False, force_update: bool = False, using: str | None = None, update_fields: Iterable[str] | None = None) -> None:  # type: ignore[override] # noqa: E501
         self.full_clean()
 
-        return super().save(force_insert, force_update, using, update_fields)
+        super().save(force_insert, force_update, using, update_fields)
 
     @override
     def __init__(self, *args: object, **kwargs: object) -> None:
@@ -100,14 +100,12 @@ class CustomBaseModel(Model):
             setattr(self, field_name, value)
 
         if commit:
-            return self.save(
+            self.save(
                 force_insert=force_insert,
                 force_update=force_update,
                 using=using,
                 update_fields=update_fields
             )
-
-        return None
 
     update.alters_data: bool = True  # type: ignore[attr-defined, misc]
 
