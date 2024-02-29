@@ -65,7 +65,7 @@ used to configure the Python and Poetry environments.
 ```Dockerfile
 RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential
 RUN python3 -m venv $POETRY_HOME
-RUN $POETRY_HOME/bin/pip install poetry==1.7.1
+RUN $POETRY_HOME/bin/pip install poetry==1.8.1
 ```
 
 This section installs the required system dependencies for the container,

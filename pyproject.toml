@@ -29,7 +29,7 @@ django = "~4.2"  # NOTE: Django is pinned below version 5.0 because the django-s
 django-allauth = "^0.61"
 django-environ = "^0.11"
 django-admin-rangefilter = "^0.12"
-confusable_homoglyphs = "^3.3"
+confusable-homoglyphs = "^3.3"
 tldextract = "^5.1"
 classproperties = {git = "https://github.com/hottwaj/classproperties.git"}
 setuptools = "^69.1"
@@ -48,7 +48,7 @@ pymarkdownlnt = "^0.9"
 optional = true
 
 [tool.poetry.group.deploy.dependencies]
-gunicorn = "^21.0"
+gunicorn = "^21.2"
 
 
 [tool.mypy]
