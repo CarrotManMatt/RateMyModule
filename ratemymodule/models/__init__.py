@@ -532,7 +532,6 @@ class ToolTag(BaseTag):
 class _Ratings(models.IntegerChoices):
     """Enum of post star rating numbers."""
 
-    ZERO = 0, "0"
     ONE = 1, "1"
     TWO = 2, "2"
     THREE = 3, "3"
@@ -558,23 +557,23 @@ class Post(CustomBaseModel):
         verbose_name=_("User")
     )
 
-    overall_rating = models.IntegerField(
+    overall_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
         verbose_name=_("Overall Rating")
     )
-    difficulty_rating = models.IntegerField(
+    difficulty_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
         null=True,
         blank=True,
         verbose_name=_("Difficulty Rating")
     )
-    assessment_rating = models.IntegerField(
+    assessment_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
         null=True,
         blank=True,
         verbose_name=_("Assessment Rating")
     )
-    teaching_rating = models.IntegerField(
+    teaching_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
         null=True,
         blank=True,
