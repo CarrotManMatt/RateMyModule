@@ -12,6 +12,28 @@
 
         <title>{% block title %}RateMyModule{% endblock title %}</title>
 
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="{% static 'ratemymodule/favicon/apple-touch-icon.png' %}" />
+        <link rel="icon"
+              type="image/svg+xml"
+              href="{% static 'ratemymodule/favicon/favicon.svg' %}" />
+        <link rel="icon"
+              type="image/png"
+              sizes="32x32"
+              href="{% static 'ratemymodule/favicon/favicon-32x32.png' %}" />
+        <link rel="icon"
+              type="image/png"
+              sizes="16x16"
+              href="{% static 'ratemymodule/favicon/favicon-16x16.png' %}" />
+        <link rel="manifest"
+              href="{% static 'ratemymodule/favicon/site.webmanifest' %}" />
+        <link rel="mask-icon"
+              href="{% static 'ratemymodule/favicon/safari-pinned-tab.svg' %}"
+              color="#b295e8" />
+        <meta name="msapplication-TileColor" content="#b295e8" />
+        <meta name="theme-color" content="#b295e8" />
+
         <link rel="stylesheet" href="{% static 'ratemymodule/css/base.css' %}" />
         {% block extra_css %}
         {% endblock extra_css %}
@@ -21,7 +43,8 @@
         <header>
             <div class="banner">
                 <div class="logo-container">
-                    <a href="{% url 'default' %}"> {# Clicking Logo takes user to base page #}
+                    <a href="{% url 'default' %}">
+                        {# Clicking Logo takes user to base page #}
                         <img src="{% static 'ratemymodule/svgs/logo.svg' %}"
                              alt="RateMyModule Logo"
                              class="logo" />
