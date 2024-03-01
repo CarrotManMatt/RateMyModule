@@ -1,0 +1,43 @@
+{% extends "ratemymodule/base.html" %}
+
+{% load static %}
+
+{% block title %}RateMyModule{% endblock title %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ratemymodule/css/content.css' %}" />
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="wrapper">
+        <aside class="left-sidebar">
+            {% block left_sidebar %}
+            {% endblock left_sidebar %}
+        </aside>
+
+        <section class="main-content">
+            {# This block will be overridden by child templates #}
+            {% block main_content %}
+            {% endblock main_content %}
+        </section>
+
+        <aside class="right-sidebar">
+            <section class="right-sidebar-upper">
+                {# Upper right sidebar content #}
+                {% block right_sidebar_upper %}
+                {% endblock right_sidebar_upper %}
+            </section>
+
+            <section class="right-sidebar-lower">
+                {# Lower right sidebar content #}
+                {% block right_sidebar_lower %}
+                {% endblock right_sidebar_lower %}
+            </section>
+        </aside>
+    </div>
+{% endblock content %}
+
+{# TODO-Lilah: At the bottom of the sidebar, add a disclaimer section. This should be styled similarly to the Instagram disclaimer bubble, can also include GDPR here #}
+{# TODO-Lilah: Implement a sticky behavior for the sidebar where it becomes fixed once the user scrolls past its bottom edge, but still allowing the main content to scroll independently. #}
+{# TODO-Lilah: Create a 'Scroll to Top' button that floats over the main content. This button should have a high z-index to ensure it lays over other elements, such as graphs. It should be discreet but easily accessible. #}

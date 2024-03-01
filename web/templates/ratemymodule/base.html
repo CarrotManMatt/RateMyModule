@@ -12,43 +12,90 @@
 
         <title>{% block title %}RateMyModule{% endblock title %}</title>
 
-        <link rel="apple-touch-icon"
-              sizes="180x180"
-              href="{% static 'ratemymodule/favicon/apple-touch-icon.png' %}" />
-        <link rel="icon"
-              type="image/svg+xml"
-              href="{% static 'ratemymodule/favicon/favicon.svg' %}" />
-        <link rel="icon"
-              type="image/png"
-              sizes="32x32"
-              href="{% static 'ratemymodule/favicon/favicon-32x32.png' %}" />
-        <link rel="icon"
-              type="image/png"
-              sizes="16x16"
-              href="{% static 'ratemymodule/favicon/favicon-16x16.png' %}" />
-        <link rel="manifest"
-              href="{% static 'ratemymodule/favicon/site.webmanifest' %}" />
-        <link rel="mask-icon"
-              href="{% static 'ratemymodule/favicon/safari-pinned-tab.svg' %}"
-              color="#b295e8" />
-        <meta name="msapplication-TileColor" content="#b295e8" />
-        <meta name="theme-color" content="#b295e8" />
-        <!-- Add any common CSS or JavaScript files here -->
+        <link rel="stylesheet" href="{% static 'ratemymodule/css/base.css' %}" />
+        {% block extra_css %}
+        {% endblock extra_css %}
     </head>
 
     <body>
         <header>
-            <!-- Navigation and other common header elements -->
+            <div class="banner">
+                <div class="logo-container">
+                    <a href="{% url 'default' %}"> {# Clicking Logo takes user to base page #}
+                        <img src="{% static 'ratemymodule/svgs/logo.svg' %}"
+                             alt="RateMyModule Logo"
+                             class="logo" />
+                    </a>
+                    <span class="name">RateMyModule</span>
+                </div>
+
+                <div class="search-container">
+                    <input type="search"
+                           placeholder="Type here to search..."
+                           class="search-input" />
+                    <span class="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                            {# djlint:off H017 #}
+                            <path d="M 21 3 C 11.622998 3 4 10.623005 4 20 C 4 29.376995 11.622998 37 21 37 C 24.712383 37 28.139151 35.791079 30.9375 33.765625 L 44.085938 46.914062 L 46.914062 44.085938 L 33.886719 31.058594 C 36.443536 28.083 38 24.223631 38 20 C 38 10.623005 30.377002 3 21 3 z M 21 5 C 29.296122 5 36 11.703883 36 20 C 36 28.296117 29.296122 35 21 35 C 12.703878 35 6 28.296117 6 20 C 6 11.703883 12.703878 5 21 5 z"></path>
+                            {# djlint:on H017 #}
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="user-profile-container">
+                    <a href="#" class="create-post">Create Post</a>
+                    {# TODO-Lilah: Add in the link to the submit-review page #}
+                    <img src="{% static 'ratemymodule/svgs/user-avatar.svg' %}"
+                         alt="User Icon"
+                         class="user-icon" />
+                    <span class="username">delilahl...</span>
+
+                    <div class="user-dropdown">
+                        <button class="user-dropbtn">
+                            <img src="{% static 'ratemymodule/svgs/down-arrow.svg' %}"
+                                 alt="Dropdown Icon"
+                                 class="dropdown-icon" />
+                        </button>
+                        <div class="user-dropdown-content">
+                            <a href="{% url 'ratemymodule:user-settings' %}">User
+                            Settings</a>
+                            <div class="toggle-container">
+                                <span>Toggle Light/Dark Mode</span>
+                                <div class="toggle-container">
+                                    <label class="switch">
+                                        <input type="checkbox" id="theme-toggle" />
+                                        {# TODO-Lilah: Add in functionality for the theme toggle #}
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <a href="#">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main>
             {% block content %}
-                <!-- This block will be overridden by child templates -->
+                {# content goes here i.e. base-with-content.html #}
             {% endblock content %}
         </main>
 
         <footer>
-            <p>You are accessing an experimental web application developed by participants of the Team Project 2024 module.</p>
+            <p>
+                You are accessing an experimental web application developed by
+                participants of the Team Project 2024 module.
+            </p>
         </footer>
+
+        {#HTMX script here #}
+        <script src="https://unpkg.com/htmx.org@1.9.10"
+                integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+                crossorigin="anonymous"></script>
+
+        {% block scripts %}
+            {# any other scripts go here #}
+        {% endblock scripts %}
     </body>
 </html>

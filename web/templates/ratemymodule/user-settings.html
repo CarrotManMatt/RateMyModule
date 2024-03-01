@@ -1,0 +1,19 @@
+{% extends "ratemymodule/base-with-content.html" %}
+
+{% load static %}
+
+{% block title %}User Settings{% endblock title %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet"
+          href="{% static 'ratemymodule/css/user-settings.css' %}" />
+{% endblock extra_css %}
+
+{% block left_sidebar %}
+    {# Include content for the left sidebar i.e. navigation links for user settings #}
+{% endblock left_sidebar %}
+
+{% block main_content %}
+    {# Main content for user settings #}
+{% endblock main_content %}

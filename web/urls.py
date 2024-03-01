@@ -11,12 +11,17 @@ import django
 from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
-from web.views import HomeView
+from web.views import HomeView, UserSettingsView
 
 app_name: Final[str] = "ratemymodule"
 
 view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
-    django.urls.path(r"", HomeView.as_view(), name="home")
+    django.urls.path(r"", HomeView.as_view(), name="home"),
+    django.urls.path(
+        r"settings/",
+        UserSettingsView.as_view(),
+        name="user-settings"
+    ),
 ]
 
 favicon_urlpatterns: MutableSequence[URLResolver | URLPattern] = [

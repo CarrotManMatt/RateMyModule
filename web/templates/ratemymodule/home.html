@@ -1,8 +1,40 @@
-{% extends "ratemymodule/base.html" %}
+{% extends "ratemymodule/base-with-content.html" %}
 
-{% block title %}Welcome to RateMyModule{% endblock title %}
+{% load static %}
 
-{% block content %}
-    <h1>Welcome to RateMyModule</h1>
-    <p>This is the home page for the RateMyModule application.</p>
-{% endblock content %}
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ratemymodule/css/home.css' %}" />
+{% endblock extra_css %}
+
+{% block left_sidebar %}
+    {# dropdown content goes here #}
+    <div>Navigation Goes Here</div>
+{% endblock left_sidebar %}
+
+{% block main_content %}
+    <div class="filter-bar">
+        {# Filter bar goes here #}
+        Filter Bar Goes Here
+    </div>
+
+    {# post content goes here #}
+
+    <div class="post-container">
+        <div class="post-item">Posts Go Here</div>
+    </div>
+{% endblock main_content %}
+
+{% block right_sidebar_upper %}
+    <div class="right-sidebar-upper">
+        {# Content for upper part of the right sidebar #}
+        <div>Wiki Goes Here</div>
+    </div>
+{% endblock right_sidebar_upper %}
+
+{% block right_sidebar_lower %}
+    <div class="right-sidebar-lower">
+        {# Content for lower part of the right sidebar #}
+        <div>Analytics Goes Here</div>
+    </div>
+{% endblock right_sidebar_lower %}

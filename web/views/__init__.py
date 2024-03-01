@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("HomeView",)
+__all__: Sequence[str] = ("HomeView", "UserSettingsView")
 
 from django.views.generic import TemplateView
 
@@ -11,3 +11,9 @@ class HomeView(TemplateView):
     """Main Dashboard view, for users to look at the most recent posts about uni modules."""
 
     template_name = "ratemymodule/home.html"
+
+
+class UserSettingsView(TemplateView):
+    """Account management view, for users to edit their account settings."""
+
+    template_name = "ratemymodule/user-settings.html"
