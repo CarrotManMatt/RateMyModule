@@ -371,7 +371,7 @@ if "EMAIL_BACKEND" not in locals() or "smtp" in EMAIL_BACKEND.lower():
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [BASE_DIR / "override-templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

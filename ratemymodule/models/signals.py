@@ -30,5 +30,3 @@ def ready() -> None:
 # TODO: Signal to prevent removing creator from post's liked_user_set
 # TODO: Signal to prevent adding post creator to creator's disliked_post_set
 # TODO: Signal to prevent adding creator to post's disliked_user_set
-# TODO: Signal to ensure course added to user's enrolled_course_set has course's university's email_domain matching user's email domain
-# TODO: Signal to ensure user added to course's enrolled_user_set has user's email domain matching course's university's email_domain

@@ -16,11 +16,13 @@ __all__: Sequence[str] = (
 )
 
 import datetime
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from collections.abc import Set as ImmutableSet
 from typing import Final, override
 
+import tldextract
 from allauth.account.models import EmailAddress
+from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.core.exceptions import ValidationError
@@ -41,9 +43,11 @@ from .validators import (
     ExampleEmailValidator,
     FreeEmailValidator,
     HTML5EmailValidator,
-    PreexistingEmailTLDValidator,
     UnicodePropertiesRegexValidator,
 )
+
+# NOTE: Adding external package functions to the global scope for frequent usage
+get_user_model: Callable[[], "User"] = auth.get_user_model  # type: ignore[assignment]
 
 EARLIEST_TEACHING_YEAR: Final[int] = 1096
 LATEST_TEACHING_YEAR: Final[int] = 3000
@@ -73,7 +77,6 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
             HTML5EmailValidator(),
             FreeEmailValidator(),
             ConfusableEmailValidator(),
-            PreexistingEmailTLDValidator(),
             ExampleEmailValidator()
         ),
         error_messages={
@@ -143,15 +146,30 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         self.date_time_created = __value
 
     @property
-    def university(self) -> "University":
-        """Shortcut accessor to the university this user is a student at."""
-        return (
-            University.objects.alias(
-                full_email_domain=models.Value(self.email.rpartition("@")[2])
-            ).get(
-                full_email_domain__endswith=models.F("email_domain")
-            )
+    def university(self) -> "University | None":
+        """
+        Shortcut accessor to the university this user is a student at.
+
+        If the user is a staff member, they may have no university.
+        """
+        return self._get_university_from_email_domain(
+            self.email.rpartition("@")[2],
+            is_staff=any((self.is_staff, self.is_superuser))
         )
+
+    @staticmethod
+    def _get_university_from_email_domain(email_domain: str, *, is_staff: bool) -> "University | None":  # noqa: E501
+        try:
+            return (
+                University.objects.alias(full_email_domain=models.Value(email_domain)).get(
+                    full_email_domain__endswith=models.F("email_domain")
+                )
+            )
+        except University.DoesNotExist:
+            if is_staff:
+                return None
+
+            raise
 
     class Meta:
         """Metadata options about this model."""
@@ -189,16 +207,29 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         self.liked_post_set.add(*self.made_post_set.all())
         self.disliked_post_set.through.objects.filter(post__user=self).delete()  # type: ignore[attr-defined]
 
-    @override
-    def clean(self) -> None:
-        EMAIL_MATCHES_A_UNIVERSITY_DOMAIN: Final[bool] = (
-            University.objects.alias(
-                full_email_domain=models.Value(self.email.rpartition("@")[2])
-            ).filter(
-                full_email_domain__endswith=models.F("email_domain")
+    def _validate_email_not_already_exists(self) -> None:
+        local: str
+        domain: str
+        local, __, domain = self.email.rpartition("@")
+
+        EMAIL_ALREADY_EXISTS: Final[bool] = (
+            get_user_model().objects.exclude(email=self.email).exclude(pk=self.pk).filter(
+                email__icontains=f"{local}@{tldextract.extract(domain).domain}"
             ).exists()
         )
-        if not EMAIL_MATCHES_A_UNIVERSITY_DOMAIN:
+        if EMAIL_ALREADY_EXISTS:
+            raise ValidationError(
+                {"email": _("That Email Address is already in use by another user.")},
+                code="unique"
+            )
+
+    @override
+    def clean(self) -> None:
+        self._validate_email_not_already_exists()
+
+        try:
+            __ = self.university
+        except University.DoesNotExist:
             raise ValidationError(
                 {
                     "email": _(
@@ -206,25 +237,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
                     )
                 },
                 code="invalid"
-            )
-
-        if self.pk:
-            if not self.is_staff and not self.enrolled_course_set.exists():
-                raise ValidationError(
-                    {"enrolled_course_set": _("This field is required.")},
-                    code="required"
-                )
-
-            if self.enrolled_course_set.exclude(university=self.university).exists():
-                raise ValidationError(
-                    {
-                        "enrolled_course_set": _(
-                            "A user cannot be enrolled in courses "
-                            "across multiple universities."
-                        )
-                    },
-                    code="invalid"
-                )
+            ) from None
 
     @classmethod
     @override
@@ -385,7 +398,6 @@ class Module(CustomBaseModel):
     )
     code = models.CharField(
         max_length=60,
-        unique=True,
         verbose_name=_("Reference Code"),
         help_text=_("The unique reference code of this module within its university"),
         validators=(
@@ -416,29 +428,11 @@ class Module(CustomBaseModel):
 
     @override
     def clean(self) -> None:
-        if self.pk:
+        if self.pk:  # noqa: SIM102
             if self.course_set.exclude(university=self.university).exists():
                 raise ValidationError(
                     _("A module cannot be linked to courses across multiple universities."),
                     code="invalid"
-                )
-
-            if self.university.module_set.filter(name=self.name).exists():
-                raise ValidationError(
-                    {
-                        "name": _("A module with this name already exists at %(university)s.")
-                    },
-                    code="unique",
-                    params={"university": self.university}
-                )
-
-            if self.university.module_set.filter(code=self.code).exists():
-                raise ValidationError(
-                    {
-                        "code": _("A module with this code already exists at %(university)s.")
-                    },
-                    code="unique",
-                    params={"university": self.university}
                 )
 
     @property
@@ -484,19 +478,6 @@ class BaseTag(CustomBaseModel):
         abstract = True
 
     @override
-    def clean(self) -> None:
-        TAG_NAME_EXISTS: Final[bool] = (
-            TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
-            or OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
-            or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
-        )
-        if TAG_NAME_EXISTS:
-            raise ValidationError(
-                {"name": _("A tag with this name already exists.")},
-                code="unique"
-            )
-
-    @override
     def __str__(self) -> str:
         return self.name
 
@@ -509,6 +490,23 @@ class TopicTag(BaseTag):
 
         verbose_name = _("Topic Tag")
 
+    @override
+    def clean(self) -> None:
+        TAG_NAME_EXISTS: Final[bool] = (
+            OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or (
+                TopicTag.objects.exclude(pk=self.pk).filter(
+                    name__iexact=self.name.casefold()
+                ).exists()
+            )
+        )
+        if TAG_NAME_EXISTS:
+            raise ValidationError(
+                {"name": _("A tag with this name already exists.")},
+                code="unique"
+            )
+
 
 class OtherTag(BaseTag):
     """Model class for other tags describing a module, that can be added to posts."""
@@ -518,6 +516,23 @@ class OtherTag(BaseTag):
 
         verbose_name = _("Other Tag")
 
+    @override
+    def clean(self) -> None:
+        TAG_NAME_EXISTS: Final[bool] = (
+            TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or (
+                OtherTag.objects.exclude(pk=self.pk).filter(
+                    name__iexact=self.name.casefold()
+                ).exists()
+            )
+        )
+        if TAG_NAME_EXISTS:
+            raise ValidationError(
+                {"name": _("A tag with this name already exists.")},
+                code="unique"
+            )
+
 
 class ToolTag(BaseTag):
     """Model class for tags about the tools used in a module, that can be added to posts."""
@@ -526,6 +541,23 @@ class ToolTag(BaseTag):
         """Metadata options about this model."""
 
         verbose_name = _("Tool Tag")
+
+    @override
+    def clean(self) -> None:
+        TAG_NAME_EXISTS: Final[bool] = (
+            OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or (
+                ToolTag.objects.exclude(pk=self.pk).filter(
+                    name__iexact=self.name.casefold()
+                ).exists()
+            )
+        )
+        if TAG_NAME_EXISTS:
+            raise ValidationError(
+                {"name": _("A tag with this name already exists.")},
+                code="unique"
+            )
 
 
 # NOTE: Choices classes need to be defined outside of their respective models, so that they can be referenced within the model's Meta constraints list
@@ -658,15 +690,20 @@ class Post(CustomBaseModel):
 
     @override
     def clean(self) -> None:
-        if self.module not in self.user.module_set.all():
-            raise ValidationError(
-                {
-                    "module": _(
-                        "You cannot create posts about modules that you have not taken."
-                    )
-                },
-                code="invalid"
-            )
+        try:
+            module: Module = self.module
+        except Module.DoesNotExist:
+            pass
+        else:
+            if module not in self.user.module_set.all():
+                raise ValidationError(
+                    {
+                        "module": _(
+                            "You cannot create posts about modules that you have not taken."
+                        )
+                    },
+                    code="invalid"
+                )
 
     @classmethod
     @override
@@ -729,7 +766,6 @@ class Post(CustomBaseModel):
 
     @override
     def __str__(self) -> str:
-        # TODO: Not a unique identifier in admin interface
         return f"Post by {self.student_type} for {self.module}"
 
 

@@ -79,7 +79,8 @@ module = [
     "confusable_homoglyphs",
     "environ",
     "allauth.account.models",
-    "allauth.socialaccount.models"
+    "allauth.socialaccount.models",
+    "rangefilter.filters"
 ]
 ignore_missing_imports = true
 

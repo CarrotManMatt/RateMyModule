@@ -67,9 +67,18 @@ class UserManager(DjangoUserManager["User"]):
 
 
 class UniversityModuleManager(Manager["Module"]):
+    """
+    Manager class to create & retrieve instances of the `Module` model.
+
+    Module objects are selected by the instances that are linked to a university
+    through its `course_set`.
+    """
+
     @override
     def __init__(self, university: "University") -> None:
         self.university: University = university
+        # noinspection PyTypeChecker
+        self.model = apps.get_model(app_label="ratemymodule", model_name="Module")
 
         super().__init__()
 
@@ -81,14 +90,23 @@ class UniversityModuleManager(Manager["Module"]):
 
 
 class UserModuleManager(Manager["Module"]):
+    """
+    Manager class to create & retrieve instances of the `Module` model.
+
+    Module objects are selected by the instances that are linked to a user
+    through their `enrolled_course_set`.
+    """
+
     @override
     def __init__(self, user: "User") -> None:
-        self.user: User = user
+        self._user: User = user
+        # noinspection PyTypeChecker
+        self.model = apps.get_model(app_label="ratemymodule", model_name="Module")
 
         super().__init__()
 
     @override
     def get_queryset(self) -> QuerySet["Module"]:
-        return apps.get_model(app_label="ratemymodule", model_name="User").objects.filter(  # type: ignore[no-any-return]
-            course_set__pk__in=self.user.enrolled_course_set.all()
+        return apps.get_model(app_label="ratemymodule", model_name="Module").objects.filter(  # type: ignore[no-any-return]
+            course_set__pk__in=self._user.enrolled_course_set.all()
         ).distinct()

@@ -156,35 +156,11 @@ class ExampleEmailValidator:
 
 @deconstructible
 class PreexistingEmailTLDValidator:
-    """
-    Validator that disallows email address values that are already used by another user.
+    """Deprecated! DO NOT USE!"""  # noqa: D400
 
-    Checks for usage without any subdomain parts. Always performs the check,
-    even if it is not that other user's primary email address.
-    """
-
-    def __call__(self, value: object) -> None:
+    def __call__(self, _: object) -> None:
         """Execute this validator to decide whether the given value is valid."""
-        if not isinstance(value, str):
-            return
-
-        if value.count("@") != 1:
-            return
-
-        local: str
-        domain: str
-        local, __, domain = value.rpartition("@")
-
-        EMAIL_ALREADY_EXISTS: Final[bool] = (
-            get_user_model().objects.exclude(email=value).filter(
-                email__icontains=f"{local}@{tldextract.extract(domain).domain}"
-            ).exists()
-        )
-        if EMAIL_ALREADY_EXISTS:
-            raise ValidationError(
-                {"email": _("That Email Address is already in use by another user.")},
-                code="unique"
-            )
+        raise DeprecationWarning
 
 
 @deconstructible

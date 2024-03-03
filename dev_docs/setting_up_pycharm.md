@@ -134,5 +134,5 @@ then navigate to the [`Languages & Frameworks > Django` page](https://jetbrains.
 8. Mark the following directories as [`Tests`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
 `api_htmx/tests/`, `api_rest/tests/`, `ratemymodule/tests/` & `web/tests/`
 9. Mark the following directories as [`Templates`](https://jetbrains.com/help/pycharm/project-structure-dialog.html#dc5370fc):
-`api_htmx/templates/` & `web/templates/`
+`override-templates/`, `api_htmx/templates/` & `web/templates/`
 10. Click the `Apply` button in the bottom-right corner to save your changes
