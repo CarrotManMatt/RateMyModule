@@ -63,6 +63,10 @@ raw_log_level: str
 if env("PRODUCTION"):
     production_env: Env = EnvClass(  # type: ignore[no-any-unimported]
         ALLOWED_HOSTS=(list, ["team55.bham.team", "team55.dev.bham.team", "ratemymodule"]),
+        CSRF_TRUSTED_ORIGINS=(
+            list,
+            ["https://team55.bham.team", "https://team55.dev.bham.team"]
+        ),
         LOG_LEVEL=(str, "WARNING")
     )
 
@@ -72,6 +76,7 @@ if env("PRODUCTION"):
     DEBUG = False
 
     ALLOWED_HOSTS = production_env("ALLOWED_HOSTS")
+    CSRF_TRUSTED_ORIGINS = production_env("CSRF_TRUSTED_ORIGINS")
 
 else:
     development_env: Env = EnvClass(  # type: ignore[no-any-unimported]
@@ -87,6 +92,16 @@ else:
                 "ratemymodule"
             ]
         ),
+        CSRF_TRUSTED_ORIGINS=(
+            list,
+            [
+                "https://localhost",
+                "https://127.0.0.1",
+                "https://[::1]",
+                "https://.localhost",
+                "https://team55.dev.bham"
+            ]
+        ),
         LOG_LEVEL=(str, "INFO")
     )
 
@@ -95,6 +110,7 @@ else:
     DEBUG = development_env("DEBUG")
 
     ALLOWED_HOSTS = development_env("ALLOWED_HOSTS")
+    CSRF_TRUSTED_ORIGINS = development_env("CSRF_TRUSTED_ORIGINS")
 
     if DEBUG:
         debug_env: Env = EnvClass(EMAIL_TO_CONSOLE=(bool, True))  # type: ignore[no-any-unimported]
