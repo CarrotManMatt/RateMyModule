@@ -36,10 +36,11 @@ WORKDIR /app
 COPY LICENSE .en[v] core.d[b] core.sqlit[e] sqlite3.d[b] manage.py ./
 RUN chmod +x manage.py
 
-COPY core/ ./core
-COPY api_htmx/ ./api_htmx
-COPY api_rest/ ./api_rest
+COPY core/ ./core/
+COPY api_htmx/ ./api_htmx/
+COPY api_rest/ ./api_rest/
 COPY ratemymodule/ ./ratemymodule/
 COPY web/ ./web/
+COPY override-templates/ ./override-templates/
 
 ENTRYPOINT ["sh", "/app/entrypoint.sh"]
