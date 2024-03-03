@@ -61,7 +61,7 @@ class _BaseUserCleanForm(forms.ModelForm[User]):
                 )
 
             USER_HAS_POSTS_ABOUT_MODULES_ON_REMOVED_COURSES: Final[bool] = (
-                bool(self.instance)
+                bool(self.instance.pk)
                 and Post.objects.filter(
                     user=self.instance,
                     module__course_set__pk__in=self.instance.enrolled_course_set.exclude(
