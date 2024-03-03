@@ -99,7 +99,7 @@ else:
                 "https://127.0.0.1",
                 "https://[::1]",
                 "https://.localhost",
-                "https://team55.dev.bham"
+                "https://team55.dev.bham.team"
             ]
         ),
         LOG_LEVEL=(str, "INFO")
