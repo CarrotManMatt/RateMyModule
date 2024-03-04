@@ -347,7 +347,7 @@ class Course(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z")
         )
     )
     student_type = models.CharField(
@@ -393,7 +393,7 @@ class Module(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z")
         )
     )
     code = models.CharField(
