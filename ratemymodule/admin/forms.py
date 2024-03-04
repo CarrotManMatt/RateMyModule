@@ -477,7 +477,7 @@ class ModuleModelForm(DjangoModelForm[Module]):
                     )
 
                 MODULE_HAS_POSTS_FROM_USERS_ON_REMOVED_COURSES: Final[bool] = (
-                    bool(self.instance)
+                    bool(self.instance.pk)
                     and Post.objects.filter(
                         module=self.instance,
                         user__enrolled_course_set__pk__in=self.instance.course_set.exclude(
