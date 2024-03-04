@@ -465,7 +465,7 @@ class BaseTag(CustomBaseModel):
         verbose_name=_("Tag Name"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' +&()#-]+\Z")
         )
     )
     is_verified = models.BooleanField(default=False, verbose_name=_("Is Verified?"))
