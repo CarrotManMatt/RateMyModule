@@ -18,7 +18,7 @@ __all__: Sequence[str] = (
 import datetime
 from collections.abc import Callable, Iterable
 from collections.abc import Set as ImmutableSet
-from typing import Final, override
+from typing import Final, TypeAlias, override
 
 import tldextract
 from allauth.account.models import EmailAddress
@@ -574,7 +574,8 @@ class _Ratings(models.IntegerChoices):
 class Post(CustomBaseModel):
     """Core model class for posts that can be made by users about modules."""
 
-    Ratings: type[_Ratings] = _Ratings
+    # noinspection PyTypeHints
+    Ratings: TypeAlias = _Ratings
 
     module = models.ForeignKey(
         Module,
@@ -785,7 +786,8 @@ class _Reasons(models.TextChoices):
 class Report(CustomBaseModel):
     """Model class for reports, that users can make about posts."""
 
-    Reasons: type[_Reasons] = _Reasons
+    # noinspection PyTypeHints
+    Reasons: TypeAlias = _Reasons
 
     post = models.ForeignKey(
         Post,
