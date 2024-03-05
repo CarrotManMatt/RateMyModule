@@ -35,14 +35,14 @@ class HomeView(TemplateView):
         else:
             context_data.update(
                 {
-                    "overall_rating_bar_graph": mark_safe(
+                    "overall_rating_bar_graph": mark_safe(  # noqa: S308
                         graph_utils.overall_rating_bar_graph()
                     ),
-                    "difficulty_bar_graph": mark_safe(
+                    "difficulty_bar_graph": mark_safe(  # noqa: S308
                         graph_utils.difficulty_rating_bar_graph()
                     ),
-                    "teaching_graph": mark_safe(graph_utils.teaching_quality_bar_graph()),
-                    "assessment_graph": mark_safe(graph_utils.assessment_quality_bar_graph())
+                    "teaching_graph": mark_safe(graph_utils.teaching_quality_bar_graph()),  # noqa: S308
+                    "assessment_graph": mark_safe(graph_utils.assessment_quality_bar_graph())  # noqa: S308
                 }
             )
 
