@@ -35,6 +35,11 @@
 {% block right_sidebar_lower %}
     <div class="right-sidebar-lower">
         {# Content for lower part of the right sidebar #}
-        <div>Analytics Goes Here</div>
+        <div>
+            {{ overall_rating_bar_graph }}
+            {{ difficulty_bar_graph }}
+            {{ teaching_graph }}
+            {{ assessment_graph }}
+        </div>
     </div>
 {% endblock right_sidebar_lower %}
