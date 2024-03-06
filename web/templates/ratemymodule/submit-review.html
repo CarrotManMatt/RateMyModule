@@ -1,0 +1,115 @@
+{% extends "ratemymodule/base.html" %}
+{% load static %}
+
+{% block title %}Submit a Review{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'ratemymodule/styles/submit-review.css' %}">
+{% endblock styles %}
+
+{% block content %}
+    <div class="container">
+        <h1>Submit Your Module Review</h1>
+        <form id="review-form" method="post"
+              action="{% url 'ratemymodule:submit-review' %}">
+            {% csrf_token %}
+            <div class="module-selection-container">
+                <label for="moduleSelect">Module:</label>
+                <select id="moduleSelect" name="module" required>
+                    <option value="" disabled selected>Select module...
+                    </option>
+                    {% for module in module_choices %}
+                        <option value="{{ module.id }}">{{ module.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="academicYearSelect">Year:</label>
+                <select id="academicYearSelect" name="academic_year_start" required>
+                    <option value="" disabled selected>Select academic
+                        year...
+                    </option>
+                    {% for year, display_year in academic_year_choices %}
+                        <option value="{{ year }}">{{ display_year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {{ form.content }}
+            <div class="rating-container">
+                <label>Star Rating:</label>
+                <div class="rating">
+                    {% for value, star in form.overall_rating.field.choices reversed %}
+                        <input type="radio" id="star{{ value }}"
+                               name="{{ form.overall_rating.html_name }}"
+                               value="{{ value }}">
+                        <label for="star{{ value }}"></label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="sliders-container">
+                <div class="rating-container small-rating">
+                    <label>Difficulty:</label>
+                    <div class="rating">
+                        {% for value, star in form.difficulty_rating.field.choices reversed %}
+                            <input type="radio" id="difficulty_star{{ value }}"
+                                   name="{{ form.difficulty_rating.html_name }}"
+                                   value="{{ value }}">
+                            <label for="difficulty_star{{ value }}"></label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="rating-container small-rating">
+                    <label>Teaching Quality:</label>
+                    <div class="rating">
+                        {% for value, star in form.teaching_rating.field.choices reversed %}
+                            <input type="radio" id="teaching_star{{ value }}"
+                                   name="{{ form.teaching_rating.html_name }}"
+                                   value="{{ value }}">
+                            <label for="teaching_star{{ value }}"></label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="rating-container small-rating">
+                    <label>Assessment Quality:</label>
+                    <div class="rating">
+                        {% for value, star in form.assessment_rating.field.choices reversed %}
+                            <input type="radio" id="assessment_star{{ value }}"
+                                   name="{{ form.assessment_rating.html_name }}"
+                                   value="{{ value }}">
+                            <label for="assessment_star{{ value }}"></label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="tags-container">
+                <div class="tag-input-container">
+                    <label for="id_tool_tags">Tools Used:</label>
+                    {{ form.tool_tags }}
+                </div>
+
+                <div class="tag-input-container">
+                    <label for="id_topic_tags">Main Topics:</label>
+                    {{ form.topic_tags }}
+                </div>
+
+                <div class="tag-input-container">
+                    <label for="id_other_tags">Other Tags:</label>
+                    {{ form.other_tags }}
+                </div>
+            </div>
+
+
+            {% if form.errors %}
+                <div class="form-errors">
+                    Please correct the following errors:
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <button type="submit">Submit Review</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,320 @@
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: var(--button-color-light);
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+textarea {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    min-height: 150px;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #925EF4;
+}
+
+.module {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.select-with-add-btn select {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Source Sans Pro', sans-serif;
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.select-with-add-btn select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #925EF4;
+}
+
+.select-with-add-btn #addModuleBtn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #925EF4;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+.select-with-add-btn #addModuleBtn:hover {
+    background-color: #6c3cc5;
+}
+
+.select-with-add-btn {
+    margin-bottom: 20px;
+}
+
+.select-with-add-btn label {
+    margin-right: 10px;
+}
+
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--button-color);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    width: auto;
+    height: auto;
+    line-height: 1;
+    font-size: 14px;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+button:hover {
+    background-color: var(--button-hover);
+}
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.rating {
+    display: flex;
+    flex-direction: row-reverse; /* Reverse the flex container */
+    justify-content: flex-end;
+    gap: 4px;
+    margin-left: 10px;
+}
+
+.rating input[type="radio"] {
+    display: none;
+}
+
+.rating label {
+    cursor: pointer;
+    font-size: 35px;
+    color: #925EF4; /* Default star color */
+}
+
+.rating label:before {
+    content: "☆"; /* Empty star */
+}
+
+.rating label:hover:before,
+.rating label:hover ~ label:before,
+.rating input[type="radio"]:checked ~ label:before {
+    content: "★"; /* Filled star character */
+    color: #925EF4; /* Color of filled stars */
+}
+
+/* Specifically fill the selected star */
+.rating input[type="radio"]:checked + label:before {
+    content: "★";
+    color: #925EF4;
+}
+
+.sliders-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.sliders-container > div {
+    text-align: center;
+    width: 30%;
+}
+
+.sliders-container .rating-container {
+    display: flex;
+    flex-direction: column; /* Stacks items vertically */
+    align-items: center; /* Horizontally centers the items */
+    flex-basis: calc(33.333% - 10px); /* Gives each item a third of the container width minus margin */
+    margin: 5px; /* Adds a small margin to each side */
+}
+
+.sliders-container .rating-container .rating {
+    justify-content: center; /* Ensures stars are centered */
+}
+
+.small-rating .rating label {
+    font-size: 30px; /* Adjust to desired smaller star size */
+}
+
+.sliders-container label {
+    display: block;
+    margin-bottom: 15px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    background: var(--background-color);
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #6c3cc5;
+    border: 2px solid #6c3cc5;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 2px #6c3cc5;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #6c3cc5;
+    border: 2px solid #6c3cc5;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 2px #6c3cc5;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover,
+input[type="range"]::-moz-range-thumb:hover {
+    background: #6c3cc5;
+}
+
+input[type="range"]:active::-webkit-slider-thumb,
+input[type="range"]:active::-moz-range-thumb {
+    background: #6c3cc5;
+    box-shadow: 0 0 4px #6c3cc5;
+}
+
+.tags-container {
+    display: flex;
+    justify-content: center; /* Center the containers */
+    height: auto;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+.tag-input-container {
+    flex-basis: calc(33.333% - 10px); /* Allocate space for 3 dropdowns */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align the items */
+}
+
+.tag-input-container label {
+    margin-bottom: 5px;
+    text-align: center; /* Center the text */
+}
+
+.tag-input-container select {
+    width: 100%; /* Make the select box fill the container */
+    padding: 8px 12px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Source Sans Pro', sans-serif;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.tag-input-container select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #925EF4;
+}
+
+@media (max-width: 768px) {
+    .tags-container {
+        justify-content: start; /* Align containers to the start on smaller screens */
+    }
+
+    .tag-input-container {
+        flex-basis: 100%; /* Each dropdown takes full width on smaller screens */
+        margin-bottom: 10px; /* Add some space between the dropdowns */
+    }
+}
+
+
+.module-selection-container {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.module-selection-container select {
+    padding: 8px 12px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Source Sans Pro', sans-serif;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+}
+
+.module-selection-container select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #925EF4;
+}
+
+.module-selection-container label {
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .module-selection-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .module-selection-container select {
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .module-selection-container label {
+        margin-bottom: 5px;
+    }
+}

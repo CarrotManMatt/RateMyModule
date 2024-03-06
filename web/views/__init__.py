@@ -2,7 +2,8 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("HomeView", "UserSettingsView")
+__all__: Sequence[str] = (
+    "HomeView", "SubmitPostView", "UserSettingsView")
 
 from typing import TYPE_CHECKING, override
 from urllib.parse import unquote_plus
@@ -13,9 +14,10 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
+from django.views.generic import CreateView, TemplateView
 
 from ratemymodule.models import Module, Post, University
+from web.forms import PostForm
 from web.views import graph_utils
 
 if TYPE_CHECKING:
@@ -116,6 +118,28 @@ class HomeView(TemplateView):
         context_data = self._get_post_list_context_data(context_data)
 
         return context_data  # noqa: RET504
+
+
+class SubmitPostView(CreateView):
+    """SubmitPostView for handling module review submissions."""
+
+    template_name = "ratemymodule/submit-review.html"
+    form_class = PostForm
+    success_url = "/"
+    model = Post
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.user = self.request.user
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["module_choices"] = Module.objects.all()
+        context["academic_year_choices"] = (
+            self.form_class.generate_academic_year_choices()
+        )
+        return context
 
 
 class UserSettingsView(TemplateView):

@@ -699,7 +699,7 @@ class Post(CustomBaseModel):
         except Module.DoesNotExist:
             pass
         else:
-            if module not in self.user.module_set.all():
+            if self.pk and module not in self.user.module_set.all():
                 raise ValidationError(
                     {
                         "module": _(

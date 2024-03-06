@@ -2,174 +2,176 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description"
-              content="Enhanced student feedback for university modules; a dynamic and user-friendly platform for honest reviews." />
-        <meta name="keywords"
-              content="university modules,student,feedback,anonymous,RateMyModule" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description"
+          content="Enhanced student feedback for university modules; a dynamic and user-friendly platform for honest reviews."/>
+    <meta name="keywords"
+          content="university modules,student,feedback,anonymous,RateMyModule"/>
 
-        <title>{% block title %}RateMyModule{% endblock title %}</title>
+    <title>{% block title %}RateMyModule{% endblock title %}</title>
 
-        <link rel="apple-touch-icon"
-              sizes="180x180"
-              href="{% static 'ratemymodule/favicon/apple-touch-icon.png' %}" />
-        <link rel="icon"
-              type="image/svg+xml"
-              href="{% static 'ratemymodule/favicon/favicon.svg' %}" />
-        <link rel="icon"
-              type="image/png"
-              sizes="32x32"
-              href="{% static 'ratemymodule/favicon/favicon-32x32.png' %}" />
-        <link rel="icon"
-              type="image/png"
-              sizes="16x16"
-              href="{% static 'ratemymodule/favicon/favicon-16x16.png' %}" />
-        <link rel="manifest"
-              href="{% static 'ratemymodule/favicon/site.webmanifest' %}" />
-        <link rel="mask-icon"
-              href="{% static 'ratemymodule/favicon/safari-pinned-tab.svg' %}"
-              color="#b295e8" />
-        <meta name="msapplication-TileColor" content="#b295e8" />
-        <meta name="theme-color" content="#b295e8" />
+    <link rel="apple-touch-icon"
+          sizes="180x180"
+          href="{% static 'ratemymodule/favicon/apple-touch-icon.png' %}"/>
+    <link rel="icon"
+          type="image/svg+xml"
+          href="{% static 'ratemymodule/favicon/favicon.svg' %}"/>
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="{% static 'ratemymodule/favicon/favicon-32x32.png' %}"/>
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="{% static 'ratemymodule/favicon/favicon-16x16.png' %}"/>
+    <link rel="manifest"
+          href="{% static 'ratemymodule/favicon/site.webmanifest' %}"/>
+    <link rel="mask-icon"
+          href="{% static 'ratemymodule/favicon/safari-pinned-tab.svg' %}"
+          color="#b295e8"/>
+    <meta name="msapplication-TileColor" content="#b295e8"/>
+    <meta name="theme-color" content="#b295e8"/>
 
-        <link rel="stylesheet" href="{% static 'ratemymodule/styles/base.css' %}" />
-        {% block styles %}
-        {% endblock styles %}
+    <link rel="stylesheet" href="{% static 'ratemymodule/styles/base.css' %}"/>
+    {% block styles %}
+    {% endblock styles %}
 
-        <!-- Scripts -->
-        <script>
-            (function () {
-                var theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', theme);
-            })();
-        </script>
-        <script src="{% static 'ratemymodule/scripts/search.js' %}"></script>
-        <script src="{% static 'ratemymodule/scripts/rating-star-changer.js' %}"></script>
-        <script src="{% static 'ratemymodule/scripts/filter.js' %}"></script>
-    </head>
+    <!-- Scripts -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="{% static 'ratemymodule/scripts/search.js' %}"></script>
+    <script src="{% static 'ratemymodule/scripts/rating-star-changer.js' %}"></script>
+    <script src="{% static 'ratemymodule/scripts/filter.js' %}"></script>
+</head>
 
-    <body>
-        <div id="loading-overlay"
-             style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000;"></div>
-        <header>
-            <div class="banner">
-                <div class="logo-container">
-                    <a href="{% url 'default' %}"
-                       style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                        <img src="{% static 'ratemymodule/icons/logo.svg' %}"
-                             alt="RateMyModule Logo" class="logo"/>
-                        <span class="name">RateMyModule</span>
-                    </a>
-                </div>
+<body>
+<div id="loading-overlay"
+     style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000;"></div>
+<header>
+    <div class="banner">
+        <div class="logo-container">
+            <a href="{% url 'default' %}"
+               style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="{% static 'ratemymodule/icons/logo.svg' %}"
+                     alt="RateMyModule Logo" class="logo"/>
+                <span class="name">RateMyModule</span>
+            </a>
+        </div>
 
-                <div class="search-container">
-                    <input type="search"
-                           placeholder="Type here to search..."
-                           class="search-input" />
-                    <span class="search-icon" id="search-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+        <div class="search-container">
+            <input type="search"
+                   placeholder="Type here to search..."
+                   class="search-input"/>
+            <span class="search-icon" id="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 50 50">
                             {# djlint:off H017 #}
                             <path d="M 21 3 C 11.622998 3 4 10.623005 4 20 C 4 29.376995 11.622998 37 21 37 C 24.712383 37 28.139151 35.791079 30.9375 33.765625 L 44.085938 46.914062 L 46.914062 44.085938 L 33.886719 31.058594 C 36.443536 28.083 38 24.223631 38 20 C 38 10.623005 30.377002 3 21 3 z M 21 5 C 29.296122 5 36 11.703883 36 20 C 36 28.296117 29.296122 35 21 35 C 12.703878 35 6 28.296117 6 20 C 6 11.703883 12.703878 5 21 5 z"></path>
                             {# djlint:on H017 #}
                         </svg>
                     </span>
+        </div>
+        <div class="user-profile-container">
+            {% if user.is_authenticated %}
+                <a href="{% url 'ratemymodule:submit-review' %}"
+                   class="create-post">Create Post</a>
+
+                <div class="user-dropdown">
+                    <button class="user-dropbtn">
+                        <span class="short-username">{{ user.short_username }}</span>
+                        <img src="{% static 'ratemymodule/icons/down-arrow-dark.svg' %}"
+                             alt="Dropdown Icon" class="dropdown-icon"/>
+                    </button>
+                    <div class="user-dropdown-content">
+                        <a href="{% url 'ratemymodule:user-settings' %}">User
+                            Settings</a>
+                        <a href="#">Logout</a>
+                    </div>
                 </div>
-                <div class="user-profile-container">
-                    {% if user.is_authenticated %}
-                        <a href="#"
-                           class="create-post">Create Post</a>
+            {% else %}
+                <a href="#" class="login">Login/Register</a>
+            {% endif %}
+        </div>
+        <div class="toggle-container">
+            <svg class="theme-svg" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#a)">
+                    <path d="M12 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM4.929 3.515a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 0 0 1.414-1.414L4.93 3.515ZM1 11a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H1ZM18 12a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1ZM17.657 16.243a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 1 0 1.414-1.414l-2.828-2.828ZM7.757 17.657a1 1 0 1 0-1.414-1.414L3.515 19.07a1 1 0 1 0 1.414 1.414l2.828-2.828ZM20.485 4.929a1 1 0 0 0-1.414-1.414l-2.828 2.828a1 1 0 1 0 1.414 1.414l2.828-2.828ZM13 19a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"></path>
+                </g>
+                <defs>
+                    <clipPath id="a">
+                        <path d="M0 0h24v24H0z"></path>
+                    </clipPath>
+                </defs>
+            </svg>
+        </div>
+    </div>
+</header>
 
-                        <div class="user-dropdown">
-                            <button class="user-dropbtn">
-                                <span class="short-username">{{ user.short_username }}</span>
-                                <img src="{% static 'ratemymodule/icons/down-arrow-dark.svg' %}"
-                                     alt="Dropdown Icon" class="dropdown-icon"/>
-                            </button>
-                            <div class="user-dropdown-content">
-                                <a href="{% url 'ratemymodule:user-settings' %}">User
-                                    Settings</a>
-                                <a href="#">Logout</a>
-                            </div>
-                        </div>
-                    {% else %}
-                        <a href="#" class="login">Login/Register</a>
-                    {% endif %}
-                </div>
-                <div class="toggle-container">
-                    <svg class="theme-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <g clip-path="url(#a)">
-                            <path d="M12 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM4.929 3.515a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 0 0 1.414-1.414L4.93 3.515ZM1 11a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H1ZM18 12a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1ZM17.657 16.243a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 1 0 1.414-1.414l-2.828-2.828ZM7.757 17.657a1 1 0 1 0-1.414-1.414L3.515 19.07a1 1 0 1 0 1.414 1.414l2.828-2.828ZM20.485 4.929a1 1 0 0 0-1.414-1.414l-2.828 2.828a1 1 0 1 0 1.414 1.414l2.828-2.828ZM13 19a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"></path>
-                        </g>
-                        <defs>
-                            <clipPath id="a">
-                                <path d="M0 0h24v24H0z"></path>
-                            </clipPath>
-                        </defs>
-                    </svg>
-                </div>
-            </div>
-        </header>
+<main>
+    {% block content %}
+        {# content goes here i.e. base-with-content.html #}
+    {% endblock content %}
+</main>
 
-        <main>
-            {% block content %}
-                {# content goes here i.e. base-with-content.html #}
-            {% endblock content %}
-        </main>
+{% block modals %}
+{% endblock modals %}
 
-        {% block modals %}
-        {% endblock modals %}
+<footer>
+    <p>
+        You are accessing an experimental web application developed by
+        participants of the Team Project 2024 module.
+    </p>
+</footer>
 
-        <footer>
-            <p>
-                You are accessing an experimental web application developed by
-                participants of the Team Project 2024 module.
-            </p>
-        </footer>
+{# HTMX script here #}
+<script src="https://unpkg.com/htmx.org@1.9.10"
+        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+        crossorigin="anonymous"></script>
 
-    {# HTMX script here #}
-    <script src="https://unpkg.com/htmx.org@1.9.10"
-            integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-            crossorigin="anonymous"></script>
+{% block scripts %}
+    <script>
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            setDropdownIconTheme(newTheme);
+            // You might want to call any function here that updates the SVG fill based on the theme
+        }
 
-    {% block scripts %}
-        <script>
-            function toggleTheme() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                setDropdownIconTheme(newTheme);
-                // You might want to call any function here that updates the SVG fill based on the theme
-            }
-
-            function setDropdownIconTheme(theme) {
-                const dropdownIcons = document.querySelectorAll('.dropdown-icon');
-                dropdownIcons.forEach(icon => {
-                    icon.src = `/static/ratemymodule/icons/down-arrow-${theme}.svg`;
-                });
-            }
-
-            // Add click event listener to the SVG for theme toggling
-            document.addEventListener('DOMContentLoaded', () => {
-                const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                setDropdownIconTheme(savedTheme);
-                // Update this part to target the SVG container instead of an input element
-                const themeToggleSvg = document.querySelector('.toggle-container');
-                if (themeToggleSvg) {
-                    themeToggleSvg.addEventListener('click', toggleTheme);
-                }
-
-                // Hide the loading overlay if it exists
-                const loadingOverlay = document.getElementById('loading-overlay');
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'none';
-                }
-                document.body.classList.add('loaded');
+        function setDropdownIconTheme(theme) {
+            const dropdownIcons = document.querySelectorAll('.dropdown-icon');
+            dropdownIcons.forEach(icon => {
+                icon.src = `/static/ratemymodule/icons/down-arrow-${theme}.svg`;
             });
-        </script>
-    {% endblock scripts %}
-    </body>
+        }
+
+        // Add click event listener to the SVG for theme toggling
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            setDropdownIconTheme(savedTheme);
+            // Update this part to target the SVG container instead of an input element
+            const themeToggleSvg = document.querySelector('.toggle-container');
+            if (themeToggleSvg) {
+                themeToggleSvg.addEventListener('click', toggleTheme);
+            }
+
+            // Hide the loading overlay if it exists
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+            document.body.classList.add('loaded');
+        });
+    </script>
+{% endblock scripts %}
+</body>
 </html>
