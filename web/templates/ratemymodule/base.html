@@ -78,9 +78,9 @@
                     </span>
         </div>
         <div class="user-profile-container">
+            <a href="{% url 'ratemymodule:submit-review' %}"
+               class="create-post">Create Post</a>
             {% if user.is_authenticated %}
-                <a href="{% url 'ratemymodule:submit-review' %}"
-                   class="create-post">Create Post</a>
 
                 <div class="user-dropdown">
                     <button class="user-dropbtn">

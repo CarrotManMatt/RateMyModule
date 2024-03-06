@@ -16,7 +16,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, TemplateView
 
-from ratemymodule.models import Module, Post, University
+from ratemymodule.models import Module, Post, University, User
 from web.forms import PostForm
 from web.views import graph_utils
 
@@ -130,7 +130,7 @@ class SubmitPostView(CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        obj.user = self.request.user
+        obj.user = User.objects.first()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
