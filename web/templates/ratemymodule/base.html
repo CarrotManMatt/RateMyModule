@@ -82,37 +82,39 @@
                class="create-post">Create Post</a>
             {% if user.is_authenticated %}
 
-                <div class="user-dropdown">
-                    <button class="user-dropbtn">
-                        <span class="short-username">{{ user.short_username }}</span>
-                        <img src="{% static 'ratemymodule/icons/down-arrow-dark.svg' %}"
-                             alt="Dropdown Icon" class="dropdown-icon"/>
-                    </button>
-                    <div class="user-dropdown-content">
-                        <a href="{% url 'ratemymodule:user-settings' %}">User
-                            Settings</a>
-                        <a href="#">Logout</a>
-                    </div>
+                        <div class="user-dropdown">
+                            <button class="user-dropbtn">
+                                <span class="short-username">{{ user.short_username }}</span>
+                                <img src="{% static 'ratemymodule/icons/down-arrow-dark.svg' %}"
+                                     alt="Dropdown Icon" class="dropdown-icon"/>
+                            </button>
+                            <div class="user-dropdown-content">
+                                <a href="{% url 'ratemymodule:user-settings' %}">User
+                                    Settings</a>
+                                <form method="post" action="{% url 'ratemymodule:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ LOGIN_URL }}" class="login-button">Login/Register</a>
+                    {% endif %}
                 </div>
-            {% else %}
-                <a href="#" class="login">Login/Register</a>
-            {% endif %}
-        </div>
-        <div class="toggle-container">
-            <svg class="theme-svg" viewBox="0 0 24 24"
-                 xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#a)">
-                    <path d="M12 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM4.929 3.515a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 0 0 1.414-1.414L4.93 3.515ZM1 11a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H1ZM18 12a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1ZM17.657 16.243a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 1 0 1.414-1.414l-2.828-2.828ZM7.757 17.657a1 1 0 1 0-1.414-1.414L3.515 19.07a1 1 0 1 0 1.414 1.414l2.828-2.828ZM20.485 4.929a1 1 0 0 0-1.414-1.414l-2.828 2.828a1 1 0 1 0 1.414 1.414l2.828-2.828ZM13 19a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"></path>
-                </g>
-                <defs>
-                    <clipPath id="a">
-                        <path d="M0 0h24v24H0z"></path>
-                    </clipPath>
-                </defs>
-            </svg>
-        </div>
-    </div>
-</header>
+                <div class="toggle-container">
+                    <svg class="theme-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#a)">
+                            <path d="M12 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM4.929 3.515a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 0 0 1.414-1.414L4.93 3.515ZM1 11a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H1ZM18 12a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1ZM17.657 16.243a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 1 0 1.414-1.414l-2.828-2.828ZM7.757 17.657a1 1 0 1 0-1.414-1.414L3.515 19.07a1 1 0 1 0 1.414 1.414l2.828-2.828ZM20.485 4.929a1 1 0 0 0-1.414-1.414l-2.828 2.828a1 1 0 1 0 1.414 1.414l2.828-2.828ZM13 19a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"></path>
+                        </g>
+                        <defs>
+                            <clipPath id="a">
+                                <path d="M0 0h24v24H0z"></path>
+                            </clipPath>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </header>
 
 <main>
     {% block content %}
@@ -120,8 +122,33 @@
     {% endblock content %}
 </main>
 
-{% block modals %}
-{% endblock modals %}
+        {% block modals %}
+            <div class="modal" id="loginModal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeLoginModal()">&times;</span>
+                    <h2>Login</h2>
+                    <form method="post" action="/">
+                        {% csrf_token %}
+                        <button type="submit" class="login-with-google-btn" >Continue with Google</button>
+                    </form>
+                    <form method="post" action="/" class="bsk-container">
+                        {% csrf_token %}
+                        <button class="bsk-btn bsk-btn-default">
+                            <object type="image/svg+xml" data="https://s3-eu-west-1.amazonaws.com/cdn-testing.web.bas.ac.uk/scratch/bas-style-kit/ms-pictogram/ms-pictogram.svg" class="x-icon"></object>
+                            Continue with Microsoft
+                        </button>
+                    </form>
+                    <button onclick="openManualLoginDialogue()" class="login-button">Other Account Types</button>
+                    <footer>Use this option if your university account is not managed by Google or Microsoft</footer>
+                </div>
+            </div>
+            <div class="modal" id="manualLoginModal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeLoginModal()">&times;</span>
+                    <h2>Work In Progress</h2>
+                </div>
+            </div>
+        {% endblock modals %}
 
 <footer>
     <p>
@@ -135,16 +162,31 @@
         integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
         crossorigin="anonymous"></script>
 
-{% block scripts %}
-    <script>
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            setDropdownIconTheme(newTheme);
-            // You might want to call any function here that updates the SVG fill based on the theme
-        }
+    {% block scripts %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById("loginModal").style.display = "{% if request.GET.action == "login" %}block{% else %}none{% endif %}";
+            });
+
+            function closeLoginModal() {
+                const currentURL = new URL(window.location.href);
+                currentURL.searchParams.delete("action", "login");
+                window.location.href = currentURL.toString();
+            }
+            function openManualLoginDialogue() {
+              document.getElementById("loginModal").style.display = "none";
+              document.getElementById("manualLoginModal").style.display = "block";
+            }
+        </script>
+        <script>
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                setDropdownIconTheme(newTheme);
+                // You might want to call any function here that updates the SVG fill based on the theme
+            }
 
         function setDropdownIconTheme(theme) {
             const dropdownIcons = document.querySelectorAll('.dropdown-icon');

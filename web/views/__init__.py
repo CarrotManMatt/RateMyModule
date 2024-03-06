@@ -3,18 +3,22 @@
 from collections.abc import Sequence
 
 __all__: Sequence[str] = (
-    "HomeView", "SubmitPostView", "UserSettingsView")
+    "HomeView",
+    "SubmitPostView",
+    "UserSettingsView",
+    "LogoutView"
+)
 
 from typing import TYPE_CHECKING, override
 from urllib.parse import unquote_plus
 
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect
-from django.urls import reverse
-from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import TemplateView, CreateView
+from allauth.account.views import LogoutView as AllAuthLogoutView
+from django.conf import settings
 
 from ratemymodule.models import Module, Post, University, User
 from web.forms import PostForm
@@ -22,6 +26,12 @@ from web.views import graph_utils
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
+
+
+class LogoutView(AllAuthLogoutView):
+    @override
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:
+        raise Http404
 
 
 class HomeView(TemplateView):
@@ -32,6 +42,14 @@ class HomeView(TemplateView):
     @override
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         # noinspection PyArgumentList
+        signup_action: str | None = self.request.GET.get("action")
+        if signup_action == "signup":
+            # noinspection PyArgumentList
+            signup_get_params: QueryDict = self.request.GET.copy()
+            signup_get_params["action"] = "login"
+            return redirect(f"{self.request.path}?{signup_get_params.urlencode()}")
+
+        # noinspection PyArgumentList
         module_code: str | None = self.request.GET.get("module")
         if module_code is None:
             university: University = (
@@ -40,10 +58,15 @@ class HomeView(TemplateView):
                 else University.objects.get(name="The University of Birmingham")
             )
             if university.module_set.exists():
-                return redirect(
-                    f"{reverse("ratemymodule:home")}?"
-                    f"{urlencode({"module": university.module_set.all()[0].code})}"
-                )
+                get_params: QueryDict = QueryDict(mutable=True)
+                get_params["module"] = university.module_set.all()[0].code
+
+                # noinspection PyArgumentList
+                action: str | None = self.request.GET.get("action")
+                if action is not None:
+                    get_params["action"] = action
+
+                return redirect(f"{self.request.path}?{get_params.urlencode()}")
 
         return super().get(request, *args, **kwargs)
 
@@ -51,19 +74,19 @@ class HomeView(TemplateView):
     def _get_graphs_context_data(self, context_data: dict[str, object]) -> dict[str, object]:
         if not Post.objects.exists():
             return {
+                **context_data,
                 "overall_rating_bar_graph": "",
                 "difficulty_bar_graph": "",
                 "teaching_graph": "",
-                "assessment_graph": "",
-                **context_data
+                "assessment_graph": ""
             }
 
         return {
+            **context_data,
             "overall_rating_bar_graph": mark_safe(graph_utils.overall_rating_bar_graph()),  # noqa: S308
             "difficulty_bar_graph": mark_safe(graph_utils.difficulty_rating_bar_graph()),  # noqa: S308
             "teaching_graph": mark_safe(graph_utils.teaching_quality_bar_graph()),  # noqa: S308
-            "assessment_graph": mark_safe(graph_utils.assessment_quality_bar_graph()),  # noqa: S308
-            **context_data
+            "assessment_graph": mark_safe(graph_utils.assessment_quality_bar_graph())  # noqa: S308
         }
 
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
@@ -71,7 +94,7 @@ class HomeView(TemplateView):
             # noinspection PyTypeChecker
             module: Module = Module.objects.get(code=unquote_plus(self.request.GET["module"]))
         except Module.DoesNotExist:
-            return {"error": _("Error: Module Not Found"), **context_data}
+            return {**context_data, "error": _("Error: Module Not Found")}
 
         post_set: QuerySet[Post] = module.post_set.all().order_by("date_time_created")
 
@@ -86,7 +109,7 @@ class HomeView(TemplateView):
             try:
                 rating: Post.Ratings = Post.Ratings(int(unquote_plus(raw_rating)))
             except ValueError:
-                return {"error": _("Error: Incorrect rating value"), **context_data}
+                return {**context_data, "error": _("Error: Incorrect rating value")}
 
             post_set = post_set.filter(overall_rating=rating)
 
@@ -96,11 +119,11 @@ class HomeView(TemplateView):
             try:
                 year: int = int(unquote_plus(raw_year))
             except ValueError:
-                return {"error": _("Error: Incorrect rating value"), **context_data}
+                return {**context_data, "error": _("Error: Incorrect rating value")}
 
             post_set = post_set.filter(academic_year_start=year)
 
-        return {"post_list": post_set, **context_data}
+        return {**context_data, "post_list": post_set}
 
     @override
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
@@ -113,6 +136,8 @@ class HomeView(TemplateView):
                 else University.objects.get(name="The University of Birmingham")
             ).course_set.prefetch_related("module_set").all()
         )
+
+        context_data["LOGIN_URL"] = settings.LOGIN_URL
 
         context_data = self._get_graphs_context_data(context_data)
         context_data = self._get_post_list_context_data(context_data)

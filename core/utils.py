@@ -127,7 +127,7 @@ def reverse_url_with_get_params(viewname: Callable[[], str] | str | None = None,
     if not get_params:
         return url
 
-    qdict: QueryDict = QueryDict("", mutable=True)
+    qdict: QueryDict = QueryDict(mutable=True)
 
     key: str
     val: object

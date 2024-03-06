@@ -32,12 +32,11 @@ from django.core.validators import (
     RegexValidator,
 )
 from django.db import models
-from django.urls import reverse
-from django.utils.http import urlencode
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 from django_stubs_ext.db.models.manager import RelatedManager
 
+from core.utils import reverse_url_with_get_params
 from .managers import UniversityModuleManager, UserManager, UserModuleManager
 from .utils import AttributeDeleter, CustomBaseModel
 from .validators import (
@@ -452,7 +451,10 @@ class Module(CustomBaseModel):
     @override  # type: ignore[misc]
     def get_absolute_url(self) -> str:
         """Return the canonical URL for a given `Module` object instance."""
-        return f"{reverse("ratemymodule:home")}?{urlencode({"module": self.code})}"
+        return reverse_url_with_get_params(
+            "ratemymodule:home",
+            get_params={"module": self.code}
+        )
 
     @override
     def __str__(self) -> str:

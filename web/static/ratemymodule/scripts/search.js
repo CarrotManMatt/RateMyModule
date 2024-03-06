@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (query !== ""){
             const currentURL = new URL(window.location.href);
             currentURL.searchParams.set("q", encodeURIComponent(query));
+            currentURL.searchParams.delete("action");
             window.location.href = currentURL.toString();
         }
     }

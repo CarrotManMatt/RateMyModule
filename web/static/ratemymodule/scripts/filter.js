@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (filterYear !== '' && !isNaN(filterYear) && Number.isInteger(parseFloat(filterYear))) {
             currentURL.searchParams.set("year", filterYear)
         }
+        currentURL.searchParams.delete("action");
 
         // Redirect to the modified URL
         window.location.href = currentURL.toString();
