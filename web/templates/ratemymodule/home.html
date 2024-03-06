@@ -5,6 +5,7 @@
 {% block extra_css %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'ratemymodule/css/home.css' %}" />
+    <link rel="stylesheet" href="{% static 'ratemymodule/css/submit-report.css' %}" />
 {% endblock extra_css %}
 
 {% block left_sidebar %}
@@ -64,6 +65,7 @@
                                 <div class="module-year">
                                     {{ post.academic_year_start }}
                                 </div>
+                                <button class="open-modal-button" onclick="openModal()">!</button>
                             </div>
                             <div class="separator"></div>
                             {# Post Item Bar Content #}
@@ -148,3 +150,72 @@
         </div>
     </div>
 {% endblock right_sidebar_lower %}
+
+{% block modals %}
+<div class="modal" id="myModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Select an Option</h2>
+    <div class="options">
+      <button onclick="selectOption('Hate Speech of Language')">Hate Speech or Language</button>
+      <button onclick="selectOption('Identifying Information')">Identifying Information</button>
+      <button onclick="selectOption('Assignment Answers')">Assignment Answers</button>
+      <button onclick="selectOption('Spam')">Spam</button>
+      <button onclick="selectOption('Bullying or Harassment')">Bullying or Harassment</button>
+      <button onclick="selectOption('False Information')">False Information</button>
+      <button onclick="selectOption('Sexual Content')">Sexual Content</button>
+    </div>
+    <button class="cancel-button" onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<div class="modal confirmation-modal" id="confirmationModal">
+  <div class="modal-content confirmation-modal-content">
+    <span class="close" onclick="closeConfirmationModal()">&times;</span>
+    <h2>You are reporting this post for:</h2>
+    <h3 id="selectedOptionText"></h3>
+    <p>We will review your report as soon as possible and take appropriate action if we believe this has broken our community guidelines</p>
+    <button class="confirm-button" onclick="confirmSelection()">Confirm Report</button>
+    <button class="cancel-button" onclick="cancelConfirmation()">Back</button>
+  </div>
+</div>
+{% endblock modals %}
+
+{% block scripts %}
+{{ block.super }}
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("confirmationModal").style.display = "none";
+});
+
+function openModal() {
+  document.getElementById("myModal").style.display = "block";
+}
+
+function closeModal() {
+  document.getElementById("myModal").style.display = "none";
+}
+
+function selectOption(option) {
+  var selectedOptionText = document.getElementById("selectedOptionText");
+  selectedOptionText.innerText = option;
+  document.getElementById("myModal").style.display = "none";
+  document.getElementById("confirmationModal").style.display = "block";
+}
+
+function closeConfirmationModal() {
+  document.getElementById("confirmationModal").style.display = "none";
+}
+
+function confirmSelection() {
+  // Add your logic for handling the confirmed selection here
+  console.log("Confirmed Selection");
+  closeConfirmationModal();
+}
+
+function cancelConfirmation() {
+  document.getElementById("myModal").style.display = "block";
+  closeConfirmationModal();
+}
+</script>
+{% endblock scripts %}
