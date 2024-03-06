@@ -5,7 +5,7 @@ from collections.abc import Sequence
 __all__: Sequence[str] = ("HomeView", "UserSettingsView")
 
 from typing import TYPE_CHECKING, override
-from urllib.parse import unquote
+from urllib.parse import unquote_plus
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -15,7 +15,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from ratemymodule.models import Module, Post
+from ratemymodule.models import Module, Post, University
 from web.views import graph_utils
 
 if TYPE_CHECKING:
@@ -31,11 +31,17 @@ class HomeView(TemplateView):
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         # noinspection PyArgumentList
         module_code: str | None = self.request.GET.get("module")
-        if module_code is None and Module.objects.exists():
-            return redirect(
-                f"{reverse("ratemymodule:home")}?"
-                f"{urlencode({"module": Module.objects.all()[0].code})}"
+        if module_code is None:
+            university: University = (
+                self.request.user.university
+                if self.request.user.is_authenticated and self.request.user.university
+                else University.objects.get(name="The University of Birmingham")
             )
+            if university.module_set.exists():
+                return redirect(
+                    f"{reverse("ratemymodule:home")}?"
+                    f"{urlencode({"module": university.module_set.all()[0].code})}"
+                )
 
         return super().get(request, *args, **kwargs)
 
@@ -61,7 +67,7 @@ class HomeView(TemplateView):
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
         try:
             # noinspection PyTypeChecker
-            module: Module = Module.objects.get(code=unquote(self.request.GET["module"]))
+            module: Module = Module.objects.get(code=unquote_plus(self.request.GET["module"]))
         except Module.DoesNotExist:
             return {"error": _("Error: Module Not Found"), **context_data}
 
@@ -70,13 +76,13 @@ class HomeView(TemplateView):
         # noinspection PyArgumentList
         raw_search_string: str | None = self.request.GET.get("q")
         if raw_search_string:
-            post_set = post_set.filter(content__icontains=unquote(raw_search_string))
+            post_set = post_set.filter(content__icontains=unquote_plus(raw_search_string))
 
         # noinspection PyArgumentList
         raw_rating: str | None = self.request.GET.get("rating")
         if raw_rating:
             try:
-                rating: Post.Ratings = Post.Ratings(int(raw_rating))
+                rating: Post.Ratings = Post.Ratings(int(unquote_plus(raw_rating)))
             except ValueError:
                 return {"error": _("Error: Incorrect rating value"), **context_data}
 
@@ -86,7 +92,7 @@ class HomeView(TemplateView):
         raw_year: str | None = self.request.GET.get("year")
         if raw_year:
             try:
-                year: int = int(raw_year)
+                year: int = int(unquote_plus(raw_year))
             except ValueError:
                 return {"error": _("Error: Incorrect rating value"), **context_data}
 
@@ -97,6 +103,14 @@ class HomeView(TemplateView):
     @override
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context_data: dict[str, object] = super().get_context_data(**kwargs)
+
+        context_data["course_list"] = (
+            (
+                self.request.user.university
+                if self.request.user.is_authenticated and self.request.user.university
+                else University.objects.get(name="The University of Birmingham")
+            ).course_set.prefetch_related("module_set").all()
+        )
 
         context_data = self._get_graphs_context_data(context_data)
         context_data = self._get_post_list_context_data(context_data)

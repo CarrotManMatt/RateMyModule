@@ -4,16 +4,24 @@
 
 {% block title %}RateMyModule{% endblock title %}
 
-{% block extra_css %}
+{% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'ratemymodule/css/content.css' %}" />
-{% endblock extra_css %}
+    <link rel="stylesheet" href="{% static 'ratemymodule/styles/content.css' %}"/>
+{% endblock styles %}
 
 {% block content %}
     <div class="wrapper">
-        <aside class="left-sidebar">
-            {% block left_sidebar %}
-            {% endblock left_sidebar %}
+        <aside class="left-container">
+            <div class="left-sidebar">
+                {% block left_sidebar_upper %}
+                {% endblock left_sidebar_upper %}
+            </div>
+
+            <div class="legal-box">
+                <p>By using this site, you agree to our <a
+                        href="{% static 'ratemymodule/legal-docs/GDPR%20Privacy%20Policy.pdf' %}">GDPR
+                    policy</a></p>
+            </div>
         </aside>
 
         <section class="main-content">

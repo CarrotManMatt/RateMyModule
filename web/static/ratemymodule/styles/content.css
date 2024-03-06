@@ -1,0 +1,93 @@
+.wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+.left-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 5px;
+}
+
+.left-sidebar {
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.legal-box {
+    margin-top: 10px;
+    padding: 0 15px 0 15px;
+    background-color: var(--secondary-color);
+    color: #7e8285;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 0.875rem; /* Example font size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adds some depth */
+    word-wrap: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+}
+
+.legal-box a {
+    color: #4e8cff; /* Adjust link color for visibility */
+    text-decoration: underline;
+    display: inline-block;
+}
+
+p {
+    word-wrap: break-word; /* This will break long words that would otherwise extend outside the container */
+    white-space: normal; /* This ensures that the whitespace is handled normally */
+    overflow-wrap: break-word; /* This is a standard way to specify line breaking */
+    hyphens: auto;
+}
+
+.right-sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 5px;
+}
+
+.right-sidebar-upper, .right-sidebar-lower {
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/*.right-sidebar-upper {*/
+/*    margin-bottom: 10px; !* Space between the two right sidebar boxes *!*/
+/*}*/
+
+.right-sidebar-lower {
+    object-fit: contain;
+    overflow-x: hidden;
+}
+
+.main-content {
+    flex: 2.5;
+    padding: 5px 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .left-container, .right-sidebar {
+        flex-basis: auto;
+        order: -1;
+    }
+
+    .main-content, .left-container, .right-sidebar {
+        flex: none;
+        width: 100%;
+    }
+}

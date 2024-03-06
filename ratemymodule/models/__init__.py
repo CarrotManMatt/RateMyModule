@@ -16,13 +16,12 @@ __all__: Sequence[str] = (
 )
 
 import datetime
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from collections.abc import Set as ImmutableSet
 from typing import Final, TypeAlias, override
 
 import tldextract
 from allauth.account.models import EmailAddress
-from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.core.exceptions import ValidationError
@@ -33,6 +32,9 @@ from django.core.validators import (
     RegexValidator,
 )
 from django.db import models
+from django.urls import reverse
+from django.utils.http import urlencode
+from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 from django_stubs_ext.db.models.manager import RelatedManager
 
@@ -45,9 +47,6 @@ from .validators import (
     HTML5EmailValidator,
     UnicodePropertiesRegexValidator,
 )
-
-# NOTE: Adding external package functions to the global scope for frequent usage
-get_user_model: Callable[[], "User"] = auth.get_user_model  # type: ignore[assignment]
 
 EARLIEST_TEACHING_YEAR: Final[int] = 1096
 LATEST_TEACHING_YEAR: Final[int] = 3000
@@ -157,6 +156,11 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
             is_staff=any((self.is_staff, self.is_superuser))
         )
 
+    @property
+    def short_username(self) -> str:
+        """Shortcut accessor to the short truncated username of this user."""
+        return Truncator(self.email.partition("@")[0]).chars(50)
+
     @staticmethod
     def _get_university_from_email_domain(email_domain: str, *, is_staff: bool) -> "University | None":  # noqa: E501
         try:
@@ -213,7 +217,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         local, __, domain = self.email.rpartition("@")
 
         EMAIL_ALREADY_EXISTS: Final[bool] = (
-            get_user_model().objects.exclude(email=self.email).exclude(pk=self.pk).filter(
+            User.objects.exclude(email=self.email).exclude(pk=self.pk).filter(
                 email__icontains=f"{local}@{tldextract.extract(domain).domain}"
             ).exists()
         )
@@ -448,8 +452,7 @@ class Module(CustomBaseModel):
     @override  # type: ignore[misc]
     def get_absolute_url(self) -> str:
         """Return the canonical URL for a given `Module` object instance."""
-        # TODO: Implement function to get absolute URL
-        raise NotImplementedError
+        return f"{reverse("ratemymodule:home")}?{urlencode({"module": self.code})}"
 
     @override
     def __str__(self) -> str:

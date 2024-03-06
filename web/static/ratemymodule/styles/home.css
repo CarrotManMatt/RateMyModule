@@ -1,0 +1,279 @@
+.left-sidebar {
+    padding: 20px;
+}
+
+.right-sidebar-upper-content {
+    padding: 20px;
+}
+
+.filter-bar {
+    background-color: var(--secondary-color);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    height: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.filter-title {
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.filter-button-title {
+    font-weight: bold;
+    color: white;
+    padding-left: 5px;
+}
+
+.filter-button {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    width: 58px;
+    padding: 8px 14px;
+    background-color: var(--button-color);
+    border-radius: 8px;
+    margin-left: 2px;
+}
+
+.filter-button:hover {
+    cursor: pointer;
+    background-color: var(--button-hover); /* lighter version of button colour */
+}
+
+.rating-item {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    padding: 10px;
+}
+
+.star-elements {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 5px;
+    margin-left: 5px;
+}
+
+.filter-rating-star:hover {
+    stroke: #7F4FD9;
+    fill: #C7A9FF;
+    fill-opacity: 100%;
+    cursor: pointer;
+}
+
+.tag-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+}
+
+.year-item {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+}
+
+.year-input-box {
+    height: fit-content;
+    width: 40px;
+    border: 2px solid var(--button-color);
+    border-radius: 8px;
+    padding: 5px 5px;
+    color: var(--secondary-text-color);
+    background-color: var(--background-color);
+}
+
+.year-input-box:focus {
+    outline: none;
+}
+
+.filter-tag-drop-down-button {
+    height: 24px;
+    width: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button-color);
+    border-radius: 8px;
+}
+
+.filter-tag-drop-down-button:hover {
+    cursor: pointer;
+    background-color: var(--button-hover);
+}
+
+.post-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+    max-height: 900px;
+}
+
+.post-item {
+    position: relative; /* Added to ensure modal button is positioned relative to this container */
+    width: 100%;
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between; /* This will push the module-year and button to the ends */
+    align-items: center;
+    margin-bottom: 10px; /* Space between header and the content below */
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1.125rem; /* 18px if the base size is 16px */
+    color: var(--text-color);
+}
+
+.module-year {
+    background-color: var(--button-color);
+    padding: 5px 10px;
+    border-radius: 8px;
+    white-space: nowrap; /* Prevents breaking into multiple lines */
+    margin-right: 30px;
+    font-weight: bold;
+    font-size: 1.125rem; /* 18px if the base size is 16px */
+    color: white;
+}
+
+.separator {
+    height: 2px;
+    background-color: var(--secondary-text-color);
+    margin-bottom: 10px;
+}
+
+.items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Uniform space between item elements */
+}
+
+.item-element {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background-color: var(--secondary-button-color);
+}
+
+.can-hover:hover {
+    background-color: var(--button-color);
+    color: white;
+}
+
+.contents {
+    font-size: 14px;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: var(--secondary-text-color);
+    margin-top: 10px; /* Space between items and content */
+}
+
+.open-modal-button {
+    position: absolute;
+    top: 15px; /* Adjust according to your layout */
+    right: 15px;
+    /* Other styles remain unchanged */
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .module-year, .open-modal-button {
+        margin-top: 10px; /* Extra space in smaller screens */
+    }
+
+    .items {
+        justify-content: center; /* Center the tags in mobile view */
+    }
+}
+
+.open-modal-button {
+    position: absolute; /* Position the button absolutely relative to its parent */
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    padding: 10px; /* Adjust size as needed */
+    width: 20px; /* Adjust size as needed */
+    height: 20px; /* Adjust size as needed */
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px; /* Adjust font size as needed */
+    z-index: 2; /* Ensure it's above other elements */
+    display: flex; /* Use flexbox for centering */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    line-height: 1;
+}
+
+.right-sidebar-lower-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.graphs {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-left: 20px;
+}
+
+.graphs > div {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.graphs svg {
+    max-width: 100%;
+    height: auto;
+    color: var(--text-color);
+}
+
+/* Enhance responsiveness for smaller screens */
+@media (max-width: 768px) {
+    .right-sidebar-lower-content {
+        padding: 10px;
+        gap: 5px;
+    }
+
+    .graphs > div {
+        flex-direction: column; /* Stack label and graph vertically on smaller screens */
+        align-items: flex-start; /* Align items to the start for a tight layout */
+    }
+}

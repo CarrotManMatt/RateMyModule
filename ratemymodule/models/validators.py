@@ -12,23 +12,17 @@ __all__: Sequence[str] = (
 )
 
 import re as regex
-from collections.abc import Callable, Collection
-from typing import TYPE_CHECKING, Final, override
+from collections.abc import Collection
+from typing import Final, override
 
 import regex as full_regex
 import tldextract
 from confusable_homoglyphs import confusables
-from django.contrib import auth
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator
 from django.utils import deconstruct
 from django.utils.translation import gettext_lazy as _
 
-if TYPE_CHECKING:
-    from . import User
-
-# NOTE: Adding external package functions to the global scope for frequent usage
-get_user_model: Callable[[], "User"] = auth.get_user_model  # type: ignore[assignment]
 deconstructible = deconstruct.deconstructible
 
 

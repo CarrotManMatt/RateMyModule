@@ -1,0 +1,15 @@
+{% for course in course_list %}
+    <div class="dropdown
+            {% for module in course.module_set.all %}{% if request.GET.module == module.code %}active{% endif %}{% endfor %}">
+        <button class="dropbtn">
+            {{ course.name }}
+            <span class="arrow">&#9660;</span>
+        </button>
+        <div class="dropdown-content">
+            {% for module in course.module_set.all %}
+                <a href="{% url 'default' %}?module={{ module.code|urlencode }}"
+                   class="{% if request.GET.module == module.code %}selected{% endif %}">{{ module.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}

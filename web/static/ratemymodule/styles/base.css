@@ -4,12 +4,20 @@
 :root {
     --background-color-light: #f0f0f0;
     --background-color-dark: #1E252B;
-    --text-color-light: #333;
-    --text-color-dark: #858EAD;
+    --text-color-light: #444445;
+    --text-color-dark: #f0f0f0;
     --secondary-color-light: #ffffff;
     --secondary-color-dark: #262D34;
     --button-color-light: #7f4fd9;
     --button-color-dark: #6c3cc5;
+    --button-hover-light: #9673e8;
+    --button-hover-dark: #7a4fca;
+    --dropdown-dark: #333;
+    --dropdown-light: #F0F0F0;
+    --dropdown-content-dark: #D3D3D3;
+    --dropdown-content-light: #555;
+    --dropdown-hover-dark: #3C4451;
+    --dropdown-hover-light: #E8E8E8;
     /* Ryan's colours */
     --secondary-button-color-dark: #333C45;
     --secondary-button-color-light: #DBDFE5;
@@ -21,12 +29,15 @@
     :root {
         --background-color: var(--background-color-light);
         --text-color: var(--text-color-light);
-        --banner-background-color: var(--secondary-color-light);
+        --secondary-color: var(--secondary-color-light);
         --button-color: var(--button-color-light);
+        --button-hover: var(--button-hover-light);
+        --dropdown: var(--dropdown-light);
+        --dropdown-content: var(--dropdown-content-light);
+        --dropdown-hover: var(--dropdown-hover-light);
         /* Ryan's colours */
         --secondary-button-color: var(--secondary-button-color-light);
         --secondary-text-color: var(--secondary-text-color-light);
-        --secondary-color: var(--secondary-color-light);
     }
 }
 
@@ -34,19 +45,61 @@
     :root {
         --background-color: var(--background-color-dark);
         --text-color: var(--text-color-dark);
-        --banner-background-color: var(--secondary-color-dark);
+        --secondary-color: var(--secondary-color-dark);
         --button-color: var(--button-color-dark);
+        --button-hover: var(--button-hover-dark);
+        --dropdown: var(--dropdown-dark);
+        --dropdown-content: var(--dropdown-content-dark);
+        --dropdown-hover: var(--dropdown-hover-dark);
         /* Ryan's colours */
         --secondary-button-color: var(--secondary-button-color-dark);
         --secondary-text-color: var(--secondary-text-color-dark);
-        --secondary-color: var(--secondary-color-dark);
     }
+}
+
+[data-theme="light"] {
+    --background-color: var(--background-color-light);
+    --text-color: var(--text-color-light);
+    --secondary-color: var(--secondary-color-light);
+    --button-color: var(--button-color-light);
+    --button-hover: var(--button-hover-light);
+    --dropdown: var(--dropdown-light);
+    --dropdown-content: var(--dropdown-content-light);
+    --dropdown-hover: var(--dropdown-hover-light);
+    --secondary-button-color: var(--secondary-button-color-light);
+    --secondary-text-color: var(--secondary-text-color-light);
+}
+
+[data-theme="dark"] {
+    --background-color: var(--background-color-dark);
+    --text-color: var(--text-color-dark);
+    --secondary-color: var(--secondary-color-dark);
+    --button-color: var(--button-color-dark);
+    --button-hover: var(--button-hover-dark);
+    --dropdown: var(--dropdown-dark);
+    --dropdown-content: var(--dropdown-content-dark);
+    --dropdown-hover: var(--dropdown-hover-dark);
+    --secondary-button-color: var(--secondary-button-color-dark);
+    --secondary-text-color: var(--secondary-text-color-dark);
 }
 
 body {
     font-family: 'Spline Sans', sans-serif;
     background-color: var(--background-color);
-    color: var(--secondary-color-light);
+    color: var(--text-color);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+body.loaded {
+    opacity: 1;
+}
+
+/* Optional: Improve loading overlay appearance, e.g., adding a spinner */
+#loading-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .banner {
@@ -57,7 +110,7 @@ body {
     margin: -8px -8px 10px -8px;
     border: none;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    background-color: var(--banner-background-color);
+    background-color: var(--secondary-color);
     font-family: 'Source Sans Pro', sans-serif;
 }
 
@@ -77,6 +130,7 @@ body {
     color: var(--button-color-light);
     white-space: nowrap;
     flex-shrink: 0;
+    flex-grow: 0;
     padding-right: 10px;
 }
 
@@ -86,6 +140,7 @@ body {
 
 .search-container {
     position: relative;
+    margin: auto;
     display: flex;
     align-items: center;
     border: none;
@@ -128,15 +183,16 @@ body {
 }
 
 .user-profile-container {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
-.create-post {
+.create-post, .login {
     display: inline-block;
     text-decoration: none;
     padding: 10px 10px;
-    margin-right: 20px;
     background-color: var(--button-color);
     color: white;
     border-radius: 8px;
@@ -145,13 +201,15 @@ body {
     cursor: pointer;
 }
 
-.create-post:hover {
-    background-color: var(--button-color);
+.create-post:hover, .login:hover {
+    background-color: var(--button-hover);
 }
 
 .user-container {
+    flex-grow: 0;
     display: flex;
     align-items: center;
+    margin-left: auto;
 }
 
 .user-icon {
@@ -160,14 +218,21 @@ body {
     margin-right: 10px;
 }
 
-.username {
-    color: white;
+.short-username {
+    color: var(--text-color);
     font-weight: lighter;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1.2em;
+    margin-right: 10px;
 }
 
 .user-dropdown {
     position: relative;
     display: inline-block;
+}
+
+.dropdown-icon {
+    color: var(--text-color);
 }
 
 .user-dropbtn {
@@ -182,18 +247,22 @@ body {
     justify-content: space-between;
 }
 
+.user-dropbtn:hover {
+    background-color: transparent;
+}
+
 .user-dropdown-content {
     display: none;
     position: absolute;
     right: 0;
-    background-color: #262D34;
+    background-color: var(--secondary-color);
     min-width: 200px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
 .user-dropdown-content a {
-    color: white;
+    color: var(--text-color);
     padding: 12px 16px;
     text-decoration: none;
     display: block;
@@ -203,86 +272,41 @@ body {
     display: block;
 }
 
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 45px;
-    height: 22px;
+[data-theme="light"] .theme-svg {
+    fill: var(--button-color-dark);
 }
 
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 20px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 3px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: var(--button-color);
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px var(--button-color);
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(22px);
-    -ms-transform: translateX(22px);
-    transform: translateX(22px);
-}
-
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
+/* Styles when dark mode is active */
+[data-theme="dark"] .theme-svg {
+    fill: #f0f0f0;
 }
 
 .toggle-container {
-    padding: 16px 16px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Center the SVG in the container */
     align-items: center;
+    cursor: pointer; /* Indicates that the SVG is clickable */
+    margin-left: 10px;
+}
+
+.toggle-container svg {
+    width: 20px; /* Adjust width as necessary */
+    height: 20px; /* Adjust height as necessary */
+    transition: fill 0.3s; /* Smooth transition for color change */
 }
 
 .user-dropdown-content a:hover {
-    background-color: #3C4451;
+    background-color: var(--dropdown-hover);
 }
 
-p { /* TODO-Lilah: Update Footer Style */
+footer {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    color: white;
+    color: #7e8285;
     padding: 10px;
-    margin-bottom: -5px;
+    margin-bottom: -15px;
     z-index: 1000;
     font-size: 14px;
     font-family: 'Source Sans Pro', sans-serif;

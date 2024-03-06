@@ -27,7 +27,8 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
 favicon_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"favicon.ico",
-        RedirectView.as_view(url=r"/static/ratemymodule/favicon/favicon.ico", permanent=True),
+        RedirectView.as_view(url=r"/static/ratemymodule/favicon/favicon.ico",
+                             permanent=True),
         name="favicon_redirect"
     ),
     django.urls.path(

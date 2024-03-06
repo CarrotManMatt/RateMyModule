@@ -54,7 +54,7 @@ def custom_line_graph(x__points: list[int], y__points: list[int], x_label: str, 
 
 def rating_bar_graph(array_of_in_ratings: list[int], title: str, _color: str) -> str:
     """Make a bar graph outputted to string svg."""
-    label_color = "#ffffff"
+    label_color = "#848691"
 
     fig, ax = plt.subplots()
     rating_levels = [0, 1, 2, 3, 4, 5]
@@ -153,7 +153,7 @@ def teaching_quality_bar_graph() -> str:
 def assessment_quality_bar_graph() -> str:
     """Use rating_bar_graph to generate a bar graph of assessment rating."""
     title = "Assessment Quality"
-    color = "#7f4fd9"
+    color = "#7f4fd9"  # f060df
     data: list[int] = []
     for counter in range(6):
         data.insert(counter, len(Post.objects.filter(assessment_rating=counter)))
