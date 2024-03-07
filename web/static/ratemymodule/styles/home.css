@@ -64,6 +64,12 @@
     margin-left: 5px;
 }
 
+.filter-rating-star {
+    stroke: var(--text-color);
+    fill: var(--text-color);
+    fill-opacity: 39%;
+}
+
 .filter-rating-star:hover {
     stroke: #7F4FD9;
     fill: #C7A9FF;
@@ -121,6 +127,7 @@
     gap: 10px;
     box-sizing: border-box;
     max-height: 900px;
+    min-height: fit-content;
 }
 
 .post-item {
@@ -146,6 +153,12 @@
     font-weight: bold;
     font-size: 1.125rem; /* 18px if the base size is 16px */
     color: var(--text-color);
+}
+
+.post-star-empty {
+    stroke: var(--text-color);
+    fill: var(--text-color);
+    fill-opacity: 39%;
 }
 
 .module-year {
