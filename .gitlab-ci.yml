@@ -4,7 +4,7 @@ stages:
     - build
 
 mypy-test:
-    image: python:3.12
+    image: carrotmanmatt/poetry:3.12
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -26,17 +26,13 @@ mypy-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - export POETRY_HOME=/opt/poetry
-        - python3 -m venv $POETRY_HOME
-        - $POETRY_HOME/bin/pip install poetry==1.8.1
-        - $POETRY_HOME/bin/poetry config virtualenvs.in-project true
-        - $POETRY_HOME/bin/poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --sync --no-root --with dev --no-interaction
 
     script:
-        $POETRY_HOME/bin/poetry run mypy .
+        poetry run mypy .
 
 ruff-test:
-    image: python:3.12
+    image: carrotmanmatt/poetry:3.12
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -58,17 +54,13 @@ ruff-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - export POETRY_HOME=/opt/poetry
-        - python3 -m venv $POETRY_HOME
-        - $POETRY_HOME/bin/pip install poetry==1.8.1
-        - $POETRY_HOME/bin/poetry config virtualenvs.in-project true
-        - $POETRY_HOME/bin/poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --sync --no-root --with dev --no-interaction
 
     script:
-        $POETRY_HOME/bin/poetry run ruff check . --no-fix --extend-select TD002,TD003
+        poetry run ruff check . --no-fix --extend-select TD002,TD003
 
 djlint-test:
-    image: python:3.12
+    image: carrotmanmatt/poetry:3.12
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -89,17 +81,13 @@ djlint-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - export POETRY_HOME=/opt/poetry
-        - python3 -m venv $POETRY_HOME
-        - $POETRY_HOME/bin/pip install poetry==1.8.1
-        - $POETRY_HOME/bin/poetry config virtualenvs.in-project true
-        - $POETRY_HOME/bin/poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --sync --no-root --with dev --no-interaction
 
     script:
-        $POETRY_HOME/bin/poetry run djlint . --lint
+        poetry run djlint . --lint
 
 pymarkdown-test:
-    image: python:3.12
+    image: carrotmanmatt/poetry:3.12
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -120,17 +108,13 @@ pymarkdown-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - export POETRY_HOME=/opt/poetry
-        - python3 -m venv $POETRY_HOME
-        - $POETRY_HOME/bin/pip install poetry==1.8.1
-        - $POETRY_HOME/bin/poetry config virtualenvs.in-project true
-        - $POETRY_HOME/bin/poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --sync --no-root --with dev --no-interaction
 
     script:
-        $POETRY_HOME/bin/poetry run pymarkdown scan *.md dev_docs -r
+        poetry run pymarkdown scan *.md dev_docs -r
 
 pre-commit-test:
-    image: python:3.12
+    image: carrotmanmatt/poetry:3.12
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -153,15 +137,11 @@ pre-commit-test:
     before_script:
         - apt-get update -y
         - apt-get install -y --no-install-recommends git
-        - export POETRY_HOME=/opt/poetry
-        - python3 -m venv $POETRY_HOME
-        - $POETRY_HOME/bin/pip install poetry==1.8.1
-        - $POETRY_HOME/bin/poetry config virtualenvs.in-project true
-        - $POETRY_HOME/bin/poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --sync --no-root --with dev --no-interaction
         - chmod -R +x .local-pre-commit-scripts
 
     script:
-        $POETRY_HOME/bin/poetry run pre-commit run --all-files
+        poetry run pre-commit run --all-files
 
 check-updated-tag:
     image: python:3
