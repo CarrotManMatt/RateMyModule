@@ -26,7 +26,7 @@ mypy-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --no-root --with dev --no-interaction
 
     script:
         poetry run mypy .
@@ -54,7 +54,7 @@ ruff-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --no-root --with dev --no-interaction
 
     script:
         poetry run ruff check . --no-fix --extend-select TD002,TD003
@@ -81,7 +81,7 @@ djlint-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --no-root --with dev --no-interaction
 
     script:
         poetry run djlint . --lint
@@ -108,7 +108,7 @@ pymarkdown-test:
             - ${PIP_CACHE_DIR}
 
     before_script:
-        - poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --no-root --with dev --no-interaction
 
     script:
         poetry run pymarkdown scan *.md dev_docs -r
@@ -137,7 +137,7 @@ pre-commit-test:
     before_script:
         - apt-get update -y
         - apt-get install -y --no-install-recommends git
-        - poetry install --sync --no-root --with dev --no-interaction
+        - poetry install --no-root --with dev --no-interaction
         - chmod -R +x .local-pre-commit-scripts
 
     script:
