@@ -9,6 +9,8 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_VIRTUALENVS_CREATE=true \
     POETRY_CACHE_DIR=/tmp/poetry_cache \
+    POETRY_VIRTUALENVS_OPTIONS_ALWAYS_COPY=true \
+    POETRY_VIRTUALENVS_OPTIONS_NO_PIP=true \
     POETRY_HOME=/opt/poetry
 
 RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential
