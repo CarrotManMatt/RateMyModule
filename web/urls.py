@@ -11,7 +11,7 @@ import django
 from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
-from web.views import HomeView, UserSettingsView, SubmitPostView, LogoutView
+from web.views import HomeView, LogoutView, SubmitPostView, UserSettingsView
 
 app_name: Final[str] = "ratemymodule"
 

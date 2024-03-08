@@ -12,13 +12,13 @@ __all__: Sequence[str] = (
 from typing import TYPE_CHECKING, override
 from urllib.parse import unquote_plus
 
+from allauth.account.views import LogoutView as AllAuthLogoutView
+from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView, CreateView
-from allauth.account.views import LogoutView as AllAuthLogoutView
-from django.conf import settings
+from django.views.generic import CreateView, TemplateView
 
 from ratemymodule.models import Module, Post, University, User
 from web.forms import PostForm
@@ -28,9 +28,9 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
 
-class LogoutView(AllAuthLogoutView):
+class LogoutView(AllAuthLogoutView):  # type: ignore[misc,no-any-unimported]
     @override
-    def get(self, *args: object, **kwargs: object) -> HttpResponse:
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
         raise Http404
 
 
@@ -145,7 +145,7 @@ class HomeView(TemplateView):
         return context_data  # noqa: RET504
 
 
-class SubmitPostView(CreateView):
+class SubmitPostView(CreateView[Post, PostForm]):
     """SubmitPostView for handling module review submissions."""
 
     template_name = "ratemymodule/submit-review.html"
@@ -153,16 +153,22 @@ class SubmitPostView(CreateView):
     success_url = "/"
     model = Post
 
-    def form_valid(self, form):
+    # noinspection PyOverrides
+    @override
+    def form_valid(self, form: PostForm) -> HttpResponse:
         obj = form.save(commit=False)
-        obj.user = User.objects.first()
+        if not User.objects.exists():
+            raise User.DoesNotExist
+        obj.user = User.objects.all()[0]
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
+    # noinspection PyOverrides
+    @override
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context = super().get_context_data(**kwargs)
         context["module_choices"] = Module.objects.all()
         context["academic_year_choices"] = (
-            self.form_class.generate_academic_year_choices()
+            self.form_class.ACADEMIC_YEAR_CHOICES
         )
         return context
 

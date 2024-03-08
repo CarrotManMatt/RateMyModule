@@ -12,7 +12,9 @@ __all__: Sequence[str] = (
     "TopicTag",
     "OtherTag",
     "Post",
-    "Report"
+    "Report",
+    "EARLIEST_TEACHING_YEAR",
+    "LATEST_TEACHING_YEAR"
 )
 
 import datetime
@@ -37,6 +39,7 @@ from django.utils.translation import gettext_lazy as _
 from django_stubs_ext.db.models.manager import RelatedManager
 
 from core.utils import reverse_url_with_get_params
+
 from .managers import UniversityModuleManager, UserManager, UserModuleManager
 from .utils import AttributeDeleter, CustomBaseModel
 from .validators import (
