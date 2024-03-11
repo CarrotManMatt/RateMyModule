@@ -9,7 +9,7 @@ __all__: Sequence[str] = (
     "TagIsVerifiedListFilter",
     "ReportIsSolvedListFilter",
     "ReportReasonListFilter",
-    "post_rating_list_filter_builder"
+    "post_rating_list_filter_builder",
 )
 
 from collections.abc import Iterable, MutableMapping
@@ -29,7 +29,7 @@ from ratemymodule.models import BaseTag, Post, Report, User
 RequiredRatingField: TypeAlias = IntegerField[float | int | str | Combinable, int]
 OptionalRatingField: TypeAlias = IntegerField[
     float | int | str | Combinable | None,
-    int | None
+    int | None  # noqa: COM812
 ]
 
 

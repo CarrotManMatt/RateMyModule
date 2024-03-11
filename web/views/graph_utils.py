@@ -6,7 +6,7 @@ __all__: Sequence[str] = (
     "assessment_quality_bar_graph",
     "teaching_quality_bar_graph",
     "difficulty_rating_bar_graph",
-    "overall_rating_bar_graph"
+    "overall_rating_bar_graph",
 )
 
 from io import StringIO
@@ -83,7 +83,7 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _color: str) ->
                                 abs(bb.height),
                                 boxstyle="round,pad=-0.0080,rounding_size=0.1",
                                 ec="none", fc=color,
-                                mutation_aspect=4
+                                mutation_aspect=4,
                                 )
         # TODO(Tom): some cretin decided curvature is proportional to size ^
         patch.remove()

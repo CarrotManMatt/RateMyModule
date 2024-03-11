@@ -158,17 +158,13 @@ ignore = [
     "D212",
     "ANN101",
     "ANN102",
-    "ANN401",
-    "S101",
-    "S311",
-    "COM812",
     "Q003",
     "TD002",
     "TD003",
-    "PLR0911",
-    "PLR0915",
-    "TRY400",
-    "UP040"  # NOTE: Mypy does not currently support PEP 695 type aliases, so they should not be used
+    "S311",
+    "UP040",  # NOTE: Mypy does not currently support PEP 695 type aliases, so they should not be used
+    "PT009",
+    "PT027"
 ]
 task-tags = [
     "TODO",

@@ -52,7 +52,7 @@ env: Env = EnvClass(  # type: ignore[no-any-unimported]
     EMAIL_HOST_USER=(str, ""),
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(bool, False),
-    EMAIL_USE_SSL=(bool, False)
+    EMAIL_USE_SSL=(bool, False),
 )
 
 
@@ -65,9 +65,9 @@ if env("PRODUCTION"):
         ALLOWED_HOSTS=(list, ["team55.bham.team", "team55.dev.bham.team", "ratemymodule"]),
         CSRF_TRUSTED_ORIGINS=(
             list,
-            ["https://team55.bham.team", "https://team55.dev.bham.team"]
+            ["https://team55.bham.team", "https://team55.dev.bham.team"]  # noqa: COM812
         ),
-        LOG_LEVEL=(str, "WARNING")
+        LOG_LEVEL=(str, "WARNING"),
     )
 
     raw_log_level = production_env("LOG_LEVEL").upper().strip()
@@ -89,8 +89,8 @@ else:
                 "[::1]"
                 ".localhost",
                 "team55.dev.bham.team",
-                "ratemymodule"
-            ]
+                "ratemymodule",
+            ]  # noqa: COM812
         ),
         CSRF_TRUSTED_ORIGINS=(
             list,
@@ -99,10 +99,10 @@ else:
                 "https://127.0.0.1",
                 "https://[::1]",
                 "https://.localhost",
-                "https://team55.dev.bham.team"
-            ]
+                "https://team55.dev.bham.team",
+            ]  # noqa: COM812
         ),
-        LOG_LEVEL=(str, "INFO")
+        LOG_LEVEL=(str, "INFO"),
     )
 
     raw_log_level = development_env("LOG_LEVEL").upper().strip()
@@ -155,8 +155,8 @@ if env("OAUTH_GOOGLE_CLIENT_ID").strip().lower() == REPLACE_OAUTH_GOOGLE_CLIENT_
 OAUTH_GOOGLE_CLIENT_ID_IS_VALID: Final[bool] = bool(
     re.match(
         r"\A[0-9]{12}-[0-9a-z]{32}\.apps\.googleusercontent\.com\Z",
-        env("OAUTH_GOOGLE_CLIENT_ID").strip()
-    )
+        env("OAUTH_GOOGLE_CLIENT_ID").strip(),
+    )  # noqa: COM812
 )
 if not OAUTH_GOOGLE_CLIENT_ID_IS_VALID:
     INVALID_OAUTH_GOOGLE_CLIENT_ID_MESSAGE: Final[str] = (
@@ -176,8 +176,8 @@ if env("OAUTH_MICROSOFT_CLIENT_ID").strip().lower() == REPLACE_OAUTH_MICROSOFT_C
 OAUTH_MICROSOFT_CLIENT_ID_IS_VALID: Final[bool] = bool(
     re.match(
         r"\A[0-9a-z]{8}-[0-9]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}\Z",
-        env("OAUTH_MICROSOFT_CLIENT_ID").strip()
-    )
+        env("OAUTH_MICROSOFT_CLIENT_ID").strip(),
+    )  # noqa: COM812
 )
 if not OAUTH_MICROSOFT_CLIENT_ID_IS_VALID:
     INVALID_OAUTH_MICROSOFT_CLIENT_ID_MESSAGE: Final[str] = (
@@ -220,28 +220,28 @@ LOGGING = {
         "ratemymodule": {
             "format": "[{asctime}] {name} | {levelname:^8} - {message}",
             "datefmt": "%d/%b/%Y %H:%M:%S",
-            "style": "{"
+            "style": "{",
         },
         "web_server": {
             "format": "[{asctime}] {message}",
             "datefmt": "%d/%b/%Y %H:%M:%S",
-            "style": "{"
-        }
+            "style": "{",
+        },
     },
     "handlers": {
         "ratemymodule": {
             "class": "logging.StreamHandler",
-            "formatter": "ratemymodule"
+            "formatter": "ratemymodule",
         },
         "web_server": {
             "class": "logging.StreamHandler",
-            "formatter": "web_server"
-        }
+            "formatter": "web_server",
+        },
     },
     "loggers": {
-        "django.server": {"handlers": ["web_server"], "level": raw_log_level}
+        "django.server": {"handlers": ["web_server"], "level": raw_log_level},
     },
-    "root": {"handlers": ["ratemymodule"], "level": raw_log_level}
+    "root": {"handlers": ["ratemymodule"], "level": raw_log_level},
 }
 
 
@@ -278,7 +278,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.admindocs",
-    "rangefilter"
+    "rangefilter",
 ]
 # noinspection PyUnresolvedReferences
 MIDDLEWARE = [
@@ -289,7 +289,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware"
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 
@@ -297,7 +297,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend"
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 
@@ -305,13 +305,13 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_URL = reverse_url_with_get_params_lazy(
     "ratemymodule:home",
-    get_params={"action": "login"}
+    get_params={"action": "login"},
 )
 LOGIN_REDIRECT_URL = django.urls.reverse_lazy("ratemymodule:home")
 LOGOUT_REDIRECT_URL = django.urls.reverse_lazy("default")
 SIGNUP_URL = reverse_url_with_get_params_lazy(
     "ratemymodule:home",
-    get_params={"action": "signup"}
+    get_params={"action": "signup"},
 )
 
 
@@ -334,7 +334,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_FORMS = {
     "login": "ratemymodule.forms.Login_Form",
-    "signup": "ratemymodule.forms.Signup_Form"
+    "signup": "ratemymodule.forms.Signup_Form",
 }
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_PROVIDERS = {
@@ -346,8 +346,8 @@ SOCIALACCOUNT_PROVIDERS = {
             "name": "Google",
             "client_id": env("OAUTH_GOOGLE_CLIENT_ID").strip(),
             "secret": env("OAUTH_GOOGLE_SECRET").strip(),
-            "key": ""
-        }
+            "key": "",
+        },
     },
     "microsoft": {
         "VERIFIED_EMAIL": True,
@@ -358,9 +358,9 @@ SOCIALACCOUNT_PROVIDERS = {
             "client_id": env("OAUTH_MICROSOFT_CLIENT_ID").strip(),
             "secret": env("OAUTH_MICROSOFT_SECRET").strip(),
             "key": "",
-            "settings": {"tenant": "organizations"}
-        }
-    }
+            "settings": {"tenant": "organizations"},
+        },
+    },
 }
 
 # Email Settings
@@ -394,10 +394,10 @@ TEMPLATES = [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages"
-            ]
-        }
-    }
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
 ]
 
 
@@ -406,8 +406,8 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "core.db"
-    }
+        "NAME": BASE_DIR / "core.db",
+    },
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

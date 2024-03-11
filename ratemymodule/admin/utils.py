@@ -6,7 +6,7 @@ __all__: Sequence[str] = (
     "UnchangeableModelAdmin",
     "CustomBaseModelAdmin",
     "Fieldsets",
-    "Fieldset"
+    "Fieldset",
 )
 
 from collections.abc import Collection
@@ -122,5 +122,5 @@ class UnchangeableModelAdmin(CustomBaseModelAdmin[ModelT]):
     def change_view(self, request: HttpRequest, object_id: str, form_url: str = "", extra_context: dict[str, object] | None = None) -> HttpResponse:  # noqa: E501
         # noinspection PyProtectedMember
         return redirect(
-            f"admin:{self.model._meta.app_label}_{self.model._meta.model_name}_changelist"
+            f"admin:{self.model._meta.app_label}_{self.model._meta.model_name}_changelist",
         )

@@ -24,21 +24,21 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
                     {
                         "applicationId": (
                             settings.SOCIALACCOUNT_PROVIDERS["microsoft"]["APP"]["client_id"]  # type: ignore[index]
-                        )
-                    }
-                ]
-            }
+                        ),
+                    },
+                ],
+            },
         ),
-        name="microsoft-oauth-domain-verification"
+        name="microsoft-oauth-domain-verification",
     ),
     django.urls.path(
         r"admin/doc/",
-        django.urls.include("django.contrib.admindocs.urls")
+        django.urls.include("django.contrib.admindocs.urls"),
     ),
     django.urls.path(r"admin/docs/", AdminDocsRedirectView.as_view()),
     django.urls.path(
         r"admin/docs/<path:subpath>",
-        AdminDocsRedirectView.as_view()
+        AdminDocsRedirectView.as_view(),
     ),
     django.urls.path(r"admin/", admin.site.urls, name="admin"),
     django.urls.path(r"api/htmx/", django.urls.include("api_htmx.urls")),
@@ -47,8 +47,8 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"",
         RedirectView.as_view(pattern_name="ratemymodule:home"),
-        name="default"
-    )
+        name="default",
+    ),
 ]
 
 if settings.DEBUG:
@@ -56,6 +56,6 @@ if settings.DEBUG:
         django.urls.path(
             r"accounts/",
             django.urls.include("allauth.urls"),
-            name="debug-accounts"
-        )
+            name="debug-accounts",
+        )  # noqa: COM812
     )

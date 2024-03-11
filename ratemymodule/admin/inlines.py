@@ -7,7 +7,7 @@ __all__: Sequence[str] = (
     "UserMadeReportsInline",
     "UniversityCoursesInline",
     "ModulePostsInline",
-    "PostReportsInline"
+    "PostReportsInline",
 )
 
 
@@ -34,8 +34,8 @@ class UserMadePostsInline(admin.StackedInline[Post, User]):
             "overall_rating",
             "difficulty_rating",
             "assessment_rating",
-            "teaching_rating"
-        )
+            "teaching_rating",
+        ),
     )
     autocomplete_fields = ("module",)
 
@@ -51,7 +51,7 @@ class UserMadeReportsInline(admin.TabularInline[Report, User]):
         "post",
         "reporter",
         "reason",
-        "is_solved"
+        "is_solved",
     )
     autocomplete_fields = ("post", "reporter")
 
@@ -64,7 +64,7 @@ class UniversityCoursesInline(admin.TabularInline[Course, University]):
     model = Course
     fields = (
         "name",
-        "student_type"
+        "student_type",
     )
 
 
@@ -82,8 +82,8 @@ class ModulePostsInline(admin.TabularInline[Post, Module]):
             "overall_rating",
             "difficulty_rating",
             "assessment_rating",
-            "teaching_rating"
-        )
+            "teaching_rating",
+        ),
     )
     autocomplete_fields = ("user",)
 

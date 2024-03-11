@@ -8,7 +8,7 @@ __all__: Sequence[str] = (
     "ExampleEmailValidator",
     "PreexistingEmailTLDValidator",
     "ConfusableEmailValidator",
-    "UnicodePropertiesRegexValidator"
+    "UnicodePropertiesRegexValidator",
 )
 
 import re as regex
@@ -74,8 +74,8 @@ class FreeEmailValidator:
             "lyft.live",
             "dewareff.com",
             "kaftee.com",
-            "letpays.com"
-        }
+            "letpays.com",
+        },
     )
 
     def __init__(self, free_email_domains: Collection[str] | None = None) -> None:
@@ -99,10 +99,10 @@ class FreeEmailValidator:
                 {
                     "email": _(
                         "Registration using free email addresses is prohibited. "
-                        "Please supply a different email address."
-                    )
+                        "Please supply a different email address."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     def __eq__(self, other: object) -> bool:
@@ -141,10 +141,10 @@ class ExampleEmailValidator:
                 {
                     "email": _(
                         "Registration using unresolvable example email addresses "
-                        "is prohibited. Please supply a different email address."
-                    )
+                        "is prohibited. Please supply a different email address."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
 
@@ -184,10 +184,10 @@ class ConfusableEmailValidator:
                 {
                     "email": _(
                         "This email address cannot be registered. "
-                        "Please supply a different email address."
-                    )
+                        "Please supply a different email address."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
 
@@ -203,5 +203,5 @@ class UnicodePropertiesRegexValidator(RegexValidator):
             message=message,
             code=code,
             inverse_match=inverse_match,
-            flags=flags
+            flags=flags,
         )

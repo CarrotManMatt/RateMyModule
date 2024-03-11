@@ -14,7 +14,7 @@ __all__: Sequence[str] = (
     "Post",
     "Report",
     "EARLIEST_TEACHING_YEAR",
-    "LATEST_TEACHING_YEAR"
+    "LATEST_TEACHING_YEAR",
 )
 
 import datetime
@@ -59,7 +59,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
 
     normalize_username = AttributeDeleter(  # type: ignore[assignment]
         object_name="User",
-        attribute_name="normalize_username"
+        attribute_name="normalize_username",
     )
 
     password = models.CharField(
@@ -67,8 +67,8 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         max_length=128,
         error_messages={
             "null": _("Password is a required field."),
-            "blank": _("Password is a required field.")
-        }
+            "blank": _("Password is a required field."),
+        },
     )
     email = models.EmailField(
         verbose_name=_("Email Address"),
@@ -78,54 +78,54 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
             HTML5EmailValidator(),
             FreeEmailValidator(),
             ConfusableEmailValidator(),
-            ExampleEmailValidator()
+            ExampleEmailValidator(),
         ),
         error_messages={
             "unique": _("A user with that Email Address already exists."),
-            "max_length": _("The Email Address must be at most 255 digits.")
-        }
+            "max_length": _("The Email Address must be at most 255 digits."),
+        },
     )
     is_superuser = models.BooleanField(
         verbose_name=_("Is Superuser?"),
         default=False,
         help_text=_(
             "Designates that this user has all permissions without "
-            "explicitly assigning them."
-        )
+            "explicitly assigning them."  # noqa: COM812
+        ),
     )
     is_staff = models.BooleanField(
         verbose_name=_("Is Staff?"),
         default=False,
-        help_text=_("Designates whether the user can log into the admin site.")
+        help_text=_("Designates whether the user can log into the admin site."),
     )
     is_active = models.BooleanField(
         verbose_name=_("Is Active?"),
         default=True,
         help_text=_(
             "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
-        )
+            "Unselect this instead of deleting accounts."  # noqa: COM812
+        ),
     )
     liked_post_set = models.ManyToManyField(
         "ratemymodule.Post",
         related_name="liked_user_set",
         verbose_name=_("Liked Posts"),
         help_text=_("The set of posts this user has liked."),
-        blank=True
+        blank=True,
     )
     disliked_post_set = models.ManyToManyField(
         "ratemymodule.Post",
         related_name="disliked_user_set",
         verbose_name=_("Disliked Posts"),
         help_text=_("The set of posts this user has disliked."),
-        blank=True
+        blank=True,
     )
     enrolled_course_set = models.ManyToManyField(
         "ratemymodule.Course",
         related_name="enrolled_user_set",
         verbose_name=_("Enrolled Courses"),
         help_text=_("The set of courses this user has enrolled in."),
-        blank=True
+        blank=True,
     )
 
     objects = UserManager()
@@ -155,7 +155,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         """
         return self._get_university_from_email_domain(
             self.email.rpartition("@")[2],
-            is_staff=any((self.is_staff, self.is_superuser))
+            is_staff=any((self.is_staff, self.is_superuser)),
         )
 
     @property
@@ -168,7 +168,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         try:
             return (
                 University.objects.alias(full_email_domain=models.Value(email_domain)).get(
-                    full_email_domain__endswith=models.F("email_domain")
+                    full_email_domain__endswith=models.F("email_domain"),
                 )
             )
         except University.DoesNotExist:
@@ -184,7 +184,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
         constraints = (
             models.CheckConstraint(
                 name="ensure_superusers_are_staff",
-                check=~models.Q(is_superuser=True, is_staff=False)
+                check=~models.Q(is_superuser=True, is_staff=False),
             ),
         )
 
@@ -207,7 +207,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
             force_insert=force_insert,
             force_update=force_update,
             using=using,
-            update_fields=update_fields
+            update_fields=update_fields,
         )
 
         self.liked_post_set.add(*self.made_post_set.all())
@@ -220,13 +220,13 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
 
         EMAIL_ALREADY_EXISTS: Final[bool] = (
             User.objects.exclude(email=self.email).exclude(pk=self.pk).filter(
-                email__icontains=f"{local}@{tldextract.extract(domain).domain}"
+                email__icontains=f"{local}@{tldextract.extract(domain).domain}",
             ).exists()
         )
         if EMAIL_ALREADY_EXISTS:
             raise ValidationError(
                 {"email": _("That Email Address is already in use by another user.")},
-                code="unique"
+                code="unique",
             )
 
     @override
@@ -239,10 +239,10 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
             raise ValidationError(
                 {
                     "email": _(
-                        "Your email address must be linked to a university registered account."
-                    )
+                        "Your email address must be linked to a university registered account."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             ) from None
 
     @classmethod
@@ -275,8 +275,8 @@ class University(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
-        )
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z"),
+        ),
     )
     short_name = models.CharField(
         max_length=5,
@@ -284,8 +284,8 @@ class University(CustomBaseModel):
         verbose_name=_("Short Name"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡'-]+\Z")
-        )
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡'-]+\Z"),
+        ),
     )
     email_domain = models.CharField(
         max_length=253,
@@ -294,17 +294,17 @@ class University(CustomBaseModel):
         validators=(
             MinLengthValidator(4),
             RegexValidator(
-                r"\A((?!-))((xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.)+(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})\Z"
-            )
-        )
+                r"\A((?!-))((xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.)+(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})\Z",
+            ),
+        ),
     )
     founding_date = models.DateField(
         verbose_name=_("Date Founded"),
         help_text=_("Date format DD/MM/YYYY"),
         validators=(
             MinValueValidator(datetime.date(year=EARLIEST_TEACHING_YEAR, month=1, day=1)),
-            MaxValueValidator(datetime.date(year=LATEST_TEACHING_YEAR, month=1, day=1))
-        )
+            MaxValueValidator(datetime.date(year=LATEST_TEACHING_YEAR, month=1, day=1)),
+        ),
     )
 
     course_set: RelatedManager["Course"]
@@ -318,8 +318,8 @@ class University(CustomBaseModel):
             models.CheckConstraint(
                 name="ensure_email_domain_adheres_to_regex",
                 check=models.Q(
-                    email_domain__regex=r"\A((?!-))((xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.)+(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})\Z"
-                )
+                    email_domain__regex=r"\A((?!-))((xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.)+(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})\Z",
+                ),
             ),
         )
 
@@ -331,7 +331,7 @@ class University(CustomBaseModel):
             force_insert=force_insert,
             force_update=force_update,
             using=using,
-            update_fields=update_fields
+            update_fields=update_fields,
         )
 
     @override
@@ -353,23 +353,23 @@ class Course(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z")
-        )
+            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z"),
+        ),
     )
     student_type = models.CharField(
         max_length=60,
         verbose_name=_("Student Type"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z")
-        )
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z"),
+        ),
     )
     university = models.ForeignKey(
         University,
         related_name="course_set",
         verbose_name=_("University"),
         on_delete=models.PROTECT,
-        help_text=_("The university that this course is taught at")
+        help_text=_("The university that this course is taught at"),
     )
 
     module_set: RelatedManager["Module"]
@@ -382,7 +382,7 @@ class Course(CustomBaseModel):
         constraints = (
             models.UniqueConstraint(
                 fields=("name", "university"),
-                name="unique_university_course_name"
+                name="unique_university_course_name",
             ),
         )
 
@@ -399,8 +399,8 @@ class Module(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z")
-        )
+            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z"),
+        ),
     )
     code = models.CharField(
         max_length=60,
@@ -408,23 +408,23 @@ class Module(CustomBaseModel):
         help_text=_("The unique reference code of this module within its university"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}0-9!?¿¡' &()-]+\Z")
-        )
+            UnicodePropertiesRegexValidator(r"\A[\p{L}0-9!?¿¡' &()-]+\Z"),
+        ),
     )
     year_started = models.DateField(
         verbose_name=_("Year Started"),
         help_text=_("Date format DD/MM/YYYY"),
         validators=(
             MinValueValidator(datetime.date(year=EARLIEST_TEACHING_YEAR, month=1, day=1)),
-            MaxValueValidator(datetime.date(year=LATEST_TEACHING_YEAR, month=1, day=1))
-        )
+            MaxValueValidator(datetime.date(year=LATEST_TEACHING_YEAR, month=1, day=1)),
+        ),
     )
     course_set = models.ManyToManyField(
         Course,
         related_name="module_set",
         verbose_name=_("Attached Courses"),
         help_text=_("The set of courses that can include this module"),
-        blank=False
+        blank=False,
     )
 
     class Meta:
@@ -438,7 +438,7 @@ class Module(CustomBaseModel):
             if self.course_set.exclude(university=self.university).exists():
                 raise ValidationError(
                     _("A module cannot be linked to courses across multiple universities."),
-                    code="invalid"
+                    code="invalid",
                 )
 
     @property
@@ -456,7 +456,7 @@ class Module(CustomBaseModel):
         """Return the canonical URL for a given `Module` object instance."""
         return reverse_url_with_get_params(
             "ratemymodule:home",
-            get_params={"module": self.code}
+            get_params={"module": self.code},
         )
 
     @override
@@ -473,8 +473,8 @@ class BaseTag(CustomBaseModel):
         verbose_name=_("Tag Name"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' +&()#-]+\Z")
-        )
+            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' +&()#-]+\Z"),
+        ),
     )
     is_verified = models.BooleanField(default=False, verbose_name=_("Is Verified?"))
 
@@ -505,14 +505,14 @@ class TopicTag(BaseTag):
             or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
             or (
                 TopicTag.objects.exclude(pk=self.pk).filter(
-                    name__iexact=self.name.casefold()
+                    name__iexact=self.name.casefold(),
                 ).exists()
             )
         )
         if TAG_NAME_EXISTS:
             raise ValidationError(
                 {"name": _("A tag with this name already exists.")},
-                code="unique"
+                code="unique",
             )
 
 
@@ -531,14 +531,14 @@ class OtherTag(BaseTag):
             or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
             or (
                 OtherTag.objects.exclude(pk=self.pk).filter(
-                    name__iexact=self.name.casefold()
+                    name__iexact=self.name.casefold(),
                 ).exists()
             )
         )
         if TAG_NAME_EXISTS:
             raise ValidationError(
                 {"name": _("A tag with this name already exists.")},
-                code="unique"
+                code="unique",
             )
 
 
@@ -557,14 +557,14 @@ class ToolTag(BaseTag):
             or TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
             or (
                 ToolTag.objects.exclude(pk=self.pk).filter(
-                    name__iexact=self.name.casefold()
+                    name__iexact=self.name.casefold(),
                 ).exists()
             )
         )
         if TAG_NAME_EXISTS:
             raise ValidationError(
                 {"name": _("A tag with this name already exists.")},
-                code="unique"
+                code="unique",
             )
 
 
@@ -589,69 +589,69 @@ class Post(CustomBaseModel):
         Module,
         on_delete=models.PROTECT,
         related_name="post_set",
-        verbose_name=_("Module")
+        verbose_name=_("Module"),
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="made_post_set",
-        verbose_name=_("User")
+        verbose_name=_("User"),
     )
 
     overall_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
-        verbose_name=_("Overall Rating")
+        verbose_name=_("Overall Rating"),
     )
     difficulty_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
         null=True,
         blank=True,
-        verbose_name=_("Difficulty Rating")
+        verbose_name=_("Difficulty Rating"),
     )
     assessment_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
         null=True,
         blank=True,
-        verbose_name=_("Assessment Rating")
+        verbose_name=_("Assessment Rating"),
     )
     teaching_rating = models.PositiveSmallIntegerField(
         choices=Ratings.choices,
         null=True,
         blank=True,
-        verbose_name=_("Teaching Rating")
+        verbose_name=_("Teaching Rating"),
     )
     content = models.TextField(
         verbose_name=_("Content"),
         null=False,
         blank=True,
-        validators=(RegexValidator(r"\A\Z|\A.{3,}\Z"),)
+        validators=(RegexValidator(r"\A\Z|\A.{3,}\Z"),),
     )
     academic_year_start = models.PositiveSmallIntegerField(
         validators=(
             MinValueValidator(EARLIEST_TEACHING_YEAR),
-            MaxValueValidator(LATEST_TEACHING_YEAR)
+            MaxValueValidator(LATEST_TEACHING_YEAR),
         ),
-        verbose_name=_("Academic Year Start")
+        verbose_name=_("Academic Year Start"),
     )
-    hidden = models.BooleanField(default=False, verbose_name=_("Is Hidden?"))
+    hidden = models.BooleanField(default=False, verbose_name=_("Is Hidden?"),)  # noqa: COM819
 
     other_tag_set = models.ManyToManyField(
         OtherTag,
         blank=True,
         related_name="post_set",
-        verbose_name=_("Other Tags")
+        verbose_name=_("Other Tags"),
     )
     tool_tag_set = models.ManyToManyField(
         ToolTag,
         blank=True,
         related_name="post_set",
-        verbose_name=_("Tool Tags")
+        verbose_name=_("Tool Tags"),
     )
     topic_tag_set = models.ManyToManyField(
         TopicTag,
         blank=True,
         related_name="post_set",
-        verbose_name=_("Topic Tags")
+        verbose_name=_("Topic Tags"),
     )
 
     report_set: RelatedManager["Report"]
@@ -665,21 +665,21 @@ class Post(CustomBaseModel):
         constraints = (
             models.UniqueConstraint(
                 fields=("user", "module"),
-                name="unique_post_creator_with_module"
+                name="unique_post_creator_with_module",
             ),
             *(
                 models.CheckConstraint(
                     name=f"ensure_{rating_field}_valid_choice",
-                    check=models.Q(**{f"{rating_field}__in": _Ratings.values})
+                    check=models.Q(**{f"{rating_field}__in": _Ratings.values}),
                 )
                 for rating_field
                 in (
                     "overall_rating",
                     "difficulty_rating",
                     "assessment_rating",
-                    "teaching_rating"
+                    "teaching_rating",
                 )
-            )
+            ),
         )
 
     @override
@@ -688,7 +688,7 @@ class Post(CustomBaseModel):
             force_insert=force_insert,
             force_update=force_update,
             using=using,
-            update_fields=update_fields
+            update_fields=update_fields,
         )
 
         if self.user not in self.liked_user_set.all():
@@ -708,10 +708,10 @@ class Post(CustomBaseModel):
                 raise ValidationError(
                     {
                         "module": _(
-                            "You cannot create posts about modules that you have not taken."
-                        )
+                            "You cannot create posts about modules that you have not taken."  # noqa: COM812
+                        ),
                     },
-                    code="invalid"
+                    code="invalid",
                 )
 
     @classmethod
@@ -758,7 +758,7 @@ class Post(CustomBaseModel):
     def student_type(self) -> str:
         """The formatted type of student that wrote this post."""
         first_course: Course | None = self.module.course_set.filter(
-            pk__in=self.user.enrolled_course_set.values_list("pk", flat=True)
+            pk__in=self.user.enrolled_course_set.values_list("pk", flat=True),
         ).first()
 
         if not first_course:
@@ -801,22 +801,22 @@ class Report(CustomBaseModel):
         Post,
         on_delete=models.CASCADE,
         related_name="report_set",
-        verbose_name=_("Post")
+        verbose_name=_("Post"),
     )
     reporter = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="made_report_set",
-        verbose_name=_("Reporter")
+        verbose_name=_("Reporter"),
     )
     reason = models.CharField(
         choices=Reasons.choices,
         max_length=3,
-        verbose_name=_("Reason")
+        verbose_name=_("Reason"),
     )
     is_solved = models.BooleanField(
         _("Is_Solved"),
-        default=False
+        default=False,
     )
 
     class Meta:
@@ -826,7 +826,7 @@ class Report(CustomBaseModel):
         constraints = (
             models.CheckConstraint(
                 name="ensure_reason_valid_choice",
-                check=models.Q(reason__in=_Reasons.values)
+                check=models.Q(reason__in=_Reasons.values),
             ),
         )
 
@@ -835,7 +835,7 @@ class Report(CustomBaseModel):
         if self.reporter == self.post.user:
             raise ValidationError(
                 {"post": _("You cannot report your own posts.")},
-                code="invalid"
+                code="invalid",
             )
 
     @override

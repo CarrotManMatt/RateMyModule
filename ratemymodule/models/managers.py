@@ -22,7 +22,7 @@ class UserManager(DjangoUserManager["User"]):
 
     normalize_username = AttributeDeleter(
         object_name="UserManager",
-        attribute_name="normalize_username"
+        attribute_name="normalize_username",
     )
     use_in_migrations: bool = True
 
@@ -85,7 +85,7 @@ class UniversityModuleManager(Manager["Module"]):
     @override
     def get_queryset(self) -> QuerySet["Module"]:
         return apps.get_model(app_label="ratemymodule", model_name="Module").objects.filter(  # type: ignore[no-any-return]
-            course_set__pk__in=self.university.course_set.all()
+            course_set__pk__in=self.university.course_set.all(),
         ).distinct()
 
 
@@ -108,5 +108,5 @@ class UserModuleManager(Manager["Module"]):
     @override
     def get_queryset(self) -> QuerySet["Module"]:
         return apps.get_model(app_label="ratemymodule", model_name="Module").objects.filter(  # type: ignore[no-any-return]
-            course_set__pk__in=self._user.enrolled_course_set.all()
+            course_set__pk__in=self._user.enrolled_course_set.all(),
         ).distinct()

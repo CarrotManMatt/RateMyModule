@@ -11,7 +11,7 @@ from collections.abc import Sequence
 __all__: Sequence[str] = (
     "MyPyEnv",
     "reverse_url_with_get_params",
-    "reverse_url_with_get_params_lazy"
+    "reverse_url_with_get_params_lazy",
 )
 
 import json
@@ -46,7 +46,7 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
                 var=var,
                 cast=cast,
                 default=default,
-                parse_default=parse_default
+                parse_default=parse_default,
             )
         except ImproperlyConfigured:
             value: str
@@ -110,7 +110,7 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
 
             return self.parse_value(  # type: ignore[no-any-return]
                 value=value,
-                cast=cast
+                cast=cast,
             )
 
 
@@ -122,7 +122,7 @@ def reverse_url_with_get_params(viewname: Callable[[], str] | str | None = None,
         urlconf=urlconf,
         args=args,
         kwargs=kwargs,
-        current_app=current_app
+        current_app=current_app,
     )
     if not get_params:
         return url

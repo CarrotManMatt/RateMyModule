@@ -26,7 +26,7 @@ class AdminDocsRedirectView(RedirectView):
         if subpath:
             SUBPATH_ARGUMENT_IS_CONSISTENT: Final[bool] = bool(
                 "subpath" in self.kwargs
-                and isinstance(self.kwargs["subpath"], str)
+                and isinstance(self.kwargs["subpath"], str)  # noqa: COM812
             )
             if not SUBPATH_ARGUMENT_IS_CONSISTENT:
                 INCONSISTENT_ARGUMENT_MESSAGE: Final[str] = (
@@ -40,7 +40,7 @@ class AdminDocsRedirectView(RedirectView):
         url: str = django.urls.reverse(
             "django-admindocs-docroot",
             args=reverse_args,
-            kwargs=reverse_kwargs
+            kwargs=reverse_kwargs,
         ) + subpath
 
         url_args: str = self.request.META.get("QUERY_STRING", "")

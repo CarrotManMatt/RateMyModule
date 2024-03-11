@@ -7,7 +7,7 @@ __all__: Sequence[str] = (
     "UserChangeForm",
     "PostModelForm",
     "CourseModelForm",
-    "ModuleModelForm"
+    "ModuleModelForm",
 )
 
 from collections.abc import Iterable, Mapping
@@ -76,7 +76,7 @@ class _BaseUserCleanForm(forms.ModelForm[User]):
         if not (is_staff or is_superuser) and not enrolled_course_set.exists():
             raise ValidationError(
                 {"enrolled_course_set": _("This field is required.")},
-                code="required"
+                code="required",
             )
 
     @staticmethod
@@ -94,8 +94,8 @@ class _BaseUserCleanForm(forms.ModelForm[User]):
             Post.objects.filter(
                 user=instance,
                 module__course_set__pk__in=instance.enrolled_course_set.exclude(
-                    pk__in=enrolled_course_set
-                )
+                    pk__in=enrolled_course_set,
+                ),
             ).exists()
         )
         if POSTS_ABOUT_MODULES_ON_REMOVED_COURSES:
@@ -103,10 +103,10 @@ class _BaseUserCleanForm(forms.ModelForm[User]):
                 {
                     "enrolled_course_set": _(
                         "Courses cannot be removed from a user if they have made posts "
-                        "about modules attached to that course."
-                    )
+                        "about modules attached to that course."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     @staticmethod
@@ -144,8 +144,8 @@ class _BaseUserCleanForm(forms.ModelForm[User]):
                 enrolled_course_set.exclude(
                     university=instance._get_university_from_email_domain(  # noqa: SLF001
                         email.rpartition("@")[2],
-                        is_staff=any((is_staff, is_superuser))
-                    )
+                        is_staff=any((is_staff, is_superuser)),
+                    ),
                 ).exists()
             )
 
@@ -157,10 +157,10 @@ class _BaseUserCleanForm(forms.ModelForm[User]):
                 {
                     "enrolled_course_set": _(
                         "A user cannot be enrolled in courses "
-                        "across multiple universities."
-                    )
+                        "across multiple universities."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     @override
@@ -173,11 +173,11 @@ class _BaseUserCleanForm(forms.ModelForm[User]):
             self._validate_enrolled_course_set_exists(cleaned_data)
             self._validate_no_posts_about_modules_on_removed_courses(
                 cleaned_data,
-                self.instance
+                self.instance,
             )
             self._validate_no_courses_across_multiple_universities(
                 cleaned_data,
-                self.instance
+                self.instance,
             )
 
         return cleaned_data
@@ -201,24 +201,24 @@ class PostModelForm(DjangoModelForm[Post]):
         required=False,
         widget=admin_widgets.FilteredSelectMultiple(
             verbose_name=_("Liked-By Users"),
-            is_stacked=False
+            is_stacked=False,
         ),
         help_text=_(
             "The set of users that have liked this post. "
-            "Hold down “Control”, or “Command” on a Mac, to select more than one."
-        )
+            "Hold down “Control”, or “Command” on a Mac, to select more than one."  # noqa: COM812
+        ),
     )
     disliked_user_set = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         required=False,
         widget=admin_widgets.FilteredSelectMultiple(
             verbose_name=_("Disliked-By Users"),
-            is_stacked=False
+            is_stacked=False,
         ),
         help_text=_(
             "The set of users that have disliked this post. "
-            "Hold down “Control”, or “Command” on a Mac, to select more than one."
-        )
+            "Hold down “Control”, or “Command” on a Mac, to select more than one."  # noqa: COM812
+        ),
     )
 
     @override
@@ -234,7 +234,7 @@ class PostModelForm(DjangoModelForm[Post]):
             empty_permitted=empty_permitted,
             instance=instance,
             use_required_attribute=use_required_attribute,
-            renderer=renderer
+            renderer=renderer,
         )
 
         if self.instance.pk:
@@ -253,7 +253,7 @@ class PostModelForm(DjangoModelForm[Post]):
 
             liked_user_set: QuerySet[User] | None = self.cleaned_data.get(
                 "liked_user_set",
-                None
+                None,
             )
             if liked_user_set is not None:
                 if not isinstance(liked_user_set, QuerySetAny):
@@ -263,7 +263,7 @@ class PostModelForm(DjangoModelForm[Post]):
 
             disliked_user_set: QuerySet[User] | None = self.cleaned_data.get(
                 "disliked_user_set",
-                None
+                None,
             )
             if disliked_user_set is not None:
                 if not isinstance(disliked_user_set, QuerySetAny):
@@ -301,10 +301,10 @@ class PostModelForm(DjangoModelForm[Post]):
             raise ValidationError(
                 {
                     "module": _(
-                        "You cannot create posts about modules that you have not taken."
-                    )
+                        "You cannot create posts about modules that you have not taken."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     @override
@@ -325,26 +325,26 @@ class CourseModelForm(DjangoModelForm[Course]):
         required=False,
         widget=admin_widgets.FilteredSelectMultiple(
             verbose_name=_("Modules"),
-            is_stacked=False
+            is_stacked=False,
         ),
         help_text=_(
             "The set of modules on this course. "
-            "Hold down “Control”, or “Command” on a Mac, to select more than one."
+            "Hold down “Control”, or “Command” on a Mac, to select more than one."  # noqa: COM812
         ),
-        label=_("Attached Modules")
+        label=_("Attached Modules"),
     )
     enrolled_user_set = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         required=False,
         widget=admin_widgets.FilteredSelectMultiple(
             verbose_name=_("Enrolled Users"),
-            is_stacked=False
+            is_stacked=False,
         ),
         help_text=_(
             "The set of users enrolled on this course. "
-            "Hold down “Control”, or “Command” on a Mac, to select more than one."
+            "Hold down “Control”, or “Command” on a Mac, to select more than one."  # noqa: COM812
         ),
-        label=_("Enrolled Users")
+        label=_("Enrolled Users"),
     )
 
     @override
@@ -360,7 +360,7 @@ class CourseModelForm(DjangoModelForm[Course]):
             empty_permitted=empty_permitted,
             instance=instance,
             use_required_attribute=use_required_attribute,
-            renderer=renderer
+            renderer=renderer,
         )
 
         if self.instance.pk:
@@ -379,7 +379,7 @@ class CourseModelForm(DjangoModelForm[Course]):
 
             module_set: QuerySet[Module] | None = self.cleaned_data.get(
                 "module_set",
-                None
+                None,
             )
             if module_set is not None:
                 if not isinstance(module_set, QuerySetAny):
@@ -389,7 +389,7 @@ class CourseModelForm(DjangoModelForm[Course]):
 
             enrolled_user_set: QuerySet[User] | None = self.cleaned_data.get(
                 "enrolled_user_set",
-                None
+                None,
             )
             if enrolled_user_set is not None:
                 if not isinstance(enrolled_user_set, QuerySetAny):
@@ -425,10 +425,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                         "module_set": _(
                             "All modules on this course "
                             "must belong to the same university "
-                            "that this course belongs to."
-                        )
+                            "that this course belongs to."  # noqa: COM812
+                        ),
                     },
-                    code="invalid"
+                    code="invalid",
                 )
 
     @staticmethod
@@ -444,9 +444,9 @@ class CourseModelForm(DjangoModelForm[Course]):
         for other_university_module in module_set.all():
             # noinspection PyUnresolvedReferences
             MODULE_WITH_NAME_ALREADY_EXISTS_ON_COURSE: bool = module_set.exclude(
-                pk=other_university_module.pk
+                pk=other_university_module.pk,
             ).filter(
-                name=other_university_module.name
+                name=other_university_module.name,
             ).exists()
 
             if MODULE_WITH_NAME_ALREADY_EXISTS_ON_COURSE:
@@ -455,10 +455,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                         "module_set": _(
                             "Modules cannot be added to this course "
                             "if they share a name with existing modules "
-                            "attached to this course."
-                        )
+                            "attached to this course."  # noqa: COM812
+                        ),
                     },
-                    code="invalid"
+                    code="invalid",
                 )
 
     @staticmethod
@@ -474,9 +474,9 @@ class CourseModelForm(DjangoModelForm[Course]):
         for other_university_module in module_set.all():
             # noinspection PyUnresolvedReferences
             MODULE_WITH_CODE_ALREADY_EXISTS_ON_COURSE: bool = module_set.exclude(
-                pk=other_university_module.pk
+                pk=other_university_module.pk,
             ).filter(
-                code=other_university_module.code
+                code=other_university_module.code,
             ).exists()
 
             if MODULE_WITH_CODE_ALREADY_EXISTS_ON_COURSE:
@@ -485,10 +485,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                         "module_set": _(
                             "Modules cannot be added to this course "
                             "if they share a reference code with existing modules "
-                            "attached to this course."
-                        )
+                            "attached to this course."  # noqa: COM812
+                        ),
                     },
-                    code="invalid"
+                    code="invalid",
                 )
 
     @staticmethod
@@ -514,10 +514,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                         "enrolled_user_set": _(
                             "All users enrolled on this course "
                             "must belong to the same university "
-                            "that this course belongs to."
-                        )
+                            "that this course belongs to."  # noqa: COM812
+                        ),
                     },
-                    code="invalid"
+                    code="invalid",
                 )
 
     @staticmethod
@@ -533,7 +533,7 @@ class CourseModelForm(DjangoModelForm[Course]):
 
         REMOVED_MODULES_HAVE_POSTS_MADE_ABOUT_THEM_BY_ENROLLED_USERS: Final[bool] = (
             Post.objects.filter(
-                module__pk__in=instance.module_set.exclude(pk__in=module_set)
+                module__pk__in=instance.module_set.exclude(pk__in=module_set),
             ).exists()
         )
         if REMOVED_MODULES_HAVE_POSTS_MADE_ABOUT_THEM_BY_ENROLLED_USERS:
@@ -542,10 +542,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                     "module_set": _(
                         "Modules cannot be removed from this course "
                         "if there are posts made about them, "
-                        "by users enrolled on this course."
-                    )
+                        "by users enrolled on this course."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     @staticmethod
@@ -561,7 +561,7 @@ class CourseModelForm(DjangoModelForm[Course]):
 
         REMOVED_USERS_HAVE_MADE_POSTS_ABOUT_ATTACHED_MODULES: Final[bool] = (
             Post.objects.filter(
-                user__pk__in=instance.enrolled_user_set.exclude(pk__in=enrolled_user_set)
+                user__pk__in=instance.enrolled_user_set.exclude(pk__in=enrolled_user_set),
             ).exists()
         )
         if REMOVED_USERS_HAVE_MADE_POSTS_ABOUT_ATTACHED_MODULES:
@@ -569,10 +569,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                 {
                     "enrolled_user_set": _(
                         "Users cannot be removed from this course "
-                        "if they have made posts, also attached to this course."
-                    )
+                        "if they have made posts, also attached to this course."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     @staticmethod
@@ -593,10 +593,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                     {
                         "module_set": _(
                             "Modules cannot be removed from this course "
-                            "if they are not attached to any other courses."
-                        )
+                            "if they are not attached to any other courses."  # noqa: COM812
+                        ),
                     },
-                    code="required"
+                    code="required",
                 )
 
     @staticmethod
@@ -618,7 +618,7 @@ class CourseModelForm(DjangoModelForm[Course]):
         for no_enrolled_courses_user in REMOVED_ENROLLED_USERS:
             USER_WOULD_HAVE_NO_COURSES: bool = (
                 not no_enrolled_courses_user.enrolled_course_set.exclude(
-                    pk=instance.pk
+                    pk=instance.pk,
                 ).exists()
             )
             if not no_enrolled_courses_user.is_staff and USER_WOULD_HAVE_NO_COURSES:
@@ -626,10 +626,10 @@ class CourseModelForm(DjangoModelForm[Course]):
                     {
                         "enrolled_user_set": _(
                             "Users cannot be removed from this course "
-                            "if they are not enrolled in any other courses."
-                        )
+                            "if they are not enrolled in any other courses."  # noqa: COM812
+                        ),
                     },
-                    code="required"
+                    code="required",
                 )
 
     @override
@@ -643,13 +643,13 @@ class CourseModelForm(DjangoModelForm[Course]):
             self._validate_no_enrolled_users_across_multiple_universities(cleaned_data)
             self._validate_removed_modules_have_no_posts_made_about_them(
                 cleaned_data,
-                self.instance
+                self.instance,
             )
             self._validate_removed_users_have_no_made_posts(cleaned_data, self.instance)
             self._validate_removed_modules_have_remaining_courses(cleaned_data, self.instance)
             self._validate_removed_users_have_remaining_enrolled_courses(
                 cleaned_data,
-                self.instance
+                self.instance,
             )
 
         return cleaned_data
@@ -670,7 +670,7 @@ class ModuleModelForm(DjangoModelForm[Module]):
         if not course_set.exists():
             raise ValidationError(
                 {"course_set": _("This field is required.")},
-                code="required"
+                code="required",
             )
 
     @staticmethod
@@ -687,10 +687,10 @@ class ModuleModelForm(DjangoModelForm[Module]):
                 {
                     "course_set": _(
                         "All courses this module is attached to "
-                        "must be at the same university."
-                    )
+                        "must be at the same university."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     @staticmethod
@@ -708,8 +708,8 @@ class ModuleModelForm(DjangoModelForm[Module]):
             Post.objects.filter(
                 module=instance,
                 user__enrolled_course_set__pk__in=instance.course_set.exclude(
-                    pk__in=course_set
-                )
+                    pk__in=course_set,
+                ),
             ).exists()
         )
         if MODULE_HAS_POSTS_FROM_USERS_ON_REMOVED_COURSES:
@@ -718,10 +718,10 @@ class ModuleModelForm(DjangoModelForm[Module]):
                     "course_set": _(
                         "Courses cannot be removed from a module "
                         "if it has posts made about it "
-                        "by users enrolled on that course."
-                    )
+                        "by users enrolled on that course."  # noqa: COM812
+                    ),
                 },
-                code="invalid"
+                code="invalid",
             )
 
     @staticmethod
@@ -750,7 +750,7 @@ class ModuleModelForm(DjangoModelForm[Module]):
             raise ValidationError(
                 _("A module with this name already exists at %(university)s."),
                 params={"university": university},
-                code="unique"
+                code="unique",
             )
 
     @staticmethod
@@ -779,7 +779,7 @@ class ModuleModelForm(DjangoModelForm[Module]):
             raise ValidationError(
                 _("A module with this reference code already exists at %(university)s."),
                 params={"university": university},
-                code="unique"
+                code="unique",
             )
 
     @override

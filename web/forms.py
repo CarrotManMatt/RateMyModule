@@ -22,37 +22,37 @@ class PostForm(ModelForm[Post]):
         choices=ACADEMIC_YEAR_CHOICES,
         required=True,
         coerce=int,
-        label=_("Academic Year")
+        label=_("Academic Year"),
     )
     content = forms.CharField(
         widget=forms.Textarea(
             attrs={"placeholder": _("Write your module review...")}),
         required=False,  # Not a required field
-        label=_("Content")
+        label=_("Content"),
     )
     overall_rating = forms.ChoiceField(
         choices=[(i, str(i)) for i in range(1, 6)],
         widget=forms.RadioSelect(),
         required=True,
-        label=_("Overall Rating")
+        label=_("Overall Rating"),
     )
     difficulty_rating = forms.ChoiceField(
         choices=[(i, str(i)) for i in range(1, 6)],
         widget=forms.RadioSelect(),
         required=False,
-        label=_("Difficulty Rating")
+        label=_("Difficulty Rating"),
     )
     assessment_rating = forms.ChoiceField(
         choices=[(i, str(i)) for i in range(1, 6)],
         widget=forms.RadioSelect(),
         required=False,
-        label=_("Assessment Rating")
+        label=_("Assessment Rating"),
     )
     teaching_rating = forms.ChoiceField(
         choices=[(i, str(i)) for i in range(1, 6)],
         widget=forms.RadioSelect(),
         required=False,
-        label=_("Teaching Rating")
+        label=_("Teaching Rating"),
     )
 
     @override
@@ -78,5 +78,5 @@ class PostForm(ModelForm[Post]):
             "overall_rating",
             "difficulty_rating",
             "assessment_rating",
-            "teaching_rating"
+            "teaching_rating",
         )

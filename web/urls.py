@@ -20,122 +20,124 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"submit-review/",
         SubmitPostView.as_view(),
-        name="submit-review"
+        name="submit-review",
     ),
     django.urls.path(
         r"settings/",
         UserSettingsView.as_view(),
-        name="user-settings"
+        name="user-settings",
     ),
-    django.urls.path(r"logout/", LogoutView.as_view(), name="logout")
+    django.urls.path(r"logout/", LogoutView.as_view(), name="logout"),
 ]
 
 favicon_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"favicon.ico",
-        RedirectView.as_view(url=r"/static/ratemymodule/favicon/favicon.ico",
-                             permanent=True),
-        name="favicon_redirect"
+        RedirectView.as_view(
+            url=r"/static/ratemymodule/favicon/favicon.ico",
+            permanent=True,
+        ),
+        name="favicon_redirect",
     ),
     django.urls.path(
         r"android-chrome-192x192.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/android-chrome-192x192.png",
-            permanent=True
+            permanent=True,
         ),
-        name="chrome_favicon_192_redirect"
+        name="chrome_favicon_192_redirect",
     ),
     django.urls.path(
         r"android-chrome-512x512.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/android-chrome-512x512.png",
-            permanent=True
+            permanent=True,
         ),
-        name="chrome_favicon_512_redirect"
+        name="chrome_favicon_512_redirect",
     ),
     django.urls.path(
         r"apple-touch-icon.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/apple-touch-icon.png",
-            permanent=True
+            permanent=True,
         ),
-        name="apple_favicon_redirect"
+        name="apple_favicon_redirect",
     ),
     django.urls.path(
         r"browserconfig.xml",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/browserconfig.xml",
-            permanent=True
+            permanent=True,
         ),
-        name="browser_config_redirect"
+        name="browser_config_redirect",
     ),
     django.urls.path(
         r"favicon.svg",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/favicon.svg",
-            permanent=True
+            permanent=True,
         ),
-        name="svg_favicon_redirect"
+        name="svg_favicon_redirect",
     ),
     django.urls.path(
         r"favicon-16x16.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/favicon-16x16.png",
-            permanent=True
+            permanent=True,
         ),
-        name="favicon_16_redirect"
+        name="favicon_16_redirect",
     ),
     django.urls.path(
         r"favicon-32x32.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/favicon-32x32.png",
-            permanent=True
+            permanent=True,
         ),
-        name="favicon_32_redirect"
+        name="favicon_32_redirect",
     ),
     django.urls.path(
         r"mstile-70x70.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/mstile-70x70.png",
-            permanent=True
+            permanent=True,
         ),
-        name="microsoft_favicon_70_redirect"
+        name="microsoft_favicon_70_redirect",
     ),
     django.urls.path(
         r"mstile-144x144.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/mstile-144x144.png",
-            permanent=True
+            permanent=True,
         ),
-        name="microsoft_favicon_144_redirect"
+        name="microsoft_favicon_144_redirect",
     ),
     django.urls.path(
         r"mstile-150x150.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/mstile-150x150.png",
-            permanent=True
+            permanent=True,
         ),
-        name="microsoft_favicon_150_redirect"
+        name="microsoft_favicon_150_redirect",
     ),
     django.urls.path(
         r"mstile-310x150.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/mstile-310x150.png",
-            permanent=True
+            permanent=True,
         ),
-        name="microsoft_favicon_310x150_redirect"
+        name="microsoft_favicon_310x150_redirect",
     ),
     django.urls.path(
         r"mstile-310x310.png",
         RedirectView.as_view(
             url=r"/static/ratemymodule/favicon/mstile-310x310.png",
-            permanent=True
+            permanent=True,
         ),
-        name="microsoft_favicon_310_redirect"
-    )
+        name="microsoft_favicon_310_redirect",
+    ),
 ]
 
 urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     *view_urlpatterns,
-    *favicon_urlpatterns
+    *favicon_urlpatterns,
 ]

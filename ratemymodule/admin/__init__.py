@@ -89,16 +89,16 @@ class UserAdmin(DjangoUserAdmin):
                     "is_active",
                     "enrolled_course_set",
                     "university",
-                    "made_post_count"
-                )
-            }
+                    "made_post_count",
+                ),
+            }  # noqa: COM812
         ),
         (
             "Authentication",
             {
                 "fields": ("date_time_joined", "last_login", "password"),
-                "classes": ("collapse",)
-            }
+                "classes": ("collapse",),
+            }  # noqa: COM812
         ),
         (
             "Permissions",
@@ -107,43 +107,52 @@ class UserAdmin(DjangoUserAdmin):
                     "groups",
                     "user_permissions",
                     "is_staff",
-                    "is_superuser"
+                    "is_superuser",
                 ),
-                "classes": ("collapse",)
-            }
+                "classes": ("collapse",),
+            }  # noqa: COM812
         ),
         (
             "Liked & Disliked Posts",
             {
                 "fields": (
                     ("liked_post_set", "liked_post_count"),
-                    ("disliked_post_set", "disliked_post_count")
+                    ("disliked_post_set", "disliked_post_count"),
                 ),
-                "classes": ("collapse",)
-            }
-        )
+                "classes": ("collapse",),
+            }  # noqa: COM812
+        ),
     )
     add_fieldsets = (
-        (None, {
-            "fields": (
-                "email",
-                ("password1", "password2"),
-                "enrolled_course_set"
-            )
-        }),
-        ("Extra", {
-            "fields": ("is_active",),
-            "classes": ("collapse",)
-        }),
-        ("Permissions", {
-            "fields": (
-                "groups",
-                "user_permissions",
-                "is_staff",
-                "is_superuser"
-            ),
-            "classes": ("collapse",)
-        })
+        (
+            None,
+            {
+                "fields": (
+                    "email",
+                    ("password1", "password2"),
+                    "enrolled_course_set",
+                ),
+            }  # noqa: COM812
+        ),
+        (
+            "Extra",
+            {
+                "fields": ("is_active",),
+                "classes": ("collapse",),
+            }  # noqa: COM812
+        ),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "groups",
+                    "user_permissions",
+                    "is_staff",
+                    "is_superuser",
+                ),
+                "classes": ("collapse",),
+            }  # noqa: COM812
+        ),
     )
     inlines = (UserMadePostsInline, UserMadeReportsInline)
     list_display = (
@@ -151,25 +160,25 @@ class UserAdmin(DjangoUserAdmin):
         "is_staff",
         "is_active",
         "made_post_count",
-        "last_login"
+        "last_login",
     )
     list_display_links = ("email",)
     list_editable = (
         "is_staff",
-        "is_active"
+        "is_active",
     )
     list_filter = (
         UserIsStaffListFilter,
         UserGroupListFilter,
         UserIsActiveListFilter,
         ("date_time_created", DateTimeRangeFilterBuilder(title=_("Date & Time Joined"))),
-        ("last_login", DateTimeRangeFilterBuilder(title=_("Last Login")))
+        ("last_login", DateTimeRangeFilterBuilder(title=_("Last Login"))),
     )
     autocomplete_fields = (
         "groups",
         "enrolled_course_set",
         "liked_post_set",
-        "disliked_post_set"
+        "disliked_post_set",
     )
     readonly_fields = (
         "email",
@@ -179,7 +188,7 @@ class UserAdmin(DjangoUserAdmin):
         "university",
         "made_post_count",
         "liked_post_count",
-        "disliked_post_count"
+        "disliked_post_count",
     )
     # noinspection SpellCheckingInspection
     search_fields = (
@@ -191,12 +200,12 @@ class UserAdmin(DjangoUserAdmin):
         "enrolled_course_set__university__short_name",
         "enrolled_course_set__university__email_domain",
         "made_post_set__module__name",
-        "emailaddress_set__email"
+        "emailaddress_set__email",
     )
     search_help_text = _(
         "Search for a user's email address, group name, enrolled course name, "
         "student type, posted-about module name, university name, university short name or "
-        "university email domain."
+        "university email domain."  # noqa: COM812
     )
 
     @override
@@ -209,7 +218,7 @@ class UserAdmin(DjangoUserAdmin):
         return super().get_queryset(request).annotate(  # type: ignore[return-value]
             made_post_count=models.Count("made_post_set", distinct=True),
             liked_post_count=models.Count("liked_post_set", distinct=True),
-            disliked_post_count=models.Count("disliked_post_set", distinct=True)
+            disliked_post_count=models.Count("disliked_post_set", distinct=True),
         )
 
     @admin.display(description=_("Date & Time Joined"), ordering="date_time_created")
@@ -315,9 +324,9 @@ class UserAdmin(DjangoUserAdmin):
                     "user_permissions": None,
                     "is_staff": None,
                     "is_superuser": None,
-                    "is_active": None
-                }
-            }
+                    "is_active": None,
+                },
+            },
         )
         return super().get_form(request=request, obj=obj, change=change, **kwargs)
 
@@ -325,7 +334,7 @@ class UserAdmin(DjangoUserAdmin):
     def get_readonly_fields(self, request: HttpRequest, obj: DjangoUser | None = None) -> ReadonlyFieldsList:  # noqa: E501
         readonly_fields: ReadonlyFieldsList = super().get_readonly_fields(
             request=request,
-            obj=obj
+            obj=obj,
         )
 
         if request.user.is_superuser:
@@ -351,7 +360,7 @@ class UserAdmin(DjangoUserAdmin):
             self=self,
             request=request,
             obj=obj,
-            post_url_continue=post_url_continue
+            post_url_continue=post_url_continue,
         )
 
 
@@ -362,7 +371,7 @@ class UniversityAdmin(CustomBaseModelAdmin[University]):
         "short_name",
         "email_domain",
         "founding_date",
-        "date_time_created"
+        "date_time_created",
     )
     list_display = ("name", "short_name", "email_domain", "founding_date")
     list_editable = ("short_name", "email_domain", "founding_date")
@@ -373,8 +382,8 @@ class UniversityAdmin(CustomBaseModelAdmin[University]):
         ("founding_date", DateRangeFilterBuilder(title=_("Founding Date"))),
         (
             "date_time_created",
-            DateTimeRangeFilterBuilder(title=_("Date & Time Object Was Created"))
-        )
+            DateTimeRangeFilterBuilder(title=_("Date & Time Object Was Created"))  # noqa: COM812
+        ),
     )
     inlines = (UniversityCoursesInline,)
 
@@ -388,7 +397,7 @@ class CourseAdmin(CustomBaseModelAdmin[Course]):
         "university",
         "date_time_created",
         "module_set",
-        ("enrolled_user_set", "enrolled_user_count")
+        ("enrolled_user_set", "enrolled_user_count"),
     )
     list_display = ("name", "student_type", "university", "enrolled_user_count")
     list_editable = ("student_type", "university")
@@ -399,7 +408,7 @@ class CourseAdmin(CustomBaseModelAdmin[Course]):
     list_filter = (
         (
             "date_time_created",
-            DateTimeRangeFilterBuilder(title=_("Date & Time Object Was Created"))
+            DateTimeRangeFilterBuilder(title=_("Date & Time Object Was Created"))  # noqa: COM812
         ),
     )
 
@@ -411,7 +420,7 @@ class CourseAdmin(CustomBaseModelAdmin[Course]):
         This is used by changelist_view.
         """
         return super().get_queryset(request).annotate(
-            enrolled_user_count=models.Count("enrolled_user_set", distinct=True)
+            enrolled_user_count=models.Count("enrolled_user_set", distinct=True),
         )
 
     @admin.display(description=_("Number of Users Enrolled"), ordering="enrolled_user_count")
@@ -437,7 +446,7 @@ class ModuleAdmin(CustomBaseModelAdmin[Module]):
         ("year_started", DateRangeFilterBuilder(title=_("Date Module Started"))),
         (
             "date_time_created",
-            DateTimeRangeFilterBuilder(title=_("Date & Time Object Was Created"))
+            DateTimeRangeFilterBuilder(title=_("Date & Time Object Was Created"))  # noqa: COM812
         ),
     )
     inlines = (ModulePostsInline,)
@@ -450,7 +459,7 @@ class ModuleAdmin(CustomBaseModelAdmin[Module]):
         This is used by changelist_view.
         """
         return super().get_queryset(request).annotate(
-            post_count=models.Count("post_set", distinct=True)
+            post_count=models.Count("post_set", distinct=True),
         )
 
     @admin.display(description=_("Number of Posts About This Module"), ordering="post_count")
@@ -485,8 +494,8 @@ class BaseTagAdmin(UnchangeableModelAdmin[T_tag]):
         TagIsVerifiedListFilter,
         (
             "date_time_created",
-            DateTimeRangeFilterBuilder(title=_("Date & Time Tag Was Created"))
-        )
+            DateTimeRangeFilterBuilder(title=_("Date & Time Tag Was Created"))  # noqa: COM812
+        ),
     )
 
     @override
@@ -497,7 +506,7 @@ class BaseTagAdmin(UnchangeableModelAdmin[T_tag]):
         This is used by changelist_view.
         """
         return super().get_queryset(request).annotate(  # type: ignore[no-any-return]
-            post_count=models.Count("post_set", distinct=True)
+            post_count=models.Count("post_set", distinct=True),
         )
 
     @admin.display(description=_("Number of Posts Using this Tag"), ordering="post_count")
@@ -536,28 +545,28 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
                     "overall_rating",
                     "difficulty_rating",
                     "assessment_rating",
-                    "teaching_rating"
-                )
-            }
+                    "teaching_rating",
+                ),
+            }  # noqa: COM812
         ),
         (
             "Tags",
             {
                 "fields": ("other_tag_set", "tool_tag_set", "topic_tag_set", "tags_count"),
-                "classes": ("collapse",)
-            }
+                "classes": ("collapse",),
+            }  # noqa: COM812
         ),
         (
             "Likes & Dislikes",
             {
                 "fields": (
                     ("liked_user_set", "liked_user_count"),
-                    ("disliked_user_set", "disliked_user_count")
+                    ("disliked_user_set", "disliked_user_count"),
                 ),
-                "classes": ("collapse",)
-            }
+                "classes": ("collapse",),
+            }  # noqa: COM812
         ),
-        ("Extra", {"fields": ("date_time_posted", "hidden"), "classes": ("collapse",)})
+        ("Extra", {"fields": ("date_time_posted", "hidden"), "classes": ("collapse",)}),
     )
     list_display = (
         "pk",
@@ -567,39 +576,39 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
         "assessment_rating",
         "teaching_rating",
         "liked_user_count",
-        "disliked_user_count"
+        "disliked_user_count",
     )
     list_editable = (
         "module",
         "overall_rating",
         "difficulty_rating",
         "assessment_rating",
-        "teaching_rating"
+        "teaching_rating",
     )
     autocomplete_fields = (
         "user",
         "module",
         "other_tag_set",
         "tool_tag_set",
-        "topic_tag_set"
+        "topic_tag_set",
     )
     search_fields = (
         "user__email",
         "user__groups__name",
         "module__name",
         "content",
-        "tags__name"
+        "tags__name",
     )
     search_help_text = _(
         "Search for a post's content, module's name, tag's name, creator's email or "
-        "creator's group name"
+        "creator's group name",
     )
     list_display_links = ("pk",)
     readonly_fields = (
         "date_time_posted",
         "tags_count",
         "liked_user_count",
-        "disliked_user_count"
+        "disliked_user_count",
     )
     # noinspection PyUnresolvedReferences
     list_filter = (
@@ -607,7 +616,7 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
         post_rating_list_filter_builder(Post.difficulty_rating.field),
         post_rating_list_filter_builder(Post.assessment_rating.field),
         post_rating_list_filter_builder(Post.teaching_rating.field),
-        ("date_time_created", DateTimeRangeFilterBuilder(title=_("Date & Time Posted")))
+        ("date_time_created", DateTimeRangeFilterBuilder(title=_("Date & Time Posted"))),
     )
     inlines = (PostReportsInline,)
 
@@ -625,7 +634,7 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
                 + models.Count("other_tag_set", distinct=True)
             ),
             liked_user_count=models.Count("liked_user_set", distinct=True),
-            disliked_user_count=models.Count("disliked_user_set", distinct=True)
+            disliked_user_count=models.Count("disliked_user_set", distinct=True),
         )
 
     @admin.display(description=_("Date & Time Posted"), ordering="date_time_created")
@@ -676,11 +685,11 @@ class ReportAdmin(CustomBaseModelAdmin[Report]):
         "post__module__name",
         "post__tags__name",
         "post__user__email"
-        "reporter__email"
+        "reporter__email",
     )
     search_help_text = _(
         "Search for a reporter's email or a reported post's content, module name, "
-        "tag's name or creator's email"
+        "tag's name or creator's email"  # noqa: COM812
     )
     list_display_links = ("pk",)
     readonly_fields = ("date_time_created",)

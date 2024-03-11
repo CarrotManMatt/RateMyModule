@@ -6,7 +6,7 @@ __all__: Sequence[str] = (
     "HomeView",
     "SubmitPostView",
     "UserSettingsView",
-    "LogoutView"
+    "LogoutView",
 )
 
 from typing import TYPE_CHECKING, override
@@ -78,7 +78,7 @@ class HomeView(TemplateView):
                 "overall_rating_bar_graph": "",
                 "difficulty_bar_graph": "",
                 "teaching_graph": "",
-                "assessment_graph": ""
+                "assessment_graph": "",
             }
 
         return {
@@ -86,7 +86,7 @@ class HomeView(TemplateView):
             "overall_rating_bar_graph": mark_safe(graph_utils.overall_rating_bar_graph()),  # noqa: S308
             "difficulty_bar_graph": mark_safe(graph_utils.difficulty_rating_bar_graph()),  # noqa: S308
             "teaching_graph": mark_safe(graph_utils.teaching_quality_bar_graph()),  # noqa: S308
-            "assessment_graph": mark_safe(graph_utils.assessment_quality_bar_graph())  # noqa: S308
+            "assessment_graph": mark_safe(graph_utils.assessment_quality_bar_graph()),  # noqa: S308
         }
 
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
