@@ -2,19 +2,25 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("UserManager", "UniversityModuleManager", "UserModuleManager")
+__all__: Sequence[str] = (
+    "UserManager",
+    "UniversityModuleManager",
+    "UserModuleManager",
+    "PostFilteredByTagManager",
+)
 
 
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Final, override
 
-from django.apps import apps
 from django.contrib.auth.models import UserManager as DjangoUserManager
+from django.db import models
 from django.db.models import Manager, QuerySet
 
 from .utils import AttributeDeleter
 
 if TYPE_CHECKING:
-    from . import Module, University, User
+    from . import Module, Post, University, User
 
 
 class UserManager(DjangoUserManager["User"]):
@@ -75,17 +81,16 @@ class UniversityModuleManager(Manager["Module"]):
     """
 
     @override
-    def __init__(self, university: "University") -> None:
-        self.university: University = university
-        # noinspection PyTypeChecker
-        self.model = apps.get_model(app_label="ratemymodule", model_name="Module")
+    def __init__(self, university: "University", model: type["Module"]) -> None:
+        self._university: University = university
+        self._model: type["Module"] = model
 
         super().__init__()
 
     @override
     def get_queryset(self) -> QuerySet["Module"]:
-        return apps.get_model(app_label="ratemymodule", model_name="Module").objects.filter(  # type: ignore[no-any-return]
-            course_set__pk__in=self.university.course_set.all(),
+        return self._model.objects.filter(
+            course_set__pk__in=self._university.course_set.all(),
         ).distinct()
 
 
@@ -98,15 +103,37 @@ class UserModuleManager(Manager["Module"]):
     """
 
     @override
-    def __init__(self, user: "User") -> None:
+    def __init__(self, user: "User", model: type["Module"]) -> None:
         self._user: User = user
-        # noinspection PyTypeChecker
-        self.model = apps.get_model(app_label="ratemymodule", model_name="Module")
+        self._model: type["Module"] = model
 
         super().__init__()
 
     @override
     def get_queryset(self) -> QuerySet["Module"]:
-        return apps.get_model(app_label="ratemymodule", model_name="Module").objects.filter(  # type: ignore[no-any-return]
+        return self._model.objects.filter(
             course_set__pk__in=self._user.enrolled_course_set.all(),
+        ).distinct()
+
+
+class PostFilteredByTagManager(Manager["Post"]):
+    """
+    Manager class to create & retrieve instances of the `Post` model.
+
+    Post objects are selected by whether they have one of the given tags.
+    """
+
+    @override
+    def __init__(self, tag_names: Iterable[str], model: type["Post"]) -> None:
+        self._tag_names: Iterable[str] = tag_names
+        self._model: type["Post"] = model
+
+        super().__init__()
+
+    @override
+    def get_queryset(self) -> QuerySet["Post"]:
+        return self._model.objects.filter(
+            models.Q(other_tag_set__name__in=self._tag_names)
+            | models.Q(tool_tag_set__name__in=self._tag_names)
+            | models.Q(topic_tag_set__name__in=self._tag_names)  # noqa: COM812
         ).distinct()

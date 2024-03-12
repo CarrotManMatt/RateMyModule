@@ -83,7 +83,6 @@ class CustomBaseModel(Model):
         field_name: str
         for field_name in set(kwargs.keys()) - self.get_proxy_field_names():
             try:
-                # noinspection PyUnresolvedReferences
                 self._meta.get_field(field_name)
             except FieldDoesNotExist:
                 unexpected_kwargs.add(field_name)

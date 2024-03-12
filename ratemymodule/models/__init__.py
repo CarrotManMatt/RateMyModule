@@ -34,13 +34,19 @@ from django.core.validators import (
     RegexValidator,
 )
 from django.db import models
+from django.db.models import Manager
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 from django_stubs_ext.db.models.manager import RelatedManager
 
 from core.utils import reverse_url_with_get_params
 
-from .managers import UniversityModuleManager, UserManager, UserModuleManager
+from .managers import (
+    PostFilteredByTagManager,
+    UniversityModuleManager,
+    UserManager,
+    UserModuleManager,
+)
 from .utils import AttributeDeleter, CustomBaseModel
 from .validators import (
     ConfusableEmailValidator,
@@ -192,7 +198,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
-        self.module_set: UserModuleManager = UserModuleManager(self)
+        self.module_set: UserModuleManager = UserModuleManager(self, Module)
 
     @override
     def __str__(self) -> str:
@@ -338,7 +344,7 @@ class University(CustomBaseModel):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
-        self.module_set: UniversityModuleManager = UniversityModuleManager(self)
+        self.module_set: UniversityModuleManager = UniversityModuleManager(self, Module)
 
     @override
     def __str__(self) -> str:
@@ -776,6 +782,10 @@ class Post(CustomBaseModel):
     @override
     def __str__(self) -> str:
         return f"Post by {self.student_type} for {self.module}"
+
+    @classmethod
+    def filter_by_tags(cls, names: Iterable[str]) -> Manager["Post"]:
+        return PostFilteredByTagManager(tag_names=names, model=cls)
 
 
 # NOTE: Choices classes need to be defined outside of their respective models, so that they can be referenced within the model's Meta constraints list

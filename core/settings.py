@@ -260,7 +260,6 @@ WSGI_APPLICATION = "core.wsgi.APPLICATION"
 
 # Application definition
 
-# noinspection SpellCheckingInspection
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -383,7 +382,6 @@ if "EMAIL_BACKEND" not in locals() or "smtp" in EMAIL_BACKEND.lower():
 
 # Template Settings
 
-# noinspection PyUnresolvedReferences
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",

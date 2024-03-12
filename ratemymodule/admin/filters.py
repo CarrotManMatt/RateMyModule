@@ -171,7 +171,6 @@ class ReportReasonListFilter(admin.SimpleListFilter):
 
     @override
     def lookups(self, request: HttpRequest, model_admin: ModelAdmin[Report]) -> Iterable[tuple[object, StrOrPromise]] | None:  # type: ignore[override]  # noqa: E501
-        # noinspection PyUnresolvedReferences
         return ((reason.value, reason.label) for reason in Report.Reasons)
 
     @override
