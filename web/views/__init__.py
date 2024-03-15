@@ -9,6 +9,7 @@ __all__: Sequence[str] = (
     "LogoutView",
 )
 
+import re
 from typing import TYPE_CHECKING, override
 from urllib.parse import unquote_plus
 
@@ -81,12 +82,75 @@ class HomeView(TemplateView):
                 "assessment_graph": "",
             }
 
+        try:
+            # noinspection PyTypeChecker
+            module: Module = Module.objects.get(code=unquote_plus(self.request.GET["module"]))
+        except Module.DoesNotExist:
+            return {**context_data, "error": _("Error: Module Not Found")}
+
+        # noinspection SpellCheckingInspection
         return {
             **context_data,
-            "overall_rating_bar_graph": mark_safe(graph_utils.overall_rating_bar_graph()),  # noqa: S308
-            "difficulty_bar_graph": mark_safe(graph_utils.difficulty_rating_bar_graph()),  # noqa: S308
-            "teaching_graph": mark_safe(graph_utils.teaching_quality_bar_graph()),  # noqa: S308
-            "assessment_graph": mark_safe(graph_utils.assessment_quality_bar_graph()),  # noqa: S308
+            "overall_rating_bar_graph": mark_safe(  # noqa: S308
+                re.sub(
+                    "#aaaaaa",
+                    "var(--text-color)",
+                    re.sub(
+                        "#ffffff",
+                        "var(--button-color)",
+                        graph_utils.overall_rating_bar_graph(
+                            module,
+                            "ffffff",
+                            "aaaaaa",
+                        ),
+                    ),
+                )  # noqa: COM812
+            ),
+            "difficulty_bar_graph": mark_safe(  # noqa: S308
+                re.sub(
+                    "#aaaaaa",
+                    "var(--text-color)",
+                    re.sub(
+                        "#ffffff",
+                        "var(--button-color)",
+                        graph_utils.difficulty_rating_bar_graph(
+                            module,
+                            "ffffff",
+                            "aaaaaa",
+                        ),
+                    ),
+                )  # noqa: COM812
+            ),
+            "teaching_graph": mark_safe(  # noqa: S308
+                re.sub(
+                    "#aaaaaa",
+                    "var(--text-color)",
+                    re.sub(
+                        "#ffffff",
+                        "var(--button-color)",
+                        graph_utils.teaching_quality_bar_graph(
+                            module,
+                            "ffffff",
+                            "aaaaaa",
+                        ),
+                    ),
+                )  # noqa: COM812
+            ),
+            "assessment_graph": mark_safe(  # noqa: S308
+                re.sub(
+                    "#aaaaaa",
+                    "var(--text-color)",
+                    re.sub(
+                        "#ffffff",
+                        "var(--button-color)",
+                        graph_utils.assessment_quality_bar_graph(
+                            module,
+                            "ffffff",
+                            "aaaaaa",
+                        ),
+                    ),
+                )  # noqa: COM812
+            ),
         }
 
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
