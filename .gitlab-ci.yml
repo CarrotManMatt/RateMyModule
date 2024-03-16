@@ -102,7 +102,7 @@ asciidoctor-test:
         - apt-get install -y --no-install-recommends asciidoctor
 
     script:
-        - asciidoctor -v --failure-level=WARNING -w  -o /dev/null README.adoc dev_docs/*.adoc
+        - asciidoctor -v --failure-level=WARNING -w -o /dev/null README.adoc dev_docs/*.adoc
 
 pre-commit-test:
     image: carrotmanmatt/poetry:3.12

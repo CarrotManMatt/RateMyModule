@@ -71,11 +71,11 @@
 :url-django-wiki-admin-site-display-decorator: {url-django-wiki-admin-site}#the-display-decorator
 :url-django-wiki-testing: {url-django-wiki}/topics/testing
 :url-django-wiki-templates: {url-django-wiki}/topics/templates
-:url-django-wiki-templates-inheritance: {url-django-wiki-templates}/language#template-inheritance
+:url-django-wiki-templates-inheritance: {url-django-wiki}/ref/language#template-inheritance
 :url-django-wiki-templates-tags: {url-django-wiki-templates}#tags
-:url-django-wiki-templates-tags-extends: {url-django-wiki-templates}/builtins#extends
-:url-django-wiki-templates-tags-static: {url-django-wiki-templates}/builtins#static
-:url-django-wiki-templates-tags-load: {url-django-wiki-templates}/builtins#load
+:url-django-wiki-templates-tags-extends: {url-django-wiki}/ref/templates/builtins#extends
+:url-django-wiki-templates-tags-static: {url-django-wiki}/ref/templates/builtins#static
+:url-django-wiki-templates-tags-load: {url-django-wiki}/ref/templates/builtins#load
 :url-django-wiki-static-files: {url-django-wiki}/howto/static-files
 :url-djecrety: https://djecrety.ir
 :url-allauth-home: https://allauth.org

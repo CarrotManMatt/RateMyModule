@@ -166,7 +166,7 @@ You can do this by adding the {url-django-wiki-templates-tags-extends}[`+extends
 
 - {url-django-wiki-templates-tags-static}[Referencing the location of static files] can be {url-django-wiki-templates-tags-load}[enabled] by adding the {url-django-wiki-templates-tags-static}[`+{% load static %}+`] {url-django-wiki-templates-tags}[template-tag] to the top of your {url-django-wiki-templates}[HTML template].
 +
-.Using the `+static+` tag to locate the source of a static image file
+.Using the {url-django-wiki-templates-tags-static}[`+static+` tag] to locate the source of a {url-wiki-static-web-files}[static] {url-wiki-image}[image file]
 [example]
 `+<img src="{% static 'ratemymodule/icons/logo.svg' %}" alt="RateMyModule Logo" class="logo"/>+`
 
