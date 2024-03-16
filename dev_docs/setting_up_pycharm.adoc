@@ -1,0 +1,157 @@
+= Setting up PyCharm
+Matthew Norton <matt@carrotmanmatt.com>
+v1.0, 12/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+[#install-pycharm-professional]
+== 1. Install {labelled-url-pycharm-professional}
+
+Although {labelled-url-pycharm-professional} is an *extremely* expensive subscription-based IDE,  the great news is that as students we get free access!
+{labelled-url-github-student-dev-pack} gives you access to {labelled-url-pycharm-professional} for every year that you are at university!
+
+Once you have signed up for {labelled-url-github-student-dev-pack}, you can go to {url-jetbrains-github-account-connection}[the JetBrains account connection page], to connect your {url-github-account}[GitHub account] to your {url-jetbrains-account}[JetBrains account] (creating one if necessary).
+
+Now you can {url-pycharm-download}[download & install PyCharm Professional] for your chosen operating system.
+
+[#setup-git]
+== 2. Set Up {labelled-url-git}
+
+. Install {labelled-url-git} for your desired OS
+
+. Configure your {url-wiki-line-seperators}[OS-dependent line separators] with the following commands:
++
+--
+.On {labelled-url-wiki-microsoft-windows}
+[source,console]
+$ git config --global core.autocrlf true
+
+.On {labelled-url-wiki-linux}
+[source,console]
+$ git config --global core.autocrlf input
+--
+
+[#install-python-312]
+== 3. Install {labelled-url-python-312}
+
+This project requires {labelled-url-python-312} specifically.
+You *must* use this version, even if you already have a lower version (E.g. Python 3.11) already installed.
+
+NOTE: If you already have {labelled-url-python-312} installed, you can skip this step.
+
+[#installing-python-312-on-windows]
+=== Installing {labelled-url-python-312} on {labelled-url-wiki-microsoft-windows}
+
+The {url-python-312-windows-installer}[Windows installer] can be downloaded {url-python-312-windows-installer}[here].
+
+[#installing-python-312-on-linux]
+=== Installing {labelled-url-python-312} on {labelled-url-wiki-linux}
+
+If you are running an {labelled-url-ubuntu}-based {url-wiki-linux-distribution}[distribution], you can add the {url-deadsnakes-python-ppa}[deadsnakes third-party repository] that contains {url-deadsnakes-python-ppa-packages}[updated versions of Python] (including {url-deadsnakes-python-ppa-312}[3.12]).
+Instructions for installing {url-deadsnakes-python-ppa-312}[Python 3.12] from the {url-deadsnakes-python-ppa}[deadsnakes repository] can be found {url-article-install-python-from-deadsnakes-ppa}[here].
+
+If you are running a {labelled-url-fedora}/link:{labelled-url-rhel}-based {url-wiki-linux-distribution}[distribution], {url-fedora-python-312}[Python 3.12] should already be installed by default. {labelled-url-redhat} are reasonably good at https://developer.fedoraproject.org/tech/languages/python/multiple-pythons.html[keeping their Python packages up to date].
+
+If you are running an {labelled-url-arch}-based {url-wiki-linux-distribution}[distribution], you can install {url-arch-python-312}[Python 3.12] from the {labelled-url-arch-aur}.
+
+In all other {url-wiki-linux-distribution}[Linux distributions], you will need to install {labelled-url-python-312} from source.
+Make sure that you install {labelled-url-python-312} under a different alias, so that it does not conflict with your pre-installed Python version  (E.g. `+python3.12+` instead of [.line-through]#`+python3+`#).
+A good set of installation instructions can be found {url-article-install-python-from-source}[here].
+
+[#install-poetry]
+== 4. Install {labelled-url-poetry}
+
+{labelled-url-poetry} is the {url-poetry-managing-dependencies}[dependency management system] this project uses.
+Install it using the official installer (*not* [.line-through]#pipx#).
+The official installation instructions can be found {url-poetry-installation-instructions}[here].
+
+IMPORTANT: *Make sure you follow these instructions EXACTLY*, because many issues can occur if you do not read the installation instructions correctly.
+
+[#pull-down-a-local-version-of-this-repository]
+== 5. Pull down a Local Version of This Repository
+
+. Open {labelled-url-pycharm}, then close any currently open projects
+
+. Ensure you have the {url-pycharm-gitlab-plugin}[PyCharm GitLab plugin] installed.
+This comes pre-bundled with {labelled-url-pycharm} & can be installed from the {url-pycharm-plugins}[menu:Settings[Plugins] page]
+
+. Return to the Projects page, then click menu:Projects[Get from VCS]
+
+. Choose {url-pycharm-gitlab-plugin}[btn:[GitLab]] as your VCS provider
+
+. Connect {labelled-url-pycharm} to your {labelled-url-uob-cs-gitlab-account} by {url-uob-cs-gitlab-access-tokens}[generating a token], then entering it into the input box
++
+TIP: The default selected API permissions are suitable
+
+. Select btn:[Team Projects 2023–24 / RateMyModule] from the list of projects, then choose a suitable directory for your local version of the repository to be saved to
+
+. Wait for {labelled-url-pycharm} to finish indexing your new project
+
+[#set-up-a-python-interpreter-and-install-the-dependencies-using-poetry]
+== 6. Set up a {url-pycharm-wiki-configuring-python-interpreter}[Python Interpreter] & Install the {url-poetry-managing-dependencies}[Dependencies] Using {labelled-url-poetry}
+
+
+. Open the settings pop-up (btn:[Ctrl+Alt+S]), then navigate to the menu:Project: {project name}[Python Interpreter] page
+
+. Click menu:Add New Interpreter[&#127968; Add Local Interpreter...]
+
+. Because you have already installed {labelled-url-poetry}, you should see the btn:[Poetry Environment] option.
+Select this interpreter type
+
+. Choose btn:[New Poetry Environment] (*not* [.line-through]#btn:[Existing Environment]#)
+
+. Select {labelled-url-python-312} from the menu:New Poetry Environment[Base interpreter:] drop-down menu
+
+. **Uncheck** btn:[Install packages from pyproject.toml]
+
+. Click btn:[OK] to create the new {url-wiki-python-virtual-environment}[Python virtual environment]
+
+. Open a new {url-pycharm-wiki-terminal-pane}[terminal pane] (kbd:[Alt+F12]) and run the following commands to install all the necessary dependencies:
++
+--
+.Install dependencies
+[source,console]
+$ poetry install --no-root --sync
+
+.Set up {labelled-url-pre-commit}
+[source,console]
+$ poetry run pre-commit install
+--
+
+[#set-up-asciidoc-plugin]
+== 7. Set up the {url-pycharm-asciidoc-plugin}[AsciiDoc PyCharm Plugin]
+
+. {url-pycharm-wiki-settings-popup}[PyCharm's settings pop-up] (kbd:[Ctrl+Alt+S]), then navigate to the {url-pycharm-plugins}[menu:Settings[Plugins] page]
+
+. Go to the menu:Plugins[Marketplace] tab and search for `+AsciiDoc+`
+
+. Install the {url-pycharm-asciidoc-plugin}[AsciiDoc PyCharm Plugin]
+
+. Click the btn:[Apply] button in the bottom-right corner to save your changes (you may need to restart {labelled-url-pycharm} after it has finished installing)
+
+TIP: The settings for the {url-pycharm-asciidoc-plugin}[AsciiDoc PyCharm Plugin] can be changed under menu:Languages & Frameworks[AsciiDoc] in {url-pycharm-wiki-settings-popup}[PyCharm's settings pop-up] (kbd:[Ctrl+Alt+S])
+
+[#set-up-django-within-your-python-workspace]
+== 8. Set up Django Within Your PyCharm Workspace
+
+. Open {url-pycharm-wiki-settings-popup}[PyCharm's settings pop-up] (kbd:[Ctrl+Alt+S]), then navigate to {url-pycharm-wiki-settings-django}[the menu:Languages & Frameworks[Django] page]
+
+. Check {url-pycharm-wiki-settings-django-enable}[btn:[Enable Django Support]]
+
+. Select the directory you started this project in as {url-pycharm-wiki-settings-django-enable}[btn:[Django project root:]]
+
+. Select the file `+core/settings.py+` in the {url-pycharm-wiki-settings-django-enable}[btn:[Settings:] input box]
+
+. Click the btn:[Apply] button in the bottom-right corner to save your changes
+
+. Navigate to the {url-pycharm-wiki-settings-project-structure}[menu:Project&colon; {project name}[Project Structure] settings page]
+
+. Mark the following directories as {url-pycharm-wiki-settings-project-structure-marked-directories}[btn:[Sources]]: `+api_htmx/+`, `+api_rest/+`, `+core/+`, `+ratemymodule/+` & `+web/+`
+
+. Mark the following directories as {url-pycharm-wiki-settings-project-structure-marked-directories}[btn:[Tests]]: `+api_htmx/tests/+`, `+api_rest/tests/+`, `+ratemymodule/tests/+` & `+web/tests/+`
+
+. Mark the following directories as {url-pycharm-wiki-settings-project-structure-marked-directories}[btn:[Templates]]: `+override-templates/+`, `+api_htmx/templates/+` & `+web/templates/+`
+
+. Click the btn:[Apply] button in the bottom-right corner to save your changes

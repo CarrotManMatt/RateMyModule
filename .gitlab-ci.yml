@@ -86,36 +86,27 @@ djlint-test:
     script:
         poetry run djlint . --lint
 
-pymarkdown-test:
-    image: carrotmanmatt/poetry:3.12
-    stage: test
+asciidoctor-test:
+    image: python:3
+    stage: check
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
         - if: $CI_COMMIT_TAG
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-    allow_failure: true
-
     tags:
         - python
 
-    variables:
-        PIP_CACHE_DIR: ${CI_PROJECT_DIR}/.cache/pip
-
-    cache:
-        paths:
-            - .venv
-            - ${PIP_CACHE_DIR}
-
     before_script:
-        - poetry install --no-root --with dev --no-interaction
+        - apt-get update -y
+        - apt-get install -y --no-install-recommends asciidoctor
 
     script:
-        poetry run pymarkdown scan *.md dev_docs -r
+        - asciidoctor -v --failure-level=WARNING -w  -o /dev/null README.adoc dev_docs/*.adoc
 
 pre-commit-test:
     image: carrotmanmatt/poetry:3.12
-    stage: test
+    stage: check
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
         - if: $CI_COMMIT_TAG
@@ -138,7 +129,6 @@ pre-commit-test:
         - apt-get update -y
         - apt-get install -y --no-install-recommends git
         - poetry install --no-root --with dev --no-interaction
-        - chmod -R +x .local-pre-commit-scripts
 
     script:
         poetry run pre-commit run --all-files

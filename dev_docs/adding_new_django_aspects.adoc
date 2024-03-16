@@ -1,0 +1,196 @@
+= Adding New Django Aspects
+Matthew Norton <matt@carrotmanmatt.com>
+v1.3, 12/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+== Quick Links
+
+- <<adding-a-new-db-model,Adding a New DB Model>>
+- <<adding-a-model-to-the-admin-ui,Adding a Module to the Admin UI>>
+- <<adding-a-new-web-url,Adding a New Web URL>>
+- <<adding-a-new-htmx-api-url,Adding a New HTMX API URL>>
+- <<adding-a-new-web-view,Adding a New Web View>>
+- <<adding-a-new-htmx-api-view,Adding a New HTMX API View>>
+- <<adding-a-new-web-html-template,Adding a New Web HTML Template>>
+- <<adding-a-new-htmx-api-html-template,Adding a New HTMX API HTML Template>>
+- <<adding-static-files,Adding Static Files>>
+
+[#adding-a-new-db-model]
+== Adding a New DB {url-django-wiki-models}[Model]
+
+- Your {url-django-wiki-models}[model class] *must* be added inside link:../ratemymodule/models/&#95;&#95;init&#95;&#95;.py[`+ratemymodule/models/__init__.py+`]
+
+- Your {url-django-wiki-models}[model class] *must* {url-django-wiki-models-inheritance}[inherit] from `+CustomBaseClass+` (found within link:../ratemymodule/models/utils.py[`+models/utils.py+`])
+
+- If you {url-wiki-python-method-overriding}[override the superclass'] {url-django-wiki-models-clean}[`+clean()+`] or {url-django-wiki-models-save}[`+save()+`] methods, you *must* {url-wiki-python-super}[call back to the superclass] using `+super().clean()+` or `+super().save(*args, **kwargs)+`, respectively.
+(See {url-django-wiki-models-overriding-methods}[Django's documentation on overriding model methods])
+
+- {url-django-wiki-models-fields-verbose-name}[The `+verbose_name+`] for every {url-django-wiki-models}#fields[field in your model] *must* be a {url-django-wiki-translatable-string}[translatable string].
+(See the existing +`User+` model as an example)
+
+- {url-django-wiki-models-verbose-name}[The `+verbose_name+`] within {url-django-wiki-models-meta}[the `+class Meta:+` of your model] *must* be a {url-django-wiki-translatable-string}[translatable string].
+(See the existing `+User+` model as an example)
+
+- Read-only shortcut accessors can be defined with {url-wiki-python-property-decorator}[the `+@property+` decorator]
+
+- Any {url-django-wiki-models}#fields[model fields] *must not* be {url-wiki-python-type-annotations}[type-annotated]
++
+--
+.Correct model field without {url-wiki-python-type-annotations}[type-annotation]
+[example]
+`+first_name = models.CharField(max_length=50)+`
+
+.Incorrect model field with {url-wiki-python-type-annotations}[type-annotation]
+[example]
+[.line-through]#`+first_name: str = models.CharField(max_length=50)+`#
+--
+
+- After finishing your {url-django-wiki-models}[model class], but *before committing your changes*, run these {url-django-wiki-manage-commands}[`+manage.py+` commands] to {url-django-wiki-models-migrations}[migrate your Python changes to the database]:
++
+--
+[source,console]
+$ makemigrations
+
+[source,console]
+$ migrate
+
+(You can run these commands easily within {url-pycharm-wiki-run-django-manage}[PyCharm's `+manage.py+` interface].
+Open it using the shortcut kbd:[Ctrl+Alt+R])
+--
+
+[#adding-a-model-to-the-admin-ui]
+== Adding a Model to the Admin UI
+
+- Your new {url-django-wiki-admin-site-modeladmin}[admin-configuration class] *must* be added inside link:../ratemymodule/admin/&#95;&#95;init&#95;&#95;.py[`+ratemymodule/admin/__init__.py+`]
+
+- A calculation function can be made into a value that can be displayed within {url-django-wiki-admin-site}[the admin interface] with {url-django-wiki-admin-site-display-decorator}[the `+@admin.display()+` decorator].
+(See the `+UserAdmin+` class as an example)
+
+[#adding-a-new-web-url]
+== Adding a New Web {labelled-url-wiki-url}
+
+- Your new web {labelled-url-wiki-url} *must* be added inside {url-django-wiki-urls-urlpatterns}[the `+view_urlpatterns+` list], within link:../web/urls.py[`+web/urls.py+`]
+
+- Your {labelled-url-wiki-url} **must **{url-django-wiki-urls}#example[*not* start with a leading forward-slash (`+/+`)]
+
+- Your new web {labelled-url-wiki-url} *must* {url-django-wiki-urls}#example[end with a trailing forward-slash (`+/+`)]
+
+- {url-django-wiki-urls-path}[The `+route+` string parameter] to {url-django-wiki-urls-path}[the `+django.urls.path()+` function] *must* be {url-wiki-python-raw-strings}[a raw string].
+(See the existing {url-django-wiki-urls-urlpatterns}[URL patterns] within link:../web/urls.py[`+web/urls.py+`] for examples)
+
+- Your {url-django-wiki-urls-path}[URL pattern] *must* be named, so that it can be {url-django-wiki-urls-reverse}[reverse referenced] throughout this project.
+(See {url-django-wiki-urls-naming}[Django's documentation on naming URL patterns] for more information on why this is beneficial)
+
+- You *must* use the full expansion of the import location of {url-django-wiki-urls-path}[the `+path()+` function (`+django.urls.path()+`)],
+to make it clear which `+path()+` function is being used
+
+[#adding-a-new-htmx-api-url]
+== Adding a New HTMX API {labelled-url-wiki-url}
+
+- Your new HTMX API {labelled-url-wiki-url} *must* be added inside {url-django-wiki-urls-urlpatterns}[the `+urlpatterns+` list], within link:../api_htmx/urls.py[`+api_htmx/urls.py+`]
+
+- Your new HTMX API {labelled-url-wiki-url} **must **{url-django-wiki-urls}#example[*not* start with a leading forward-slash (`+/+`)]
+
+- Your {labelled-url-wiki-url} *must* {url-django-wiki-urls}#example[end with a trailing forward-slash (`+/+`)]
+
+- {url-django-wiki-urls-path}[The `+route+` string parameter] to {url-django-wiki-urls-path}[the `+django.urls.path()+` function] *must* be {url-wiki-python-raw-strings}[a raw string].
+(See the existing {url-django-wiki-urls-urlpatterns}[URL patterns] within link:../api_htmx/urls.py[`+api_htmx/urls.py+`] for examples)
+
+- Your {url-django-wiki-urls-path}[URL pattern] *must* be named, so that it can be {url-django-wiki-urls-reverse}[reverse referenced] throughout this project.
+(See {url-django-wiki-urls-naming}[Django's documentation on naming URL patterns] for more information on why this is beneficial)
+
+- You *must* use the full expansion of the import location of {url-django-wiki-urls-path}[the `+path()+` function (`+django.urls.path()+`)],
+to make it clear which `+path()+` function is being used
+
+[#adding-a-new-web-view]
+== Adding a New Web {url-django-wiki-views}[View]
+
+- Your new web {url-django-wiki-views}[view] *must* be added inside link:../web/views/&#95;&#95;init&#95;&#95;.py[`+web/views/__init__.py+`]
+
+- Your new web {url-django-wiki-views}[view] *must* be a {url-django-wiki-views-class-based}[classed-based view] that inherits from at least {url-django-wiki-views-template-response}[Django's base `+View+`]
+
+- Your new web {url-django-wiki-views}[view] *must* be named using {labelled-url-wiki-pascal-case}.
+(E.g. `+HomeView+`)
+
+- Your new web {url-django-wiki-views}[view] *must* end with the word `+View+`.
+(E.g. `+HomeView+`)
+
+- Any configuration {url-wiki-python-class-attributes}[class-variables] *must not* be {url-wiki-python-type-annotations}[type-annotated] {url-wiki-python-type-annotations}
++
+--
+.Correct class-variable without type-annotation
+[example]
+`+template_name = "ratemymodule/home.html"+`
+
+.Incorrect class-variable with type-annotation
+[example]
+[.line-through]#`+template_name: str = "ratemymodule/home.html"+`#
+--
+
+[#adding-a-new-htmx-api-view]
+== Adding a New HTMX API {url-django-wiki-views}[View]
+
+- Your new HTMX API {url-django-wiki-views}[view] *must* be added inside link:../api_htmx/views/&#95;&#95;init&#95;&#95;.py[`+api_htmx/views/__init__.py+`]
+
+- Your new HTMX API {url-django-wiki-views}[view] *must* be a {url-django-wiki-views-class-based}[classed-based view] that inherits from at least {url-django-wiki-views-base-view}[Django's base `+View+`]
+
+- Your new HTMX API {url-django-wiki-views}[view] *must* be named using {labelled-url-wiki-pascal-case}.
+(E.g. `+LoginPopUpView+`)
+
+- Your new HTMX API {url-django-wiki-views}[view] *must* end with the word `+View+`.
+(E.g. `+LoginPopUpView+`)
+
+- Any configuration {url-wiki-python-class-attributes}[class-variables] *must not* be {url-wiki-python-type-annotations}[type-annotated]
++
+--
+.Correct class-variable without type-annotation
+[example]
+`+template_name = "ratemymodule/htmx_fragments/login_pop_up.html"+`
+
+.Incorrect class-variable with type-annotation
+[example]
+[.line-through]#`+template_name: str = "ratemymodule/htmx_fragments/login_pop_up.html"+`#
+--
+
+[#adding-a-new-web-html-template]
+== Adding a New Web {url-django-wiki-templates}[HTML Template]
+
+- Your new web {url-django-wiki-templates}[HTML Template] *must* be added inside link:../web/templates/ratemymodule/[`+web/templates/ratemymodule/+`]
+
+- Your new web {url-django-wiki-templates}[HTML template] *must* {url-django-wiki-templates-inheritance}[extend] from at least link:../web/templates/ratemymodule/base.html[`+web/templates/ratemymodule/base.html+`].
+You can do this by adding the {url-django-wiki-templates-tags-extends}[`+extends+`]-link:{url-django-wiki-templates-tags}[template-tag] `+{% extends "ratemymodule/base.html" %}+` to the top of your {url-django-wiki-templates}[HTML template].
+({url-django-wiki-templates-inheritance}[Extending] from link:../web/templates/ratemymodule/base.html[`+base.html+`] ensures your {url-django-wiki-templates}[HTML template] contains consistent styling, favicons and the header & footer, as defined in link:../web/templates/ratemymodule/base.html[the base HTML template])
+
+- {url-django-wiki-templates-tags-static}[Referencing the location of static files] can be {url-django-wiki-templates-tags-load}[enabled] by adding the {url-django-wiki-templates-tags-static}[`+{% load static %}+`] {url-django-wiki-templates-tags}[template-tag] to the top of your {url-django-wiki-templates}[HTML template].
++
+.Using the `+static+` tag to locate the source of a static image file
+[example]
+`+<img src="{% static 'ratemymodule/icons/logo.svg' %}" alt="RateMyModule Logo" class="logo"/>+`
+
+[#adding-a-new-htmx-api-html-template]
+== Adding a New HTMX API {url-django-wiki-templates}[HTML Template]
+
+- Your new HTMX API {url-django-wiki-templates}[HTML Template] *must* be added inside link:../api_htmx/templates/ratemymodule/[`+api_htmx/templates/ratemymodule/+`]
+
+- Your new HTMX API {url-django-wiki-templates}[HTML template] *must not* {url-django-wiki-templates-inheritance}[extend] from any wider templates within [.line-through]#link:../web/templates/ratemymodule/[`+web/templates/ratemymodule/+`]#.
+({url-django-wiki-templates}[HTML template] fragments are {url-htmx-wiki-ajax}[delivered to HTMX on the client device] and {url-htmx-wiki-swapping}[placed within existing major HTML templates that have already been served to the client])
+
+- {url-django-wiki-templates-tags-static}[Referencing the location of static files] can be {url-django-wiki-templates-tags-load}[enabled] by adding the {url-django-wiki-templates-tags-load}[`+{% load static %}+`] {url-django-wiki-templates-tags}[template-tag] to the top of your {url-django-wiki-templates}[HTML template].
++
+.Using the `+static+` tag to locate the source of a static image file
+[example]
+`+<img src="{% static 'ratemymodule/icons/logo.svg' %}" alt="RateMyModule Logo" class="logo"/>+`
+
+[#adding-static-files]
+== Adding Static Files
+
+- Any new {url-wiki-static-web-files}[static files] (E.g. url-wiki-image[images]) *must* be stored within link:../web/static/ratemymodule/[the `+web/static/ratemymodule/+` directory]
+
+- It may be useful to organise files into {url-wiki-subdirectory}[subdirectories] within link:../web/static/ratemymodule/[the `+web/static/ratemymodule/+` directory]
++
+.Example: Organising static files into a subdirectory
+[example]
+All files relating to {url-wiki-favicon}[favicons] could be stored inside `+web/static/ratemymodule/favicon/+`

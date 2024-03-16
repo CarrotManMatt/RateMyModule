@@ -1,0 +1,76 @@
+= Running the Development Server Locally
+Matthew Norton <matt@carrotmanmatt.com>
+v1.2, 12/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+== Quick Links
+
+- <<creating-a-pycharm-run-configuration,Creating a PyCharm Run Configuration>>
+- <<setting-environment-variables,Setting Environment Variables>>
+- <<manually-running-the-development-server-from-the-terminal,Manually Running the Development Server From the Terminal>>
+
+[#creating-a-pycharm-run-configuration]
+== Creating a PyCharm Run Configuration
+
+One of the features that makes developing with {url-pycharm-django-support}[Django in PyCharm] easier is {url-pycharm-wiki-run-configurations}[saved run-configurations].
+These are stored commands with extra instructions that describe how to run the code in this project during {url-wiki-development}[development].
+
+.These instructions show you how to set up your own {url-pycharm-wiki-run-django}[run-configuration] for {url-pycharm-wiki-run-django}[a local instance of the Django development server]
+--
+. Select {url-pycharm-wiki-settings-run-configurations}[the run-configurations drop-down in the top-right of any main UI page in PyCharm].
+(It is likely to be showing the default {url-pycharm-wiki-run-configurations}[run-configuration]: btn:[Current File])
+
+. Select btn:[Edit Configurations] from the drop-down list
+
+. Click the btn:[+] (plus) button in the top-left of {url-pycharm-wiki-settings-run-configurations}[the pop-up settings screen] to add a new {url-pycharm-wiki-run-configurations}[run-configuration]
+
+. Select {url-pycharm-wiki-run-django}[btn:[Django Server]] from the available {url-pycharm-wiki-run-configurations-templates}[run-configurations templates list]
+
+. Give your newly created {url-pycharm-wiki-run-django}[run-configuration] a suitable name.
+(E.g. `+Run Local Django Development Server+`)
+
+. Select {url-pycharm-wiki-run-django}[menu:Modify options[Run browser]] to open a {url-wiki-web-page}[web-page] to your {url-django-wiki-development-server}[locally running server] every time you run this {url-pycharm-wiki-run-django}[run-configuration]
+
+. Click the btn:[Apply] button in the bottom-right corner of {url-pycharm-wiki-settings-run-configurations}[the pop-up] to save your changes
+
+. You can now close {url-pycharm-wiki-settings-run-configurations}[the pop-up]
+
+. Your newly created {url-pycharm-wiki-run-django}[run-configuration] can be run by clicking {url-pycharm-wiki-run-tool-window}[the big green btn:[&#9655;] (play) button] in the top-right of any main UI page
+--
+
+[#setting-environment-variables]
+== Setting Environment Variables
+
+When running the {url-django-wiki-development-server}[development server], there are some required {url-wiki-environment-variables}[environment variables] that you will need to set.
+Most of the required {url-wiki-environment-variables}[environment variables] are {url-wiki-application-secrets}[secret values] that {url-article-dont-commit-application-secrets}[*must not* be committed to the remote repository].
+
+.The easiest way to set the required environment variable values is to follow these steps
+
+. Copy the link:../.env.example[`+.env.example+` file] to a new file called {url-wiki-env-files}[`+.env+`] in link:../[the root of the project]
+
+. Edit this new {url-wiki-env-files}[`+.env+` file] to *remove* any of the {url-wiki-environment-variables}[environment variables] that are *not* marked as `+!!!REQUIRED!!!+`
+
+. Generate a new value for {url-django-wiki-settings-secret-key}[the `+SECRET_KEY+` environment variable] using {url-djecrety}[the online key-gen tool Djecrety]
+
+. Add the defined values for all the OAUTH {url-wiki-environment-variables}[environment variables].
+Someone in your team is likely to have already set up the {url-allauth-social-providers}[external OAUTH providers], so *check with your team as to where the existing values for these environment variables are stored!*
+
+. Set the {url-wiki-environment-variables}[environment variable] `+PRODUCTION+` to `+False+`
+
+. When {url-django-wiki-settings-debug}[`+DEBUG+`] is set to `+True+`, any {url-django-wiki-emails}[emails] (E.g. {url-allauth-email-verification}[email address verification messages]) will be sent to the console.
+This means that you *don't* need to set any of {url-django-wiki-settings-emails}[the `EMAIL_` environment variables]
+
+[#manually-running-the-development-server-from-the-terminal]
+== Manually Running the Development Server From the Terminal
+
+{url-pycharm-wiki-run-configurations}[The saved run-configurations tool] provided by {labelled-url-pycharm} *should* be sufficient for you to run {url-django-wiki-development-server}[the Django development server] locally.
+
+If, however, you find the need to run {url-django-wiki-development-server}[the local Django development server] from your {url-wiki-terminal}[terminal], you can use the below {url-wiki-terminal-command}[command]:
+
+[source,console]
+$ poetry run python manage.py runserver localhost:8000
+
+You can then view the running {url-wiki-web-page}[web pages] from the {labelled-url-wiki-url}: http://localhost:8000

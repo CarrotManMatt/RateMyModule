@@ -1,0 +1,62 @@
+= Start Here
+Matthew Norton <matt@carrotmanmatt.com>
+v1.2, 12/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+== Quick Links
+
+- <<getting-started,Getting Started>>
+- xref:running_the_development_server_locally.adoc[Running the Development Server Locally]
+- <<git-commit-messages,Git Commit Messages>>
+- xref:adding_new_django_aspects.adoc[Adding New Django Aspects]
+- <<licence,Licence>>
+- xref:project_structure.adoc[Project Structure]
+- xref:development_processes_and_code_quality.adoc[Development Processes & Code Quality]
+- xref:models_and_migrations.adoc[Models & Migrations]
+- xref:setting_up_pycharm.adoc[Setting up PyCharm]
+
+[#getting-started]
+== Getting Started
+
+Developing RateMyModule is based around {labelled-url-git} as a {url-wiki-version-control-system}[version control system].
+
+Although this means that any changes are accepted into this repository from any valid {url-git-wiki-push}[Git push], it is recommended to complete your local development using the {labelled-url-pycharm-ide} (*not* [.line-through]#PyCharm Community Edition#).
+This is because {labelled-url-pycharm-professional} includes {url-pycharm-django-support}[many helpful features] for developing with {labelled-url-django}.
+
+Full instructions on setting up, from scratch, your {labelled-url-pycharm-ide}, to start developing this project, are found in the xref:setting_up_pycharm.adoc["Setting up PyCharm" section].
+
+[#git-commit-messages]
+== Git Commit Messages
+
+- Commit messages should be written in the imperative present tense.
++
+.Correct commit message in imperative present tense
+====
+[literal]
+Fix bug where website would not show online
+====
+
+- Commit subjects should start with a capital letter and *not* end in a full-stop.
+
+- Commit subjects should be kept *under 80 characters* for a comfortable viewing experience on GitLab and other git tools.
+If you need more space for your message, please use the body of the commit.
+
+- See {url-article-commit-message-guidelines}[Robert Painsi's Commit Message Guidelines] for how to write good commit messages
++
+.Correct commit message that keeps the subject short
+====
+....
+Prevent users from being able to delete our database
+
+This was a major bug that was caused by us not correctly checking for who was making the given SQL Queries.
+I fixed this by adding an authentication check.
+....
+====
+
+[#licence]
+== Licence
+
+Please note that any contributions you make will be made under the terms of the link:../LICENSE[GNU General-Public Licence V3].

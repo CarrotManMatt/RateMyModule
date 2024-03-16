@@ -1,0 +1,356 @@
+= Development Processes & Code Quality
+Matthew Norton <matt@carrotmanmatt.com>
+v1.0, 14/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+== Quick Links
+
+- <<linting,Linting>>
+- <<type-checking,Type Checking>>
+- <<django-migration-checking,Django Migration Checking>>
+- <<docstrings,Docstrings>>
+- <<comment-mnemonics,Comment Mnemonics>>
+- <<correct-python-import-style,Correct Python Import Style>>
+- <<testing,Testing>>
+- <<merging-git-branches,Merging Git Branches>>
+
+[#linting]
+== Linting
+
+{url-wiki-linting}[Linting] is the process of ensuring that all written code adheres to a standardised format.
+This makes it easier for every team member to understand, read & maintain the code, as they are not trying to decipher the {url-wiki-programming-syntax}[syntactical format of the code], whilst also trying to understand what it does ({url-wiki-programming-semantics}[semantics]).
+It is far more important for a team to decide on a consistent format that may be imperfect, or not preferred by some team members, rather than each developer using their own preferred format.
+
+.RateMyModule uses multiple tools to {url-wiki-linting}[lint] any files committed to the {url-git-wiki-repository}[Git repository], including:
+--
+{labelled-url-ruff}[ruff]:: An extremely fast {labelled-url-python} {url-wiki-linting}[linter] and code formatter, written in {labelled-url-rust}[Rust]
+
+{url-pre-commit-available-checks}[pre-commit checks]:: Some out-of-the-box hooks for {labelled-url-pre-commit}[pre-commit]
+
+{url-asciidoc-validator}[Asciidoctor]:: A fast text processor & publishing toolchain for converting {url-asciidoc-home}[AsciiDoc] to {url-wiki-html}[HTML5], {labelled-url-docbook} & more.
+({labelled-url-asciidoc-asciidoctor} is used in {url-asciidoc-validator}[verbose mode] to validate the AsciiDoc files)
+
+{url-pre-commit-pygrep}[pygrep checks]:: A collection of fast, cheap, {url-wiki-regex}[regex]-based {labelled-url-pre-commit} hooks
+--
+
+Where possible, these tools have their configuration parameters defined within link:../pyproject.toml[the `+pyproject.toml+` file].
+Most of the {labelled-url-pre-commit}-based checks are configured through the individual arguments provided to each hook (defined within link:../.pre-commit-config.yaml[`+.pre-commit-config.yaml+`]).
+
+.A selection of some of the linting rules that are used to check all {labelled-url-python} code within this project
+--
+* Adherence to {url-python-wiki-pep8}[PEP8]
+
+* All {url-wiki-python-imports}[imports] must be sorted alphabetically and be ordered by local/standard library/3rd party
+** Use {url-ruff-wiki-import-sort}[ruff's auto import sorting tool]
+
+* Use {url-ruff-wiki-quote-style}[double quotation marks]
+
+* Include the {url-wiki-python-all-declaration}[object export declaration] at the top of every {labelled-url-python} file ({url-wiki-python-all-declaration}[`+__all__+`])
+
+* Use {labelled-url-wiki-pascal-case} for all class names
+
+* Use {labelled-url-wiki-snake-case} for all function & variable names // Remove confusing URL underline
+
+* Use {labelled-url-wiki-all-caps-case} for {url-wiki-python-immutable-constant-variables}[constant immutable variable values]
+
+* Ensure all {url-ruff-wiki-line-length}[lines are shorter] than 95 characters
+** It is best to split lines using the existing brackets of a calling a function, creating a class instance, declaring an iterable, etc.
+
+* Use {url-wiki-python-f-strings}[f-strings], rather than the old-fashioned [.line-through]#`+.format()+`# method
+
+* {url-wiki-python-is-vs-equals}[Compare booleans & `+None+` with an `+is+` check, rather than `+==+`]
+
+* Ensure only explicit exception types are excepted.
+(No {url-ruff-wiki-rules-no-bare-except}[bare excepts] are allowed)
+
+* Use {url-ruff-wiki-rules-mixed-spaces-and-tabs}[spaces for indentation].
+([.line-through]#Tabs (kbd:[Tab])# are *not* allowed)
+
+* Ensure there is no {url-ruff-wiki-rules-whitespace-after-bracket}[whitespace after opening brackets] or {url-ruff-wiki-rules-whitespace-before-bracket}[before closing brackets]
+
+* Ensure there is {url-ruff-wiki-rules-whitespace-around-parameter}[whitespace between typed function parameters & default value]
+
+* Ensure there is {url-ruff-wiki-rules-whitespace-before-argument}[no whitespace before calling a function]
+
+* Ensure there is a {url-ruff-wiki-rules-whitespace-around-operator}[single whitespace between expression operators].
+(E.g. `+x + y+`, not `+x+y+`)
+
+* Ensure there are {url-ruff-wiki-rules-trailing-whitespace}[no trailing whitespace characters] on any line
+
+* Ensure there is a {url-ruff-wiki-rules-missing-newline-at-eof}[single new-line character at the end] of every file
+
+* Use {url-python-wiki-pathlib}[the `+pathlib+` package] for file manipulations rather than the [.line-through]#`+os+` package functions#
+
+* Always add {url-ruff-wiki-rules-full-stop-ends-sentence}[full-stops to the end of Exception messages & Docstrings]
+
+* Every {labelled-url-python} module should {url-ruff-wiki-rules-module-docstring}[start with a module-level docstring], separated from the code below it by a single blank line
+--
+
+.The {url-wiki-terminal-command}[command] to lint all {labelled-url-python} files with {labelled-url-ruff}
+[source,console]
+$ poetry run ruff check . --extend-ignore FIX002,ERA001 --fix
+
+.The {url-wiki-terminal-command}[command] to lint all {labelled-url-wiki-html} files with {labelled-url-djlint}
+[source,console]
+$ poetry run djlint .
+
+[#type-checking]
+== Type Checking
+
+{labelled-url-python} uses {url-wiki-duck-typing}[duck typing](); that is, if it has the ability for an operation to be run upon it, it will succeed.
+If the operation cannot be run on the object, an {url-wiki-python-exceptions}[exception will be raised].
+This means that the actual concrete type of an object is never known, especially when the structure of an object can be dramatically changed at run-time.
+
+However, there are static type-checking tools that are run over your code, that can interpret the types of objects and provide errors if invalid operations would be performed on an object.
+This naturally constrains the typing system of Python as objects should not have their structure edited at run-time.
+
+This project uses the {url-wiki-static-type-checking}[static type-checker] called {labelled-url-mypy}.
+{labelled-url-mypy} relies upon {url-wiki-python-type-annotations}[type annotations] (sometimes known as type hints) to correctly infer/interpret the required type of an object.
+
+.An example of a type-annotated function
+====
+[source,python]
+----
+def foo(bar: str, baz: int) -> int:
+    print(bar)
+    return baz + 1
+----
+====
+
+.The {url-wiki-terminal-command}[command] to {url-wiki-static-type-checking}[type-check] all {labelled-url-python} files with {labelled-url-mypy}
+[source,console]
+$ poetry run mypy .
+
+[#using-explicit-type-annotations]
+=== Using Explicit Type Annotations
+
+When writing code, it is important to be as explicit as possible with the required type annotations, so that {labelled-url-mypy} can notify you of as many errors that may occur as possible.
+
+.Preferred usage of explicit type annotations
+====
+// suppress inspection "PyUnresolvedReferences"
+[source,python]
+----
+my_baz: Baz
+i: int
+for i in range(5, 10):
+    e: ValueError
+    try:
+        foo(i, "bar")
+    except ValueError as e:
+        inner: str
+        outer: str
+        inner, outer = foo(i, "bar")[0:2]
+        print(outer)
+        my_baz = Baz(inner)
+    else:
+        my_baz = Baz("baz")
+----
+====
+
+.Incorrect omission of explicit type annotations
+====
+// suppress inspection "PyUnresolvedReferences"
+[source,python]
+----
+for i in range(5, 10):
+    val: float = bongo(i)
+    try:
+        foo(i, "bar", float)
+    except ValueError as e:
+        inner, outer = foo(i, "bar", float)[0:2]
+        print(outer)
+        my_baz = Baz(inner)
+    else:
+        my_baz = Baz("baz")
+----
+====
+
+It is a common misconception that {url-wiki-python-type-annotations}[type annotations] can only be used with variable assignment, or function parameter declarations.
+In reality, {url-wiki-python-type-annotations}[type annotations] should be used whenever a new variable is being declared.
+
+[#collection-types]
+=== Collection Types
+
+Many types within Python inherit from a group called {url-wiki-python-collection-types}[collection types].
+(E.g. `+dict+`, `+list+`, `+tuple+`, `+set+`, `+str+`).
+These all include differing operations from one another, and also some common ones.
+When annotating the type of a variable as a collection object, it is essential that you are only as restrictive as the operations to be performed on the object.
+
+.When iterating (looping) over a given object, you should allow any {url-python-wiki-iterable}[`+Iterable+` object] to be passed in, rather than explicitly requiring a {url-wiki-python-lists}[list]
+====
+// suppress inspection "PyUnresolvedReferences"
+[source,python]
+----
+from collections.abc import Iterable
+
+def foo(bar: Iterable[str]) -> int:
+    value: int = 0
+
+    baz: str
+    for baz in bar:
+        if baz.endswith("foo"):
+            value += 1
+
+    return value
+----
+====
+
+.Requiring a `+list+` object from the {url-wiki-python-type-annotations}[type-annotations], even when your function would perform fine with any {url-python-wiki-iterable}[iterable] prevents users from passing in other {url-python-wiki-iterable}[iterable]s like {url-wiki-python-tuples}[tuple]s. *DON'T DO THIS!*
+====
+// suppress inspection "PyUnresolvedReferences"
+[source,python]
+----
+def foo(bar: list[str]) -> int:
+    value: int = 0
+
+    baz: str
+    for baz in bar:
+        if baz.endswith("foo"):
+            value += 1
+
+    return value
+----
+====
+
+[#use-object-rather-than-any]
+=== Don't Use `+Any+`; Use `+object+`
+
+There may be cases when the type of an object is not known.
+In this case it may seem natural to use the `+Any+` type, as this suppresses type-checkers when looking at this value.
+However, this is the incorrect way to annotate the type of this object because it allows _every_ operation to be performed upon it, whereas it is not known if _any_ operation can be performed upon it.
+Instead, {url-mypy-wiki-any-vs-object}[the correct type annotation to use is the `+object+` type], which *cannot* have any operation performed upon it and must be passed through an {url-python-wiki-isinstance}[`+isinstance()+`]/link:{url-python-wiki-hasattr}[`hasattr()`] check before an operation can be performed.
+Being explicit with saying that the object's type is unknown improves type-safety.
+
+[#overriding-object-methods]
+=== Overriding Object Methods
+
+When using {url-django}[the Django framework], it is incredibly common for developers to write classes that {url-wiki-python-inheritance}#the-object-super-class[inherit from a longer chain of parent classes].
+This naturally means that many, (if not most) of the methods being written, within that {url-wiki-python-inheritance}#whats-inheritance[child class], will be overriding methods from the parent class.
+To ensure a consistent method structure between the parent & child classes, a function decorator called {url-mypy-wiki-override}[`+@override+`] is essential to be used.
+This prevents incompatible function structures and allows the {url-wiki-python-docstrings}[docstring] to be inherited from the {url-wiki-python-inheritance}#the-object-super-class[parent class].
+
+.Example of overriding a superclass' method with the {url-mypy-wiki-override}[`+@override+` decorator]
+====
+// suppress inspection "PyUnresolvedReferences"
+// suppress inspection "PyOverrides"
+[source,python]
+----
+from typing import override
+
+class Bar(Foo):
+    @override
+    def calculate_baz(self, x: int, y: int) -> float:
+        baz: float = super().calculate_baz(x=x, y=y)
+
+        if baz > 11.9:
+            print("FooBar!")
+
+        return baz
+----
+====
+
+[#calling-super-methods-with-arguments]
+=== Calling Super Methods With Arguments
+
+When calling a {url-wiki-python-inheritance}#the-object-super-class[superclasses] method (`+super().baz()+` in the previous examples), it is essential that you pass every argument as a {url-wiki-python-keyword-arguments}[keyword argument] (rather than as a {url-wiki-python-positional-arguments}[positional argument]).
+This is so that if the function structure/argument order ever changes, you will not encounter silent argument-ordering errors.
+Be explicit!
+
+.Correct use of explicit keyword arguments within the super method call
+====
+// suppress inspection "PyUnresolvedReferences"
+[source,python]
+super().calculate_baz(x=x, y=y)
+====
+
+.Incorrect use of positional arguments within the super method call. *DON'T DO THIS!*
+====
+// suppress inspection "PyUnresolvedReferences"
+[source,python]
+super().calculatebaz(x, y)
+====
+
+[#type-annotation-incompatibilities]
+=== Type Annotation Incompatibilities
+
+There are some places, within {labelled-url-python} code, that {url-wiki-python-type-annotations}[type annotations] are not syntactically possible to provide.
+Some examples are {url-wiki-python-lambda-functions}[lambda function] definitions & {url-wiki-python-comprehensions}[list/set/generator/dictionary comprehensions].
+The suggestion for this project in these cases is to:
+
+* Not use {url-wiki-python-lambda-functions}[lambda functions]
+** Define a new fully formed function with {url-wiki-python-type-annotations}[type annotations]
+* Continue to use {url-wiki-python-comprehensions}[comprehensions]
+** Allow {labelled-url-mypy}'s type inference to guess the types within comprehensions
+
+[#encountering-typing-errors]
+=== Encountering Typing Errors
+
+When the {url-wiki-static-type-checking}[static type checker] is run over your code, it may produce an obscenely large number of errors.
+This is because this project's {url-mypy-wiki-configuration}[Mypy configuration] (defined within link:../pyproject.toml[the `pyproject.toml` file]) sets it to run in strict mode.
+Strict mode means more errors are caught, and thus, once they are fixed, it will make the code more type safe.
+Adding code to this repository will never require it to pass static type checking, due to that being a significant burden upon other developers of the project.
+Instead, there are more confident developers that will make changes to your submitted code, to adhere to the type-checking rules.
+
+It is essential that developers within this project leave a type-checking error as failing (for another developer to fix), rather than suppressing it with a `+# type: ignore+` flag, if the developer does not feel confident in fixing the issue.
+
+[#django-migration-checking]
+== Django Migration Checking
+
+Before code can be committed (even locally), a {labelled-url-pre-commit} check will run to ensure that the {labelled-url-python} code, declaring the {url-django-wiki-models}[Django model definitions], is consistent with the created migrations.
+That is, if new changes have been made to the Django models, but have not been reflected in the migrations, an error will occur that will prevent the code from being committed.
+This also prevents committing broken models code, because making the migrations naturally requires valid code.
+
+If this error occurs, the simplest fix is to run the `+manage.py+` command: `+makemigrations+`.
+
+[#docstrings]
+== Docstrings
+
+Docstrings provide essential in-file documentation, correctly linked to the necessary {labelled-url-python} entities.
+Ruff (the static code linter) will show errors if docstrings are not provided, or if they are incorrectly formatted.
+Putting docstrings within the code allows other developers to understand the purpose of the given class/function without needing to refer to external documentation.
+
+It is always preferable to include any class-wide/function-wide notes inside that class/function's docstring rather than as in-line comment.
+This is because many developers skip over reading comments, and they can often be lost when code is transmitted between presentation/viewing tools.
+
+[#comment-mnemonics]
+== Comment Mnemonics
+
+When comments are used within code, they should have their purpose explicitly marked by a mnemonic.
+In-line comments should be in the format: `<code>··#·<mnemonic>:·<comment>`
+(E.g. `print("Hello")  # TODO: Change to output username`)
+The list of acceptable comment mnemonics is {url-python-wiki-pep350-mnemonics}[here].
+Docstrings and type hinting is preferred over using the NOTE mnemonic in a comment.
+(See <<docstrings,the section above on docstrings>>).
+
+[#correct-python-import-style]
+== Correct {labelled-url-python} Import Style
+
+* Never import individual functions/variables from another package/module
+** Always import the whole package/module so that the global namespace does not get diluted
+** E.g. `+from django.contrib import admin+` (using `+admin.site+` later on), not [.line-through]#`+from django.contrib.admin import site+`#
+
+* If there is a high likelihood that modules with similar names will be imported from multiple packages, the imports should use the higher level package name
+** E.g. `+import core+` (using `+core.urls.utils+` later on) and `+import django+` (using `+django.urls.utils+` later on)
+
+* If the necessary module is not importable from the parent package, an alias that includes the parent package's name can be used
+** E.g. `+from core.urls import utils as core_url_utils+` and `+from django import urls as django_urls+`
+
+* Classes should be imported individually from modules/packages
+** E.g. `+from typing import Final+`, not [.line-through]#`+import typing+`# (using [.line-through]#`+typing.Final+`# later on)
+
+[#testing]
+== Testing
+
+The `+tests/+` directory of every app within this project contains the complete test suite, to unit-test every part of that given app.
+All tests should be limited in scope to ensure they have no variability due to side effects.
+Running the tests is done automatically during the CI/CD pipeline, but it can be beneficial to also run them manually to ensure local changes to the codebase adhere to the required functionality of the project.
+
+[#merging-git-branches]
+== Merging Git Branches
+
+Each Git branch should contain a single "unit" of work that can be wholly merged back into the main branch without containing invalid code/missing references.
+This is not to say that every merge request must contain a fully functional feature, but should *never* prevent the successful running of the server in the merged state.

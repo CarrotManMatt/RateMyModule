@@ -19,7 +19,7 @@ RUN $POETRY_HOME/bin/pip install poetry==1.8.1
 
 WORKDIR /app
 
-COPY poetry.lock pyproject.toml README.md ./
+COPY poetry.lock pyproject.toml README.adoc ./
 
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR $POETRY_HOME/bin/poetry install --without dev --no-root --no-interaction --with deploy
 

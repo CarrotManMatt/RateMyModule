@@ -16,7 +16,7 @@ repos:
     hooks:
       - id: django-check
         name: check for major errors in django project
-        entry: .local-pre-commit-scripts/django-check.bash
+        entry: bash -c 'poetry run python manage.py check'
         language: system
         types: [python]
         pass_filenames: false

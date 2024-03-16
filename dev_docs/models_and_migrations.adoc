@@ -1,0 +1,197 @@
+= Models & Migrations
+Thomas Rose txr244@student.bham.ac.uk; Matthew Norton <matt@carrotmanmatt.com>
+v1.0, 13/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+== Quick Links
+
+- <<what-is-a-model,What Is a Model?>>
+- <<making-a-new-model,Making a New Model>>
+- <<using-a-model,Using a Model>>
+- <<doing-fields-right,Doing Fields Right>>
+- <<creating-a-model-instance,Creating a Model Instance>>
+- <<querying-model-instances-from-the-database,Querying Model Instances From the Database>>
+- <<what-is-a-migration,What Is a Migration?>>
+- <<creating-and-applying-migrations,Creating & Applying Migrations>>
+- <<migration-limitations-with-the-database-used-in-this-project,Migration Limitations With the Database Used in This Project>>
+- <<vcs-issues-with-migrations,VCS Issues With Migrations>>
+- <<what-to-do-if-you-have-made-a-mistake-with-migrations,What to Do if You Have Made a Mistake With Migrations>>
+
+[#models]
+== Models
+
+[#what-is-a-model]
+=== What Is a Model?
+
+A {url-django-wiki-models}#module-django.db.models[model] is a set of fields making up a table of data.
+Each model maps to a database table.
+One model has many fields inside it, in which data is stored.
+Fields store a specific data type.
+(E.g. The model `+User+` could have a field `+email+` of type `+CharField+`).
+
+Luckily for us, Django manages the database side of things by automatically turning models into the database type of our choice.
+All that is required is to make the models, while not worrying too much about what Django is doing in the background to make it work.
+
+[#making-a-new-model]
+=== Making a New Model
+
+A new {url-django-wiki-models}#quick-example[model] is created by importing `+django.db.models.Model+` & creating a class that inherits from `+Model+`.
+
+.A simple example of a model
+[source,python]
+----
+from django.db import models
+from django.db.models import Model
+
+class Person(Model): # <1> <3>
+    first_name = models.CharField(max_length=30) # <2>
+    last_name = models.CharField(max_length=30) # <2>
+----
+<1> This model has the name `+Person+` and two fields (attributes) first_name and last_name
+<2> This model has two fields (attributes) called `+first_name+` and `+last_name+`, which are both `+CharFields+`
+<3> Django automatically adds a primary key / ID number to each entry, so we don't need to add it ourselves
+
+Take a look at the full documentation on adding new models within this project, in xref:adding_new_django_aspects.adoc#adding-a-new-db-model[the "Adding a New DB Model" documentation].
+
+[#using-a-model]
+=== Using a Model
+
+Django needs to be told you want to use the models you have made, and as such you have to name the module the model is within in `+settings.py+`.
+
+// suppress inspection "SpellCheckingInspection"
+[source,python]
+----
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.microsoft",
+    "allauth.socialaccount.providers.google",
+    "ratemymodule.apps.RateMyModuleConfig", # <1>
+    "api_htmx.apps.APIHTMXAppConfig",
+    "web.apps.WebServerConfig",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "django.contrib.admindocs",
+    "rangefilter"
+]
+----
+<1> The `+ratemymodule+` app has been added to `+INSTALLED_APPS+` so the models within that app will be located by Django
+
+[#doing-fields-right]
+=== Doing Fields Right
+
+Each attribute of the model must be a correctly called {url-django-wiki-models-fields}#django.db.models.Field[field] object.
+Django won't store normal attributes like strings or ints in a database.
+For this project, string-based fields should never be null, just empty strings.
+Should you want to limit a field to a certain set of values, you can use {url-django-wiki-models-fields-choices}[the `+choices+` argument].
+
+[#creating-a-model-instance]
+=== Creating a Model Instance
+
+After making your models, it's time to populate some data.
+
+To {url-django-wiki-models-queries}#creating-objects[create]
+a new model instance and save its data to the database, use the `+objects.create()+` method.
+
+.A simple example of creating a model instance
+[source,python]
+----
+import datetime
+
+from ratemymodule.models import University
+
+university: University = University.objects.create(
+    name="The Cool School",
+    short_name="CS",
+    email_domain="cs.ac.uk",
+    founding_date=datetime.date(year=1955, month=8, day=13)
+)
+----
+
+[#querying-model-instances-from-the-database]
+=== Querying Model Instances From the Database
+
+To {url-django-wiki-models-queries}#retrieving-objects[get data] out of the database, the `+all()+` function can be used to get all records for a given table.
+The `+filter(<specification>)+` function can be used to only get records with a specific `+<specification>+` from a given table.
+To use either of these functions, a {url-django-wiki-models-managers}#django.db.models.Manager[model manager] is needed.
+By default, Django adds a manager called `+objects+` to every model class.
+But if necessary, more managers can be made to better query the database or just change the name of the manager if the name `+objects+` displeases you.
+
+.A simple example of retrieving data from the database
+[source,python]
+----
+from django.db.models import QuerySet
+
+from ratemymodule.models import User, University
+
+all_users: QuerySet[User] = User.objects.all()
+
+wild_universities: QuerySet[University] = University.objects.filter(name__contains="wild")
+number_wild_universities: int = wild_universities.count()
+----
+
+[#migrations]
+== Migrations
+
+[#what-is-a-migration]
+=== What Is a Migration?
+
+In simple terms, it's best to think of the system of migrations as another version control system like Git.
+Migrations manage the state of your Django models.
+
+A single migration is when changes made to models are packed up into a file to describe what has been changed.
+Django stores them in link:../ratemymodule/migrations/[`+ratemymodule/migrations/+`].
+
+So, once you have made your models or changed them, you need to pack it into an instruction set such that everyone else and the server know the correct state of the database.
+
+[#creating-and-applying-migrations]
+=== Creating & Applying Migrations
+
+. Run {url-django-wiki-manage-commands}#makemigrations[the `+makemigrations+` command].
+This stores the current state of your models into the migration files it spits out
+
+. Run {url-django-wiki-manage-commands}#migrate[the `+migrate+` command] to apply that saved state to the database
+
+[#migration-limitations-with-the-database-used-in-this-project]
+=== Migration Limitations With the Database Used in This Project
+
+Due to the choice of using SQLite as our database backend, applying certain changes through migrations can be a bit slow.
+SQLite is better in its simplicity, but it makes it harder for Django to edit the database structure.
+
+Django can manage this, but it is good to be aware that when you make changes to the structure of a model, Django {url-django-wiki-models-migrations}#sqlite[hacks its way] through the changes.
+It does this by creating a new table, copying across all the data, dropping the old table, then renaming the new table.
+As our tables shouldn’t be _too_ large, this hopefully shouldn’t cause much slowdown in running commands.
+
+[#vcs-issues-with-migrations]
+=== VCS Issues With Migrations
+
+Django is sadly not impervious to
+{url-django-wiki-models-migrations}#version-control[problems] with VCS.
+Two people could try to merge migrations with the same ID number or other features causing issues with linearity, causing a merge conflict.
+
+Django can try to put them in order itself which may cause strange issues, or you can edit the files yourself.
+The files are written in Python, and assuming you have your IDE set up correctly, you will get help from PyCharm to make sure you have edited it correctly.
+
+Another issue that is common to come across is dependency problems.
+A  model can have a foreign key to another model and, as such, both must exist, or Django will get upset.
+
+[#what-to-do-if-you-have-made-a-mistake-with-migrations]
+=== What to Do if You Have Made a Mistake With Migrations
+
+If you have messed up somewhere, and need to "undo" a migration, you can run {url-django-wiki-manage-commands}#migrate[the `+migrate+` command] with  the name of the migration you want to go back to.
+
+[#additional-resources]
+== Additional Resources
+
+- {url-django-wiki-manage-commands}#module-django.db.migrations[Django's documentation on migrations]
+- {url-django-wiki-models}[Django's documentation on models]
+- {url-django-wiki-models-queries}[Django's documentation on querying model instances]

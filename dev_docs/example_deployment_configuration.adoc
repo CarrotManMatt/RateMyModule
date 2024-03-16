@@ -1,0 +1,464 @@
+= Example Deployment Configuration
+Delilah Lawes dxl288@student.bham.ac.uk; Matthew Norton <matt@carrotmanmatt.com>
+v1.0, 13/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+This document outlines how the project is currently built and deployed before the 2024 team project submission deadline.
+It is not guaranteed to be accurate for all deployments found of this project as this should be treated as an example of one possible way to deploy the project.
+
+== Quick Links
+
+- <<intro-to-containerisation,Intro to Containerisation>>
+- <<explaining-the-dockerfile-build-file,Explaining the `+Dockerfile+` Build File>>
+- <<building-th-docker-image-with-the-gitlab-CI-CD-pipeline,Building the Docker Image With the GitLab CI/CD Pipeline>>
+- <<deploying-with-docker-compose,Deploying With Docker Compose>>
+- <<versioning-and-scalability,Versioning & Scalability>>
+- <<additional-resources,Additional Resources>>
+
+[#intro-to-containerisation]
+Docker uses containers, which are bundles of software that package code and its dependencies together.
+These containers mean that application code can be run consistently across different development environments, avoiding discrepancies throughout our development process and eventually in deployment.
+
+Using Docker in our application means that we can create a Docker container image from our application code, this can then be deployed on any system using Docker Engine where it becomes a live container.
+Having our application packaged in this compact and portable way, not only reduces setup and configuration times for ourselves, but isolates the application which enhances security and aids in version control.
+
+Containers work by virtualising the operating system layer, where multiple containers share the OS kernel but operate in isolation.
+When a container is launched from a container image, the container runtime (I.e. Docker Engine) on the host system sets up this isolated environment which includes resources the application needs to run.
+The container runtime is also responsible for the lifecycle of the container, including container creation, execution, termination, and deletion.
+
+[#explaining-the-dockerfile-build-file]
+== Explaining the link:../Dockerfile[`+Dockerfile+`] Build File
+
+To set up Docker for our application, we have created a link:../Dockerfile[`+Dockerfile+`] in the root of our project.
+This file outlines the environment and dependencies required to run our application within a Docker container.
+
+[source,dockerfile]
+----
+FROM python:3.12 as builder <1> <2>
+----
+<1> Specifies the base image for our container.
+(In this case, we are using `+python:3.12+` as our base image)
+
+<2> The `+as builder+` declaration is used to create a temporary container for building the application
+
+[source,dockerfile]
+----
+ENV PYTHONUNBUFFERED=1 \ <1>
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_NO_INTERACTION=true \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_VIRTUALENVS_CREATE=true \
+    POETRY_CACHE_DIR=/tmp/poetry_cache \
+    POETRY_HOME=/opt/poetry
+----
+<1> Sets environment variables for the container.
+These variables are used to configure the Python and Poetry environments
+
+[source,dockerfile]
+----
+RUN apt-get update && apt-get install --no-install-recommends -y curl build-essential <1>
+RUN python3 -m venv $POETRY_HOME <2>
+RUN $POETRY_HOME/bin/pip install poetry==1.8.1 <3>
+----
+<1> Installs the required system dependencies for the container, including `+curl+` and `+build-essential+`
+<2> A virtual environment is created for the application
+<3> `+poetry+` is also installed
+
+[source,dockerfile]
+----
+WORKDIR /app <1>
+
+COPY poetry.lock pyproject.toml README.md ./ <2>
+
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR $POETRY_HOME/bin/poetry install --without dev --no-root --no-interaction --with deploy <3>
+----
+<1> Sets the working directory for the container to `+/app+`
+
+<2> Copies the link:../poetry.lock[`+poetry.lock+`], link:../pyproject.toml[`+pyproject.toml+`], and link:../README.adoc[`+README.adoc+`] files into the container
+
+<3> Installs the application dependencies using `+poetry+`.
+The `+--mount+` flag is used to cache the `+poetry+` dependencies to improve build times, meaning that the dependencies are only reinstalled if the link:../poetry.lock[`+poetry.lock+`] file changes
+
+[source,dockerfile]
+----
+FROM python:3.12-slim as runtime <1>
+
+ENV LANG=C.UTF-8 \
+    VIRTUAL_ENV=/app/.venv \ <2>
+    PATH="/app/.venv/bin:$PATH"
+----
+<1> Specifies the base image for the runtime container using `+python:3.12-slim+`, which is a stripped-down version of the one used to build
+<2> Sets the runtime environment variables for the container, such as specifying the virtual environment path as `+/app/.venv+`
+
+[source,dockerfile]
+----
+WORKDIR /app <1>
+RUN printf '#!/bin/sh\n\n./manage.py migrate --no-input\n./manage.py collectstatic --no-input\ngunicorn core.wsgi:APPLICATION --bind=0.0.0.0:8000\n' > /app/entrypoint.sh <2> <3> <4>
+WORKDIR / <5>
+----
+<1> Sets the working directory for the container to `+/app+` again
+
+<2> `+./manage.py migrate --no-input+`: Runs Django's `+manage.py migrate+` command which carries out database migrations.
+(The `+--no-input+` flag is used to avoid prompting the user for input, as it is run in CI and cannot retrieve user input)
+
+<3> `+./manage.py collectstatic --no-input+`: Runs Django's `+manage.py collectstatic+` command which collects static files from the application (CSS, JavaScript, images, etc.) into a single directory for deployment
+
+<4> `+gunicorn core.wsgi:APPLICATION --bind=0.0.0.0:8000+`: Runs the Gunicorn web server with `+core.wsgi:APPLICATION+` as the application entry point.
+(This application entry point is defined within link:../core/wsgi.py[`core/wsgi.py`]).
+The running server is then bound to port `+8000+`.
+Gunicorn is a Python WSGI HTTP Server, and is used to host our application in production
+
+<5> The working directory is then set back to the root of the container
+
+[source,dockerfile]
+----
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV} <1>
+WORKDIR /app
+COPY LICENSE .en[v] core.d[b] core.sqlit[e] sqlite3.d[b] manage.py ./ <2>
+RUN chmod +x manage.py
+----
+<1> Copies the virtual environment from the builder container to the runtime container
+<2> Copies the application files into the container
+
+[source,dockerfile]
+----
+COPY core/ ./core
+COPY api_htmx/ ./api_htmx
+COPY api_rest/ ./api_rest
+COPY ratemymodule/ ./ratemymodule/
+COPY web/ ./web/ <1>
+----
+<1> Copies the application code into the container
+
+[source,dockerfile]
+----
+ENTRYPOINT ["sh", "/app/entrypoint.sh"] <1>
+----
+<1> Specifies the entrypoint for the container, which is the entrypoint script created earlier
+
+[#building-th-docker-image-with-the-gitlab-CI-CD-pipeline]
+== Building the Docker Image With the GitLab CI/CD Pipeline
+
+The CI/CD pipeline allows for Docker images to be automatically built upon merging with the main branch.
+This means the latest version of our application is always available to be tested and deployed.
+
+.These steps show the flow from a commit to deployment:
+--
+. Commit: A team member merges their branch into the main repository
+
+. Build: The CI/CD pipeline is triggered, and the application is tested and built in a Docker container using the link:../Dockerfile[`+Dockerfile+`] and link:../.gitlab-ci.yml[`+.gitlab-ci.yml+`] files
+
+. Image: A Docker image is created and pushed to the GitLab Container Registry
+
+. Deploy: The Docker image is deployed to the production environment
+--
+
+[#the-gitlab-ci-configuration-file]
+=== The link:../.gitlab-ci.yml[`+.gitlab-ci.yml+`] File
+
+[source,yaml]
+----
+stages: # <1>
+    - check # <2>
+    - test # <3>
+    - build # <4>
+----
+<1> This section defines the stages of the pipeline
+<2> The `+check+` stage is used to provide quick sanity checks that the files are valid
+<3> The `+test+` stage is used to run the application
+tests & static analysis (typing & linting) tools
+<4> The `+build+` stage is used to build the Docker image
+
+.A series of jobs are then defined for each stage. We won't go into the check and test stages here, but they include:
+--
+`+check-updated-tag+`:: Checking that the version specified in the link:../pyproject.toml[`+pyproject.toml+`] file matches the tag that triggered the pipeline
+
+`+mypy-test+`:: Performing static type checking on the application code using Mypy
+
+`+ruff-test+`:: Performing linting on the application code using ruff
+
+`+pre-commit-test+`:: Performing simple regex-based tests on the application code using pre-commit
+--
+
+[#gitlab-ci-build-jobs]
+==== Build Jobs
+
+Our `+build+` stage contains the following jobs:
+
+[source,yaml]
+----
+build-latest-docker-image: # <1>
+    stage: build
+    tags:
+        - docker
+
+    rules:
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+    before_script:
+        - echo "logging in to registry:$CI_REGISTRY as $CI_REGISTRY_USER"
+        - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+        - echo "pulling most recent latest image for caching"
+        - docker pull $CI_REGISTRY_IMAGE:latest || true
+
+    script:
+        - echo "building docker image latest version:$CI_COMMIT_SHA"
+        - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+        - echo "pushing built images to GitLab repository"
+        - docker push $CI_REGISTRY_IMAGE:latest # <2> <3>
+        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA # <2> <4>
+----
+<1> This job builds the Docker image for the latest version of the application
+<2> This built image is then pushed to the GitLab Container Registry
+<3> It uses the `+latest+` tag for the latest version
+<4> It uses the commit SHA for the specific version
+
+[source,yaml]
+----
+build-stable-docker-image: # <1>
+    stage: build
+    tags:
+        - docker
+
+    rules:
+        - if: $CI_COMMIT_TAG
+
+    when: manual
+
+    before_script:
+        - echo "logging in to registry:$CI_REGISTRY as $CI_REGISTRY_USER"
+        - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+        - echo "pulling most recent stable image for caching"
+        - docker pull $CI_REGISTRY_IMAGE:stable || true
+
+    script:
+        - echo "building docker image stable version:$CI_COMMIT_TAG"
+        - docker build --cache-from $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:stable --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG .
+        - echo "pushing built images to GitLab repository"
+        - docker push $CI_REGISTRY_IMAGE:stable # <2> <3>
+        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA # <2> <4>
+        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG # <2> <5>
+----
+<1> This job builds the Docker image for the stable version of the application
+<2> This built image is then pushed to the GitLab Container Registry
+<3> It uses the `+stable+` tag for the latest version
+<4> It uses the commit SHA for the specific version
+<5> It also tags the image with the commit tag that triggered the pipeline
+
+[#deploying-with-docker-compose]
+== Deploying With Docker Compose
+
+For deployment to the production environment, we have created a `+docker-compose.yaml+` file.
+
+[#docker-compose-services]
+=== Services
+
+[#latest-version-deployment-services]
+==== `+latest+` Version Deployment
+
+// suppress inspection "SpellCheckingInspection"
+[source,yaml]
+----
+latestratemymoduleproxy: # <1>
+    container_name: latestratemymoduleproxy
+    hostname: latestratemymoduleproxy
+    image: nginx:alpine
+    volumes:
+        - latest_static:/static # <2>
+        - /ratemymodule/latest-default.conf:/etc/nginx/conf.d/default.conf:ro # <3>
+    networks:
+        - frontend
+        - backend
+    restart: unless-stopped
+    labels: [ "com.centurylinklabs.watchtower.scope=ratemymodule" ]
+    depends_on:
+        - latestratemymoduleapp
+----
+<1> This service is used to host the static files for the latest version of the application using a Nginx web server
+<2> It mounts the `+latest_static+` volume to
+serve the static files
+<3> It mounts the `+/ratemymodule/latest-default.conf+` file to configure the
+Nginx server
+
+// suppress inspection "SpellCheckingInspection"
+// suppress inspection "YAMLUnresolvedAlias"
+[source,yaml]
+----
+latestratemymoduleapp: # <1>
+    container_name: latestratemymoduleapp
+    hostname: latestratemymoduleapp
+    volumes:
+         - latest_static:/static # <2>
+         - /ratemymodule/latest-core.db:/app/core.db # <3>
+    environment: # <4>
+         SECRET_KEY: *****
+         OAUTH_GOOGLE_CLIENT_ID: *****.apps.googleusercontent.com
+         OAUTH_MICROSOFT_CLIENT_ID: *****-****-****-****-*****
+         OAUTH_GOOGLE_SECRET: *****
+         OAUTH_MICROSOFT_SECRET: *****
+         PRODUCTION: false
+         DEBUG: true
+         LOG_LEVEL: INFO
+         EMAIL_TO_CONSOLE: false
+         EMAIL_HOST: smtp.emailserver.example.com
+         EMAIL_PASSWORD: *****
+         EMAIL_PORT: 465
+         EMAIL_HOST_USER: email@example.com
+         EMAIL_USE_SSL: true
+    image: git.cs.bham.ac.uk:5050/team-projects-2023-24/team55:latest # <5>
+    networks:
+         - backend
+    restart: unless-stopped
+    labels: [ "com.centurylinklabs.watchtower.scope=ratemymodule" ]
+----
+<1> This service is used to host the latest version of the application using a Gunicorn web server
+
+<2> It mounts the `+latest_static+` volume to reference the static files
+
+<3> It mounts the `+latest-core.db+` file to interact with the application database
+
+<4> It also sets environment variables for the application.
+(E.g. `+SECRET_KEY+` & `+OAUTH_GOOGLE_CLIENT_ID+`)
+
+<5> It uses the `+latest+` tag to pull the latest version of the application from the GitLab Container Registry, and deploys it to the production environment
+
+[#stable-version-deployment-services]
+==== `+stable+` Version Deployment
+
+// suppress inspection "SpellCheckingInspection"
+// suppress inspection "YAMLUnresolvedAlias"
+[source,yaml]
+----
+stableratemymoduleproxy: # <1>
+    container_name: stableratemymoduleproxy
+    hostname: stableratemymoduleproxy
+    image: nginx:alpine
+    volumes:
+        - stable_static:/static <2>
+        - /ratemymodule/stable-default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+        - frontend
+        - backend
+    restart: unless-stopped
+    labels: [ "com.centurylinklabs.watchtower.scope=ratemymodule" ]
+    depends_on:
+        - stableratemymoduleapp
+
+stableratemymoduleapp: # <1>
+    container_name: stableratemymoduleapp
+    hostname: stableratemymoduleapp
+    volumes:
+        - stable_static:/static <2>
+        - /ratemymodule/stable-core.db:/app/core.db <3>
+    environment: # <4>
+        SECRET_KEY: *****
+        OAUTH_GOOGLE_CLIENT_ID: *****.apps.googleusercontent.com
+        OAUTH_MICROSOFT_CLIENT_ID: *****-****-****-****-*****
+        OAUTH_GOOGLE_SECRET: *****
+        OAUTH_MICROSOFT_SECRET: *****
+        PRODUCTION: true
+        EMAIL_HOST: smtp.emailserver.example.com
+        EMAIL_PASSWORD: ******
+        EMAIL_PORT: 465
+        EMAIL_HOST_USER: email@example.com
+        EMAIL_USE_SSL: true
+    image: git.cs.bham.ac.uk:5050/team-projects-2023-24/team55:stable # <5>
+    networks:
+        - backend
+    restart: unless-stopped
+    labels: [ "com.centurylinklabs.watchtower.scope=ratemymodule" ]
+----
+<1> Similarly to the `+latest+` tagged services, these services are used to host the stable version of the application using Nginx and Gunicorn web servers
+
+<2> The `+stable_static+` volume is mounted to serve/reference the static files
+
+<3> The `+stable-core.db+` file is mounted to store the application database
+
+<4> Environment variables for the application are also set.
+(E.g. `+SECRET_KEY+` & `+OAUTH_GOOGLE_CLIENT_ID+`)
+
+<5> The `+stable+` tag is used to pull the stable version of the application from the GitLab Container Registry, and deploys it to the production environment
+
+[#auto-updater-service]
+==== Auto-Updater Docker Compose Service | Watchtower
+
+// suppress inspection "SpellCheckingInspection"
+[source,yaml]
+----
+ratemymodulewatchtower: # <1>
+    container_name: ratemymodulewatchtower
+    hostname: ratemymodulewatchtower
+    image: containrrr/watchtower # <2>
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /.docker/config.json:/config.json:ro
+    command: --interval 30 --scope ratemymodule
+    labels: [ "com.centurylinklabs.watchtower.scope=ratemymodule" ]
+    networks:
+        - frontend
+----
+<1> This service is used to automatically update the application containers when a new version of the application is available
+<2> It uses the `+containrrr/watchtower+` image to monitor the GitLab Container Registry for new versions of the application, and updates the application containers when a new version is available
+
+[#docker-compose-networks]
+=== Networks
+
+[source,yaml]
+----
+networks: # <1>
+    frontend:
+        name: proxy-apps
+        external: true
+    backend:
+----
+<1> These networks are used to connect the application containers to the Nginx proxy containers
+
+[#docker-compose-volumes]
+=== Volumes
+
+[source,yaml]
+----
+volumes: # <1>
+    latest_static:
+    stable_static:
+----
+<1> These volumes are used to store the static files for the application
+
+[#starting-the-docker-compose-stack]
+=== Starting the Docker Compose Stack
+
+.Starting the stack defined within the `+docker-compose.yaml+` file
+[source,console]
+----
+$ docker-compose -f docker-compose.yml up -d # <1>
+----
+<1> The `+-d+` flag is used to run the containers in detached mode, so they run in the background
+
+[#versioning-and-scalability]
+== Versioning & Scalability
+
+Docker containers are designed with version control and scalability in mind.
+
+Everytime we make changes to our main branch, a new Docker image is built and pushed to the GitLab Container Registry.
+This allows us to keep track of different versions of our application and easily roll back to a previous version if needed.
+This also allows us to have a `+stable+` version of our application that is always available for deployment as well as a `+latest+` version that is continuously updated with the latest changes.
+
+With future scalability in mind, Docker containers can be easily scaled up to meet the demands of our application.
+This could be done by running multiple instances of the same container across different machines or servers, allowing us to handle increased traffic and load on our application without any downtime.
+Tools like Docker Swarm and Kubernetes can be used to manage and orchestrate these containers, ensuring that they are distributed and scaled effectively.
+Whilst this is not currently implemented, it is a feature that we can easily integrate into our application in the future.
+
+[#additional-resources]
+== Additional Resources
+
+- {url-docker-wiki}[Docker Documentation]
+- {url-docker-engine}[Docker Engine]
+- {url-docker-wiki-scalability}[Docker Scalability]
+- {url-docker-wiki-best-practices}[Docker Best Practices]
+- {url-docker-wiki-security}[Docker Security]

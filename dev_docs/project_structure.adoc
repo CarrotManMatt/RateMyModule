@@ -1,0 +1,124 @@
+= Project Structure
+Matthew Norton <matt@carrotmanmatt.com>
+v1.0, 12/03/2024
+
+ifndef::env-idea[]
+include::../.asciidoctorconfig[]
+endif::[]
+
+== Quick Links
+
+- <<top-level-files,Top Level Files>>
+- <<top-level-python-packages,Top-Level Python Packages>>
+- <<core-directory-structure,`+core/+`>>
+- <<ratemymodule-directory-structure,`+ratemymodule/+`>>
+- <<web-directory-structure,`+web/+`>>
+- <<htmx-api-directory-structure,`+api_htmx/+`>>
+- <<rest-api-directory-structure,`+api_rest/+`>>
+
+[#top-level-files]
+== Top Level Files
+
+link:../manage.py[`+manage.py+`]:: Runs as a command-line utility to perform administrative tasks.
+(See {url-django-wiki-manage-commands}[the Django documentation about `manage.py`])
+
+link:../pyproject.toml[`+pyproject.toml+`]:: Orchestrates project metadata & dependencies.
+(See {url-poetry-wiki-pyproject}[Poetry's documentation])
+
+link:../.env.example[`+.env.example+`]:: List of every environment variable setting that can be configured when deploying this project.
+This file can be renamed to `+.env+` in deployment (along with changing the necessary settings), to enable customisation of the deployment settings
+
+[#top-level-python-packages]
+== Top Level Python Packages
+
+Each top-level Python package is configured as a {url-django-wiki-projects-and-apps}[Django app].
+Every top-level Python package will have an `+__init__.py+` file containing the standard {url-wiki-python-all-declaration}[`+__all__+` declaration].
+However, this {url-wiki-python-all-declaration}[`+__all__+` declaration] should be empty, as Django apps should not export any objects directly.
+
+link:../core/[`+core/+`]:: The core {url-django-wiki-projects-and-apps}[Django app] that includes the configuration for the {url-django-wiki-projects-and-apps}[project]'s webserver as a whole
+
+link:../ratemymodule/[`+ratemymodule/+`]:: The primary {url-django-wiki-projects-and-apps}[Django app] that defines the database models & web-request independent {labelled-url-wiki-crud} actions
+
+link:../web/[`+web/+`]:: The main HTML web server {url-django-wiki-projects-and-apps}[Django app] that encompasses how to respond to {url-django-wiki-web-requests}[web requests] sent to this {url-django-wiki-projects-and-apps}[Django project]
+
+link:../api_htmx/[`+api_htmx/+`]:: The {labelled-url-htmx} API {url-django-wiki-projects-and-apps}[Django app] that defines how to respond to {labelled-url-htmx} url-wiki-ajax[AJAX] {url-django-wiki-web-requests}[requests] from web-based users
+
+link:../api_rest/[`+api_rest/+`]:: The {labelled-url-wiki-rest} {labelled-url-wiki-api} {url-django-wiki-projects-and-apps}[Django app] that defines how to respond to {labelled-url-wiki-json} {labelled-url-wiki-api} {url-django-wiki-web-requests}[requests] from {url-wiki-open-api}[third-party API] users
+
+[#core-directory-structure]
+== `+core/+`
+
+link:../core/settings.py[`+core/settings.py+`]:: Contains all the configurations for the entirety of this {url-django-wiki-projects-and-apps}[Django project].
+(See {url-django-wiki-settings}[Django's settings documentation])
+
+link:../core/urls.py[`+core/urls.py+`]:: The core {url-django-wiki-urls}[URL dispatcher] entry point, which defines how to traverse to every other {url-django-wiki-urls}#including-other-urlconfs[app's individual URL dispatcher].
+(See {url-django-wiki-urls}[Django's URL dispatcher documentation])
+
+link:../core/utils.py[`+core/utils.py+`]:: Contains common utility functions & classes, used within the `+core+` {url-django-wiki-projects-and-apps}[Django app].
+These *must* all be {url-django-wiki-lazy-loading}[lazily loaded] because they are imported before any of the {url-django-wiki-projects-and-apps}[Django apps] have been set up.
+(I.e. **Do not import any objects from any of the {url-django-wiki-projects-and-apps}[Django apps]**)
+
+link:../core/views.py[`+core/views.py+`]:: Contains any simplistic {url-django-wiki-views}[views] used directly within link:../core/urls.py[`core/urls.py`]
+
+link:../core/wsgi.py[`+core/wsgi.py+`]:: Defines how WSGI webservers can process incoming {url-django-wiki-web-requests}[web requests] with this {url-django-wiki-projects-and-apps}[Django project].
+This has been automatically generated and is unlikely to need to be changed
+
+[#ratemymodule-directory-structure]
+== `+ratemymodule/+`
+
+link:../ratemymodule/models/&#95;&#95;init&#95;&#95;.py[`+ratemymodule/models/__init__.py+`]:: Holds the definition for every {url-django-wiki-models}[DB model] used in this {url-django-wiki-projects-and-apps}[Django project], alongside any web-request independent {labelled-url-wiki-crud} actions, relating to each {url-django-wiki-models}[model]
+
+link:../ratemymodule/models/utils.py[`+ratemymodule/models/utils.py+`]:: Contains common utility functions & classes used by the definition of {url-django-wiki-models}[models] within link:../ratemymodule/models/&#95;&#95;init&#95;&#95;.py[`+ratemymodule/models/__init__.py+`]
+
+link:../ratemymodule/admin/&#95;&#95;init&#95;&#95;.py[`+ratemymodule/admin/__init__.py+`]:: Defines how to display the {url-django-wiki-models}[models], inside this {url-django-wiki-projects-and-apps}[Django project], on the {url-django-wiki-admin-site}[automatic admin UI] pages
+
+link:../ratemymodule/migrations/[`+ratemymodule/migrations/+`]:: Contains auto-generated {url-django-wiki-models-migrations}[database migrations] ({url-django-wiki-models-migrations}#migration-files[one migration per file]).
+These are used by {url-django-wiki-settings-databases}[Django's database engine] to ensure that the database matches the model definitions specified within link:../ratemymodule/models/&#95;&#95;init&#95;&#95;.py[`+ratemymodule/models/__init__.py+`]
+
+link:../ratemymodule/tests/[`+ratemymodule/tests/+`]:: Collection of {url-wiki-unit-tests}[unit-tests] to ensure all functionality defined within the `+ratemymodule+` {url-django-wiki-projects-and-apps}[Django app] works as expected.
+(See {url-django-wiki-testing}[Django's testing documentation])
+
+link:../ratemymodule/apps.py[`+ratemymodule/apps.py+`]:: Contains the {url-django-wiki-apps-configurations}[configuration classes] to provide metadata about the `+ratemymodule+` {url-django-wiki-projects-and-apps}[Django app]
+
+[#web-directory-structure]
+== `+web/+`
+
+link:../web/views/[`+web/views/+`]:: Contains files that in-turn contain collections of {url-django-wiki-views}[views] to respond to {url-django-wiki-web-requests}[HTTP requests] associated with the primary web request responder
+
+link:../web/apps.py[`+web/apps.py+`]:: Contains the {url-django-wiki-apps-configurations}[configuration classes] to provide metadata about the `+web+` {url-django-wiki-projects-and-apps}[Django app]
+
+link:../web/urls.py[`+web/urls.py+`]:: Contains the list of URLs available to the primary web server {url-django-wiki-urls}[URL dispatcher]
+
+link:../web/tests/[`+web/tests/+`]:: Collection of {url-wiki-unit-tests}[unit-tests] to ensure all functionality defined within the `+web+` {url-django-wiki-projects-and-apps}[Django app] works as expected.
+(See {url-django-wiki-testing}[Django's testing documentation])
+
+link:../web/templates/ratemymodule/[`+web/templates/+`]:: Contains {labelled-url-wiki-html}-style {url-django-wiki-templates}[Django templates] that are populated with the necessary {url-django-wiki-views-adding-context-data}[context data], then sent as the final {url-django-wiki-views-template-response}[HTML response] to an {url-django-wiki-web-requests}[HTTP web request]
+
+link:../web/static/ratemymodule/[`+web/static/+`]:: Contains all {url-django-wiki-static-files}[static files] that are served alongside {url-django-wiki-views-template-response}[HTML] {url-django-wiki-web-requests}[web requests].
+(E.g. image, {labelled-url-wiki-css} & {labelled-url-wiki-js} files)
+
+[#htmx-api-directory-structure]
+== `+api_htmx/+`
+
+link:../api_htmx/views/[`+api_htmx/views/+`]:: Contains files that in-turn contain collections of {url-django-wiki-views}[views] to respond to {url-django-wiki-web-requests}[HTTP requests] associated with the {url-htmx-wiki-ajax}[HTMX API]
+
+link:../api_htmx/apps.py[`+api_htmx/apps.py+`]:: Contains the {url-django-wiki-apps-configurations}[configuration classes] to provide metadata about the `+api_htmx+` {url-django-wiki-projects-and-apps}[Django app]
+
+link:../api_htmx/urls.py[`+api_htmx/urls.py+`]:: Contains the list of URLs available to the HTMX API {url-django-wiki-urls}[URL dispatcher]
+
+link:../api_htmx/tests/[`+api_htmx/tests/+`]:: Collection of {url-wiki-unit-tests}[unit-tests] to ensure all functionality defined within the `+api_htmx+` {url-django-wiki-projects-and-apps}[Django app] works as expected.
+(See {url-django-wiki-testing}[Django's testing documentation])
+
+link:../api_htmx/templates/ratemymodule/[`+api_htmx/templates/+`]:: Contains {labelled-url-wiki-html}-style {url-django-wiki-templates}[Django templates] that are populated with the necessary {url-django-wiki-views-adding-context-data}[context data], then sent as the final {url-django-wiki-views-template-response}[HTML response] to an {url-htmx-wiki-ajax}[HTMX API] {url-django-wiki-web-requests}[request]
+
+[#rest-api-directory-structure]
+== `+api_rest/+`
+
+link:../api_rest/views/[`+api_rest/views/+`]:: Contains files that in-turn contain collections of {url-django-wiki-views}[views] to respond to {url-django-wiki-web-requests}[HTTP requests] associated with the {labelled-url-wiki-rest} {labelled-url-wiki-api}
+
+link:../api_rest/apps.py[`+api_rest/apps.py+`]:: Contains the {url-django-wiki-apps-configurations}[configuration classes] to provide metadata about the `+api_rest+` {url-django-wiki-projects-and-apps}[Django app]
+
+link:../api_rest/urls.py[`+api_rest/urls.py+`]:: Contains the list of URLs available to the {labelled-url-wiki-rest} {labelled-url-wiki-api} {url-django-wiki-urls}[URL dispatcher]
+
+link:../api_rest/tests/[`+api_rest/tests/+`]:: Collection of {url-wiki-unit-tests}[unit-tests] to ensure all functionality defined within the `+api_rest+` {url-django-wiki-projects-and-apps}[Django app] works as expected.
+(See {url-django-wiki-testing}[Django's testing documentation])
