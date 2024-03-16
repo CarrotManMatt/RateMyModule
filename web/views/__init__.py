@@ -15,7 +15,7 @@ from urllib.parse import unquote_plus
 
 from allauth.account.views import LogoutView as AllAuthLogoutView
 from django.conf import settings
-from django.http import Http404, HttpRequest, HttpResponse, QueryDict
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, QueryDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 class LogoutView(AllAuthLogoutView):  # type: ignore[misc,no-any-unimported]
     @override
     def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        raise Http404
+        return HttpResponseNotAllowed(("POST",))
 
 
 class HomeView(TemplateView):
