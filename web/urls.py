@@ -11,7 +11,7 @@ import django
 from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
-from web.views import HomeView, LogoutView, SubmitPostView, UserSettingsView
+from web.views import HomeView, LogoutView, SubmitPostView, UserSettingsView, LoginView, SignupView
 
 app_name: Final[str] = "ratemymodule"
 
@@ -27,7 +27,9 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
         UserSettingsView.as_view(),
         name="user-settings",
     ),
-    django.urls.path(r"logout/", LogoutView.as_view(), name="logout"),
+    django.urls.path(r"logout/", LogoutView.as_view(), name="post-logout"),
+    django.urls.path(r"login/", LoginView.as_view(), name="post-login"),
+    django.urls.path(r"signup/", SignupView.as_view(), name="post-signup"),
 ]
 
 favicon_urlpatterns: MutableSequence[URLResolver | URLPattern] = [

@@ -1,0 +1,90 @@
+{% load socialaccount %}
+
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLoginModal()">&times;</span>
+        <h2>Login</h2>
+        <form method="post" action="{% provider_login_url "google" %}">
+            {% csrf_token %}
+            <button type="submit" class="login-with-google-btn" >Continue with Google</button>
+        </form>
+        <form method="post" action="{% provider_login_url "microsoft" %}" class="bsk-container">
+            {% csrf_token %}
+            <button class="bsk-btn bsk-btn-default">
+                <object type="image/svg+xml" data="https://s3-eu-west-1.amazonaws.com/cdn-testing.web.bas.ac.uk/scratch/bas-style-kit/ms-pictogram/ms-pictogram.svg" class="x-icon"></object>
+                Continue with Microsoft
+            </button>
+        </form>
+        <button onclick="openManualSignupModal()" class="login-button">Other Account Types</button>
+        <footer>Use this option if your university account is not managed by Google or Microsoft</footer>
+    </div>
+</div>
+
+<div class="modal" id="manualSignupModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLoginModal()">&times;</span>
+        {% if submit_form.errors %}
+            <div id="submit-form-errors">
+                <p>The operation could not be performed because one or more error(s) occurred.<br/>Please resubmit the form after making the following changes:</p>
+                <ul>
+                    {% for field, errors in signup_form.errors.items %}
+                        {% if field == "__all__" %}
+                            {% for error in errors %}
+                                <li>{{ error|striptags }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>{{ field|striptags|title }}:
+                                <ul>{% for error in errors %}
+                                    <li>{{ error|striptags }}</li>{% endfor %}</ul>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'ratemymodule:post-signup' %}">
+            {% csrf_token %}
+            {{ signup_form }}
+            <button type="submit" class="login-button">Create My Account</button>
+        </form>
+
+        <button onclick="openLoginModal()" class="button-as-link">My university uses Google/Microsoft accounts</button>
+        <button onclick="openManualLoginModal()" class="button-as-link">I already have an account</button>
+    </div>
+</div>
+
+<div class="modal" id="manualLoginModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLoginModal()">&times;</span>
+
+        {% if login_form.errors %}
+            <div id="login-form-errors">
+                <p>The operation could not be performed because one or more error(s) occurred.<br/>Please resubmit the form after making the following changes:</p>
+                <ul>
+                    {% for field, errors in login_form.errors.items %}
+                        {% if field == "__all__" %}
+                            {% for error in errors %}
+                                <li>{{ error|striptags }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>{{ field|striptags|title }}:
+                                <ul>{% for error in errors %}
+                                    <li>{{ error|striptags }}</li>{% endfor %}</ul>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'ratemymodule:post-login' %}">
+            {% csrf_token %}
+            {{ login_form }}
+            <button type="submit" class="login-button">Login</button>
+        </form>
+
+        <button onclick="openLoginModal()" class="button-as-link">My university uses Google/Microsoft accounts</button>
+        <button onclick="openManualSignupModal()" class="button-as-link">I don't have an account yet</button>
+    </div>
+</div>

@@ -35,6 +35,7 @@
     <meta name="theme-color" content="#b295e8"/>
 
     <link rel="stylesheet" href="{% static 'ratemymodule/styles/base.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ratemymodule/styles/login-modals.css' %}"/>
     {% block styles %}
     {% endblock styles %}
 
@@ -89,9 +90,13 @@
                                      alt="Dropdown Icon" class="dropdown-icon"/>
                             </button>
                             <div class="user-dropdown-content">
-                                <a href="{% url 'ratemymodule:user-settings' %}">User
-                                    Settings</a>
-                                <form method="post" action="{% url 'ratemymodule:logout' %}">
+                                <a href="{% url 'ratemymodule:user-settings' %}">
+                                    User Settings
+                                </a>
+                                {% if user.is_authenticated and user.is_staff %}
+                                    <a href="{% url 'admin:index' %}">Admin Site</a>
+                                {% endif %}
+                                <form method="post" action="{% url 'ratemymodule:post-logout' %}">
                                     {% csrf_token %}
                                     <button type="submit">Logout</button>
                                 </form>
@@ -122,33 +127,9 @@
     {% endblock content %}
 </main>
 
-        {% block modals %}
-            <div class="modal" id="loginModal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeLoginModal()">&times;</span>
-                    <h2>Login</h2>
-                    <form method="post" action="/">
-                        {% csrf_token %}
-                        <button type="submit" class="login-with-google-btn" >Continue with Google</button>
-                    </form>
-                    <form method="post" action="/" class="bsk-container">
-                        {% csrf_token %}
-                        <button class="bsk-btn bsk-btn-default">
-                            <object type="image/svg+xml" data="https://s3-eu-west-1.amazonaws.com/cdn-testing.web.bas.ac.uk/scratch/bas-style-kit/ms-pictogram/ms-pictogram.svg" class="x-icon"></object>
-                            Continue with Microsoft
-                        </button>
-                    </form>
-                    <button onclick="openManualLoginDialogue()" class="login-button">Other Account Types</button>
-                    <footer>Use this option if your university account is not managed by Google or Microsoft</footer>
-                </div>
-            </div>
-            <div class="modal" id="manualLoginModal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeLoginModal()">&times;</span>
-                    <h2>Work In Progress</h2>
-                </div>
-            </div>
-        {% endblock modals %}
+{% block modals %}
+    {% include "ratemymodule/fragments/login-modals.html" %}
+{% endblock modals %}
 
 <footer>
     <p>
@@ -166,6 +147,8 @@
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById("loginModal").style.display = "{% if request.GET.action == "login" %}block{% else %}none{% endif %}";
+                document.getElementById("manualSignupModal").style.display = "none";
+                document.getElementById("manualLoginModal").style.display = "none";
             });
 
             function closeLoginModal() {
@@ -173,8 +156,18 @@
                 currentURL.searchParams.delete("action", "login");
                 window.location.href = currentURL.toString();
             }
-            function openManualLoginDialogue() {
+            function openLoginModal() {
+                document.getElementById("manualSignupModal").style.display = "none";
+                document.getElementById("manualLoginModal").style.display = "none";
+                document.getElementById("loginModal").style.display = "block";
+            }
+            function openManualSignupModal() {
               document.getElementById("loginModal").style.display = "none";
+              document.getElementById("manualLoginModal").style.display = "none";
+              document.getElementById("manualSignupModal").style.display = "block";
+            }
+            function openManualLoginModal() {
+              document.getElementById("manualSignupModal").style.display = "none";
               document.getElementById("manualLoginModal").style.display = "block";
             }
         </script>

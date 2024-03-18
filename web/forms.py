@@ -1,14 +1,16 @@
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("PostForm",)
+__all__: Sequence[str] = ("PostForm", "SignupForm")
 
 from typing import Final, override
 
+from allauth.account.forms import SignupForm as AllAuthSignupForm
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from ratemymodule.models import Post
+from ratemymodule.models import Post, User
 
 
 class PostForm(ModelForm[Post]):
@@ -80,3 +82,28 @@ class PostForm(ModelForm[Post]):
             "assessment_rating",
             "teaching_rating",
         )
+
+
+class SignupForm(AllAuthSignupForm):
+    @override
+    def clean(self) -> dict[str]:
+        super().clean()
+
+        non_empty_fields: set[str] = set()
+        field_name: str
+        for field_name in self.fields:
+            if field_name != "password2" and self.cleaned_data.get(field_name):
+                non_empty_fields.add(field_name)
+
+        try:
+            User(
+                email=self.cleaned_data.get("email"),
+                password=self.cleaned_data.get("password1")
+            ).full_clean()
+        except ValidationError as e:
+            self.add_errors_from_validation_error_exception(e, non_empty_fields)
+
+        if self.errors.get("password1") and any("common" in error for error in self.errors["password1"]) and any("short" in error for error in self.errors["password1"]):
+            self._errors["password1"] = [error for error in self._errors["password1"] if "common" not in error]
+
+        return self.cleaned_data

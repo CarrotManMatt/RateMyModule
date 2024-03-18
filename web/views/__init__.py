@@ -7,22 +7,29 @@ __all__: Sequence[str] = (
     "SubmitPostView",
     "UserSettingsView",
     "LogoutView",
+    "LoginView",
+    "SignupView",
 )
 
 import re
 from typing import TYPE_CHECKING, override
 from urllib.parse import unquote_plus
 
+import django
 from allauth.account.views import LogoutView as AllAuthLogoutView
+from allauth.account.views import LoginView as AllAuthLoginView
+from allauth.account.views import SignupView as AllAuthSignupView
+from allauth.account.forms import LoginForm
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, QueryDict
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, TemplateView
 
 from ratemymodule.models import Module, Post, University, User
-from web.forms import PostForm
+from web.forms import PostForm, SignupForm
 from web.views import graph_utils
 
 if TYPE_CHECKING:
@@ -30,15 +37,48 @@ if TYPE_CHECKING:
 
 
 class LogoutView(AllAuthLogoutView):  # type: ignore[misc,no-any-unimported]
-    @override
-    def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        return HttpResponseNotAllowed(("POST",))
+    http_method_name = ["post"]
+
+
+class LoginView(AllAuthLoginView):  # type: ignore[misc,no-any-unimported]
+    http_method_names = ["post"]
+    redirect_authenticated_user = True
+    prefix = "login"
+
+    def form_invalid(self, form: LoginForm) -> HttpResponseRedirect:  # type: ignore[no-any-unimported]
+        if "login_form" in self.request.session:
+            self.request.session.pop("login_form")
+
+        self.request.session["login_form"] = {
+            "data": form.data,
+            "errors": form.errors
+        }
+
+        return django.shortcuts.redirect(settings.LOGIN_URL)
+
+
+class SignupView(AllAuthSignupView):  # type: ignore[misc,no-any-unimported]
+    http_method_names = ["post"]
+    redirect_authenticated_user = True
+    prefix = "signup"
+
+    def form_invalid(self, form: SignupForm) -> HttpResponseRedirect:  # type: ignore[no-any-unimported]
+        if "signup_form" in self.request.session:
+            self.request.session.pop("signup_form")
+
+        self.request.session["signup_form"] = {
+            "data": form.data,
+            "errors": form.errors
+        }
+
+        return django.shortcuts.redirect(settings.SIGNUP_URL)
 
 
 class HomeView(TemplateView):
     """Main Dashboard view, for users to look at the most recent posts about uni modules."""
 
     template_name = "ratemymodule/home.html"
+    http_method_names = ["get"]
 
     @override
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
@@ -189,6 +229,40 @@ class HomeView(TemplateView):
 
         return {**context_data, "post_list": post_set}
 
+    def _get_login_forms_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
+        if "login_form" not in context_data:
+            if "login_form" not in self.request.session:
+                context_data["login_form"] = LoginForm(prefix="login")
+
+            else:
+                login_form = LoginForm(
+                    data=self.request.session["login_form"]["data"],
+                    request=self.request,
+                    prefix="login"
+                )
+                login_form.is_valid()
+
+                context_data["login_form"] = login_form
+
+                self.request.session.pop("login_form")
+
+        if "signup_form" not in context_data:
+            if "signup_form" not in self.request.session:
+                context_data["signup_form"] = SignupForm(prefix="signup")
+
+            else:
+                signup_form = SignupForm(
+                    data=self.request.session["signup_form"]["data"],
+                    prefix="signup"
+                )
+                signup_form.is_valid()
+
+                context_data["signup_form"] = signup_form
+
+                self.request.session.pop("signup_form")
+
+        return context_data
+
     @override
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context_data: dict[str, object] = super().get_context_data(**kwargs)
@@ -205,17 +279,19 @@ class HomeView(TemplateView):
 
         context_data = self._get_graphs_context_data(context_data)
         context_data = self._get_post_list_context_data(context_data)
+        context_data = self._get_login_forms_context_data(context_data)
 
         return context_data  # noqa: RET504
 
 
-class SubmitPostView(CreateView[Post, PostForm]):
+class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
     """SubmitPostView for handling module review submissions."""
 
     template_name = "ratemymodule/submit-review.html"
     form_class = PostForm
-    success_url = "/"
+    success_url = "/"  # TODO: change to reverse url lookup
     model = Post
+    http_method_names = ["get", "post"]
 
     # noinspection PyOverrides
     @override
@@ -237,7 +313,8 @@ class SubmitPostView(CreateView[Post, PostForm]):
         return context
 
 
-class UserSettingsView(TemplateView):
+class UserSettingsView(LoginRequiredMixin, TemplateView):
     """Account management view, for users to edit their account settings."""
 
     template_name = "ratemymodule/user-settings.html"
+    http_method_names = ["get"]

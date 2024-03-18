@@ -40,7 +40,7 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
         r"admin/docs/<path:subpath>",
         AdminDocsRedirectView.as_view(),
     ),
-    django.urls.path(r"admin/", admin.site.urls, name="admin"),
+    django.urls.path(r"admin/", admin.site.urls),
     django.urls.path(r"api/htmx/", django.urls.include("api_htmx.urls")),
     django.urls.path(r"api/rest/", django.urls.include("api_rest.urls")),
     django.urls.path(r"", django.urls.include("web.urls")),

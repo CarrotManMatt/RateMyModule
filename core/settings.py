@@ -327,14 +327,12 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USER_DISPLAY = lambda user: str(user)  # noqa: E731
 ACCOUNT_USERNAME_MIN_LENGTH = 5
 ACCOUNT_CHANGE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = env("ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS")
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_FORMS = {
-    "login": "ratemymodule.forms.Login_Form",
-    "signup": "ratemymodule.forms.Signup_Form",
-}
+ACCOUNT_FORMS = {"signup": "web.forms.SignupForm"}
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -351,7 +349,7 @@ SOCIALACCOUNT_PROVIDERS = {
     "microsoft": {
         "VERIFIED_EMAIL": True,
         "OAUTH_PKCE_ENABLED": True,
-        "SCOPE": ["email", "profile", "User.Read", "User.ReadBasic.All"],
+        "SCOPE": ["openid"],
         "APP": {
             "name": "Microsoft",
             "client_id": env("OAUTH_MICROSOFT_CLIENT_ID").strip(),
