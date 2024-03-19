@@ -787,6 +787,25 @@ class Post(CustomBaseModel):
     def filter_by_tags(cls, names: Iterable[str]) -> Manager["Post"]:
         return PostFilteredByTagManager(tag_names=names, model=cls)
 
+    @property
+    def is_user_suspicious(self) -> bool:
+        unsolved_reports_count = 0
+
+        # Iterate over posts made by the user
+        for post in self.user.made_post_set.all():
+            # Count unsolved reports for each post
+            unsolved_reports_for_post = post.report_set.filter(is_solved=False).count()
+
+            # Increment the total count of unsolved reports
+            unsolved_reports_count += unsolved_reports_for_post
+
+            # Break the loop if the count reaches or exceeds three
+            if unsolved_reports_count >= 3:
+                return True
+
+        # Return False if the count is less than three
+        return False
+
 
 # NOTE: Choices classes need to be defined outside of their respective models, so that they can be referenced within the model's Meta constraints list
 class _Reasons(models.TextChoices):

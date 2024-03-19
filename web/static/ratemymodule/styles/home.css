@@ -306,3 +306,15 @@
         align-items: flex-start; /* Align items to the start for a tight layout */
     }
 }
+
+.disclaimer-content {
+    margin-top: 10px;
+    padding: 0 15px 0 15px;
+    color: #7e8285;
+    text-align: right;
+    border-radius: 8px;
+    font-size: 0.8rem; /* Example font size */
+    word-wrap: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+}
