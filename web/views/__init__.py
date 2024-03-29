@@ -28,6 +28,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, TemplateView
 
+from django.db.models import Count, Q
+
 from ratemymodule.models import Module, Post, University, User
 from web.forms import PostForm, SignupForm
 from web.views import graph_utils
@@ -200,7 +202,15 @@ class HomeView(TemplateView):
         except Module.DoesNotExist:
             return {**context_data, "error": _("Error: Module Not Found")}
 
-        post_set: QuerySet[Post] = module.post_set.all().order_by("date_time_created")
+        post_set: QuerySet[Post] = module.post_set.annotate(
+            num_reports=Count('report_set')
+        ).annotate(
+            num_solved_reports=Count('report_set', filter=Q(report_set__is_solved=True))
+        ).filter(
+            hidden=False
+        ).exclude(
+            Q(num_reports__gt=0) & ~Q(num_solved_reports__gt=0)
+        ).order_by("date_time_created")
 
         # noinspection PyArgumentList
         raw_search_string: str | None = self.request.GET.get("q")
