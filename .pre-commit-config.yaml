@@ -1,64 +1,65 @@
 default_language_version:
-  python: python3.12
+    python: python3.12
 
 repos:
-  - repo: https://github.com/python-poetry/poetry
-    rev: 1.8.1
-    hooks:
-    - id: poetry-check
-      name: check poetry config in pyproject.toml is valid
-      args: [--no-interaction]
-    - id: poetry-check
-      name: check poetry.lock file is valid
-      args: [--lock, --no-interaction]
+    - repo: https://github.com/python-poetry/poetry
+      rev: 1.8.1
+      hooks:
+          - id: poetry-check
+            name: check poetry config in pyproject.toml is valid
+            args: [--no-interaction]
+          - id: poetry-check
+            name: check poetry.lock file is valid
+            args: [--lock, --no-interaction]
 
-  - repo: local
-    hooks:
-      - id: django-check
-        name: check for major errors in django project
-        entry: bash -c 'poetry run python manage.py check'
-        language: system
-        types: [python]
-        pass_filenames: false
+    - repo: local
+      hooks:
+          - id: django-check
+            name: check for major errors in django project
+            entry: bash -c 'poetry run python manage.py check'
+            language: system
+            types: [python]
+            pass_filenames: false
 
-  - repo: https://github.com/ecugol/pre-commit-hooks-django
-    rev: v0.4.0
-    hooks:
-      - id: check-absent-migrations
+    - repo: https://github.com/ecugol/pre-commit-hooks-django
+      rev: v0.4.0
+      hooks:
+          - id: check-absent-migrations
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-      - id: check-added-large-files
-      - id: check-json
-      - id: check-yaml
-      - id: check-toml
-      - id: check-xml
-      - id: check-symlinks
-      - id: check-merge-conflict
-      - id: check-vcs-permalinks
-      - id: destroyed-symlinks
-      - id: check-case-conflict
-      - id: check-executables-have-shebangs
-      - id: check-ast
-      - id: detect-private-key
-      - id: end-of-file-fixer
-      - id: fix-byte-order-marker
-      - id: fix-encoding-pragma
-        args: [--remove]
-      - id: name-tests-test
-        args: [--django]
-      - id: no-commit-to-branch
-        args: [--branch, main, --branch, jhipster-archive]
-      - id: pretty-format-json
-        args: [--autofix]
-      - id: trailing-whitespace
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.5.0
+      hooks:
+          - id: check-added-large-files
+          - id: check-json
+          - id: check-yaml
+          - id: check-toml
+          - id: check-xml
+          - id: check-symlinks
+          - id: check-merge-conflict
+          - id: check-vcs-permalinks
+          - id: destroyed-symlinks
+          - id: check-case-conflict
+          - id: check-executables-have-shebangs
+          - id: check-ast
+          - id: detect-private-key
+          - id: end-of-file-fixer
+          - id: fix-byte-order-marker
+          - id: fix-encoding-pragma
+            args: [--remove]
+          - id: name-tests-test
+            args: [--django]
+            exclude: "utils.py$"
+          - id: no-commit-to-branch
+            args: [--branch, main, --branch, jhipster-archive]
+          - id: pretty-format-json
+            args: [--autofix, --indent, "4"]
+          - id: trailing-whitespace
 
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0
-    hooks:
-      - id: python-check-blanket-noqa
-      - id: python-check-blanket-type-ignore
-      - id: python-no-eval
-      - id: python-no-log-warn
-      - id: python-use-type-annotations
+    - repo: https://github.com/pre-commit/pygrep-hooks
+      rev: v1.10.0
+      hooks:
+          - id: python-check-blanket-noqa
+          - id: python-check-blanket-type-ignore
+          - id: python-no-eval
+          - id: python-no-log-warn
+          - id: python-use-type-annotations

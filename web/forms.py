@@ -84,9 +84,9 @@ class PostForm(ModelForm[Post]):
         )
 
 
-class SignupForm(AllAuthSignupForm):
+class SignupForm(AllAuthSignupForm):  # type: ignore[misc,no-any-unimported]
     @override
-    def clean(self) -> dict[str]:
+    def clean(self) -> dict[str, object]:  # type: ignore[misc]
         super().clean()
 
         non_empty_fields: set[str] = set()
@@ -98,12 +98,22 @@ class SignupForm(AllAuthSignupForm):
         try:
             User(
                 email=self.cleaned_data.get("email"),
-                password=self.cleaned_data.get("password1")
+                password=self.cleaned_data.get("password1"),
             ).full_clean()
         except ValidationError as e:
             self.add_errors_from_validation_error_exception(e, non_empty_fields)
 
-        if self.errors.get("password1") and any("common" in error for error in self.errors["password1"]) and any("short" in error for error in self.errors["password1"]):
-            self._errors["password1"] = [error for error in self._errors["password1"] if "common" not in error]
+        HAS_PASSWORD_ERRORS: Final[bool] = (
+            self.errors.get("password1")
+            and any("common" in error for error in self.errors["password1"])
+            and any("short" in error for error in self.errors["password1"])
+        )
+        if HAS_PASSWORD_ERRORS:
+            self._errors["password1"] = [
+                error
+                for error
+                in self._errors["password1"]
+                if "common" not in error
+            ]
 
-        return self.cleaned_data
+        return self.cleaned_data  # type: ignore[no-any-return]

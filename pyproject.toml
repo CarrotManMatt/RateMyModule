@@ -32,7 +32,7 @@ django-admin-rangefilter = "^0.12"
 confusable-homoglyphs = "^3.3"
 tldextract = "^5.1"
 classproperties = {git = "https://github.com/hottwaj/classproperties.git"}
-setuptools = "^69.1"
+setuptools = "^69.2"
 django-stubs-ext = "~4.2"
 regex = "^2023.12"
 matplotlib = "^3.8"
@@ -176,7 +176,8 @@ task-tags = [
     "REQ",
     "IDEA",
     "NOTE",
-    "ISSUE"
+    "ISSUE",
+    "DONE"
 ]
 
 

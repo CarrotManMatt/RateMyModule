@@ -16,10 +16,10 @@ from typing import TYPE_CHECKING, override
 from urllib.parse import unquote_plus
 
 import django
-from allauth.account.views import LogoutView as AllAuthLogoutView
-from allauth.account.views import LoginView as AllAuthLoginView
-from allauth.account.views import SignupView as AllAuthSignupView
 from allauth.account.forms import LoginForm
+from allauth.account.views import LoginView as AllAuthLoginView
+from allauth.account.views import LogoutView as AllAuthLogoutView
+from allauth.account.views import SignupView as AllAuthSignupView
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, QueryDict
@@ -39,38 +39,40 @@ if TYPE_CHECKING:
 
 
 class LogoutView(AllAuthLogoutView):  # type: ignore[misc,no-any-unimported]
-    http_method_name = ["post"]
+    http_method_name = ("post",)
 
 
 class LoginView(AllAuthLoginView):  # type: ignore[misc,no-any-unimported]
-    http_method_names = ["post"]
+    http_method_names = ("post",)
     redirect_authenticated_user = True
     prefix = "login"
 
-    def form_invalid(self, form: LoginForm) -> HttpResponseRedirect:  # type: ignore[no-any-unimported]
+    @override
+    def form_invalid(self, form: LoginForm) -> HttpResponseRedirect:  # type: ignore[misc,no-any-unimported]
         if "login_form" in self.request.session:
             self.request.session.pop("login_form")
 
         self.request.session["login_form"] = {
             "data": form.data,
-            "errors": form.errors
+            "errors": form.errors,
         }
 
         return django.shortcuts.redirect(settings.LOGIN_URL)
 
 
 class SignupView(AllAuthSignupView):  # type: ignore[misc,no-any-unimported]
-    http_method_names = ["post"]
+    http_method_names = ("post",)
     redirect_authenticated_user = True
     prefix = "signup"
 
-    def form_invalid(self, form: SignupForm) -> HttpResponseRedirect:  # type: ignore[no-any-unimported]
+    @override
+    def form_invalid(self, form: SignupForm) -> HttpResponseRedirect:  # type: ignore[misc]
         if "signup_form" in self.request.session:
             self.request.session.pop("signup_form")
 
         self.request.session["signup_form"] = {
             "data": form.data,
-            "errors": form.errors
+            "errors": form.errors,
         }
 
         return django.shortcuts.redirect(settings.SIGNUP_URL)
@@ -80,7 +82,7 @@ class HomeView(TemplateView):
     """Main Dashboard view, for users to look at the most recent posts about uni modules."""
 
     template_name = "ratemymodule/home.html"
-    http_method_names = ["get"]
+    http_method_names = ("get",)
 
     @override
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
@@ -248,7 +250,7 @@ class HomeView(TemplateView):
                 login_form = LoginForm(
                     data=self.request.session["login_form"]["data"],
                     request=self.request,
-                    prefix="login"
+                    prefix="login",
                 )
                 login_form.is_valid()
 
@@ -263,7 +265,7 @@ class HomeView(TemplateView):
             else:
                 signup_form = SignupForm(
                     data=self.request.session["signup_form"]["data"],
-                    prefix="signup"
+                    prefix="signup",
                 )
                 signup_form.is_valid()
 
@@ -301,7 +303,7 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
     form_class = PostForm
     success_url = "/"  # TODO: change to reverse url lookup
     model = Post
-    http_method_names = ["get", "post"]
+    http_method_names = ("get", "post")
 
     # noinspection PyOverrides
     @override
@@ -327,4 +329,4 @@ class UserSettingsView(LoginRequiredMixin, TemplateView):
     """Account management view, for users to edit their account settings."""
 
     template_name = "ratemymodule/user-settings.html"
-    http_method_names = ["get"]
+    http_method_names = ("get",)

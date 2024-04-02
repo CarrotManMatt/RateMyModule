@@ -113,9 +113,22 @@ else:
     CSRF_TRUSTED_ORIGINS = development_env("CSRF_TRUSTED_ORIGINS")
 
     if DEBUG:
-        debug_env: Env = EnvClass(EMAIL_TO_CONSOLE=(bool, True))  # type: ignore[no-any-unimported]
+        debug_env: Env = EnvClass(  # type: ignore[no-any-unimported]
+            EMAIL_TO_CONSOLE=(bool, True),
+            TEST_DATA_JSON_FILE_PATH=(str, None),
+        )
+
         if debug_env("EMAIL_TO_CONSOLE"):
             EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+        TEST_DATA_JSON_FILE_PATH = (
+            Path(debug_env("TEST_DATA_JSON_FILE_PATH").strip())
+            if (
+                debug_env("TEST_DATA_JSON_FILE_PATH")
+                and debug_env("TEST_DATA_JSON_FILE_PATH").strip()
+            )
+            else None
+        )
 
 
 # Environment Variables Validation

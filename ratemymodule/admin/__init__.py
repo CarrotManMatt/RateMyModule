@@ -64,6 +64,7 @@ admin.site.index_title = _("Overview")
 admin.site.empty_value_display = "- - - - -"
 
 # TODO: Add admin autocomplete search filtering for many-to-many connections
+# TODO: Make tag "is_verified" true by default on admin site
 
 
 @admin.register(User)

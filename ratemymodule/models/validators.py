@@ -78,6 +78,7 @@ class FreeEmailValidator:
         },
     )
 
+    @override
     def __init__(self, free_email_domains: Collection[str] | None = None) -> None:
         """Initialise a new specific instance of this validator with the given domains."""
         self.free_email_domains = (
@@ -105,6 +106,7 @@ class FreeEmailValidator:
                 code="invalid",
             )
 
+    @override
     def __eq__(self, other: object) -> bool:
         """Check whether this validator is the same as another given validator."""
         if not hasattr(other, "free_email_domains"):
@@ -120,6 +122,7 @@ class ExampleEmailValidator:
 
     DEFAULT_EXAMPLE_EMAIL_DOMAINS: Final[frozenset[str]] = frozenset({"example", "test"})
 
+    @override
     def __init__(self, example_email_domains: Collection[str] | None = None) -> None:
         """Initialise a new specific instance of this validator with the given domains."""
         self.example_email_domains = (
@@ -150,7 +153,7 @@ class ExampleEmailValidator:
 
 @deconstructible
 class PreexistingEmailTLDValidator:
-    """Deprecated! DO NOT USE!"""  # noqa: D400
+    """Deprecated! DO NOT USE!"""
 
     def __call__(self, _: object) -> None:
         """Execute this validator to decide whether the given value is valid."""

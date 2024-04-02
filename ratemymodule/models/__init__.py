@@ -281,16 +281,22 @@ class University(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z"),
+            UnicodePropertiesRegexValidator(
+                r"\A[\p{L}!?¿¡' &()-]+\Z",
+                message="Enter a valid value: cannot contain full-stops."  # noqa: COM812
+            ),
         ),
     )
     short_name = models.CharField(
-        max_length=5,
+        max_length=8,
         unique=False,
         verbose_name=_("Short Name"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡'-]+\Z"),
+            UnicodePropertiesRegexValidator(
+                r"\A[\p{L}!?¿¡'-]+\Z",
+                message="Enter a valid value: cannot contain full-stops."  # noqa: COM812
+            ),
         ),
     )
     email_domain = models.CharField(
@@ -359,7 +365,10 @@ class Course(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z"),
+            UnicodePropertiesRegexValidator(
+                r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z",
+                message="Enter a valid value: cannot contain full-stops."  # noqa: COM812
+            ),
         ),
     )
     student_type = models.CharField(
@@ -367,7 +376,10 @@ class Course(CustomBaseModel):
         verbose_name=_("Student Type"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}!?¿¡' &()-]+\Z"),
+            UnicodePropertiesRegexValidator(
+                r"\A[\p{L}!?¿¡' &()-]+\Z",
+                message="Enter a valid value: cannot contain full-stops."  # noqa: COM812
+            ),
         ),
     )
     university = models.ForeignKey(
@@ -394,7 +406,10 @@ class Course(CustomBaseModel):
 
     @override
     def __str__(self) -> str:
-        return f"{self.name} - {self.university}"
+        try:
+            return f"{self.name} - {self.university}"
+        except (Course.DoesNotExist, University.DoesNotExist):
+            return f"{self.name} ({self.pk})"
 
 
 class Module(CustomBaseModel):
@@ -405,7 +420,10 @@ class Module(CustomBaseModel):
         verbose_name=_("Name"),
         validators=(
             MinLengthValidator(3),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z"),
+            UnicodePropertiesRegexValidator(
+                r"\A[\p{L}\p{N}!?¿¡' &()-]+\Z",
+                message="Enter a valid value: cannot contain full-stops."  # noqa: COM812
+            ),
         ),
     )
     code = models.CharField(
@@ -414,7 +432,10 @@ class Module(CustomBaseModel):
         help_text=_("The unique reference code of this module within its university"),
         validators=(
             MinLengthValidator(2),
-            UnicodePropertiesRegexValidator(r"\A[\p{L}0-9!?¿¡' &()-]+\Z"),
+            UnicodePropertiesRegexValidator(
+                r"\A[\p{L}0-9!?¿¡' &()-]+\Z",
+                message="Enter a valid value: cannot contain full-stops."  # noqa: COM812
+            ),
         ),
     )
     year_started = models.DateField(
@@ -467,7 +488,10 @@ class Module(CustomBaseModel):
 
     @override
     def __str__(self) -> str:
-        return f"{self.name} - {self.university}"
+        try:
+            return f"{self.name} - {self.university}"
+        except (Course.DoesNotExist, University.DoesNotExist):
+            return f"{self.name} ({self.pk})"
 
 
 class BaseTag(CustomBaseModel):
@@ -781,23 +805,30 @@ class Post(CustomBaseModel):
 
     @override
     def __str__(self) -> str:
-        return f"Post by {self.student_type} for {self.module}"
+        try:
+            return f"Post by {self.student_type} for {self.module}"
+        except (self.module.DoesNotExist, Course.DoesNotExist, University.DoesNotExist):
+            return f"Post #{self.pk}"
 
     @classmethod
     def filter_by_tags(cls, names: Iterable[str]) -> Manager["Post"]:
+        """
+        Retrieve all posts by a list of tag names.
+
+        Searches for tag names within the ToolTag, TopicTag & OtherTag models.
+        """
         return PostFilteredByTagManager(tag_names=names, model=cls)
 
     @property
     def is_user_suspicious(self) -> bool:
-        unsolved_reports_count = 0
+        """Flag for whether the given user has suspicious activity associated with them."""
+        unsolved_reports_count: int = 0
 
         # Iterate over posts made by the user
+        post: Post
         for post in self.user.made_post_set.all():
-            # Count unsolved reports for each post
-            unsolved_reports_for_post = post.report_set.filter(is_solved=False).count()
-
             # Increment the total count of unsolved reports
-            unsolved_reports_count += unsolved_reports_for_post
+            unsolved_reports_count += post.report_set.filter(is_solved=False).count()
 
             # Break the loop if the count reaches or exceeds three
             if unsolved_reports_count >= 3:
@@ -869,4 +900,7 @@ class Report(CustomBaseModel):
 
     @override
     def __str__(self) -> str:
-        return f"Report by {self.reporter} for {self.reason} on post {self.post}"
+        try:
+            return f"Report by {self.reporter} for {self.reason} on post {self.post}"
+        except self.reporter.DoesNotExist:
+            return f"Report #{self.pk} for {self.reason} on post {self.post}"
