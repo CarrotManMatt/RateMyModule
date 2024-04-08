@@ -402,3 +402,56 @@ class UserSettingsView(LoginRequiredMixin, TemplateView):
 
     template_name = "ratemymodule/user-settings.html"
     http_method_names = ("get",)
+
+
+class LikeDislikePostView(View):
+    """View to handle like/dislike of posts"""
+
+    http_method_names = ("post", "get",)
+
+    def post(self, request, *args, **kwargs):
+        post_id = request.POST.get('post_id')
+        action = request.POST.get('action')
+
+        if post_id and action in ["like", "dislike"]:
+            try:
+                post = Post.objects.get(pk=post_id)
+                if request.user.is_authenticated:
+                    # Check if the user has already liked or disliked the post
+                    if post.liked_user_set.filter(pk=request.user.pk).exists() and action == "like":
+                        # User already liked the post, no action needed
+                        return JsonResponse({'message': 'User already liked the post'}, status=200)
+                    elif post.disliked_user_set.filter(pk=request.user.pk).exists() and action == "dislike":
+                        # User already disliked the post, no action needed
+                        return JsonResponse({'message': 'User already disliked the post'}, status=200)
+
+                    # Remove user from opposite set if present
+                    if action == "like":
+                        post.disliked_user_set.remove(request.user)
+                        post.liked_user_set.add(request.user)
+                    elif action == "dislike":
+                        post.liked_user_set.remove(request.user)
+                        post.disliked_user_set.add(request.user)
+
+                    post.save()
+                    return JsonResponse({'message': 'Action performed successfully'}, status=200)
+                else:
+                    return JsonResponse({'error': 'User Not Authenticated'}, status=400)
+            except Post.DoesNotExist:
+                return JsonResponse({'error': 'Post does not exist'}, status=404)
+        else:
+            return JsonResponse({'error': 'Invalid Post ID or Action provided'}, status=400)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user.is_authenticated:
+            liked_post_ids = list(user.liked_post_set.values_list('pk', flat=True))
+            disliked_post_ids = list(user.disliked_post_set.values_list('pk', flat=True))
+
+            data = {
+                'liked_posts': liked_post_ids,
+                'disliked_posts': disliked_post_ids
+            }
+            return JsonResponse(data)
+        else:
+            return JsonResponse({'error': 'User Not Authenticated'})

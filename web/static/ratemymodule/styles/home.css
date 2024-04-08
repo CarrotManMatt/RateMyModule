@@ -205,6 +205,28 @@
     margin-top: 10px; /* Space between items and content */
 }
 
+.post-like-rating-arrow {
+    stroke: var(--text-color);
+}
+
+.post-like-rating-arrow:hover {
+    cursor: pointer;
+    stroke: #7F4FD9;
+    fill: #C7A9FF;
+}
+
+.post-like-rating-arrow-clicked{
+    cursor: pointer;
+    stroke: #7F4FD9;
+    fill: #C7A9FF;
+}
+
+
+
+.post-like-rating-counter {
+    margin: 0 3px;
+}
+
 .open-modal-button {
     position: absolute;
     top: 15px; /* Adjust according to your layout */

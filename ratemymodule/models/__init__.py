@@ -768,6 +768,11 @@ class Post(CustomBaseModel):
         """The number of dislikes this post has."""
         return self.disliked_user_set.count()
 
+    @property
+    def overall_likes_count(self) -> int:
+        """The overall number of Likes this post has."""
+        return self.likes_count - self.dislikes_count
+
     # Methods to handle post liking and unliking logic
     def user_like(self, user: User) -> None:
         """Like this post, for a given user, ensuring it's not disliked at the same time."""

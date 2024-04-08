@@ -18,6 +18,7 @@ from web.views import (
     SignupView,
     SubmitPostView,
     UserSettingsView,
+    LikeDislikePostView,
     TopicTagAutocompleteView,
     ToolTagAutocompleteView,
     OtherTagAutocompleteView,
@@ -49,6 +50,7 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path('autocomplete/other_tags',
                      OtherTagAutocompleteView.as_view(),
                      name='autocomplete_other_tags'),
+    django.urls.path(r"like-dislike-post/", LikeDislikePostView.as_view(), name="like-dislike-post"),
 ]
 
 favicon_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
