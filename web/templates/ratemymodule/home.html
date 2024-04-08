@@ -177,7 +177,7 @@
 {{ block.super }}
 <div class="modal" id="report-modal">
   <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
+    <button class="close" onclick="closeModal()">&times;</button>
     <h2>Select an Option</h2>
     <div class="options">
       <button onclick="selectOption('Hate Speech of Language')">Hate Speech or Language</button>
@@ -194,7 +194,7 @@
 
 <div class="modal confirmation-modal" id="confirmation-modal">
   <div class="modal-content confirmation-modal-content">
-    <span class="close" onclick="closeConfirmationModal()">&times;</span>
+    <button class="close" onclick="closeConfirmationModal()">&times;</button>
     <h2>You are reporting this post for:</h2>
     <h3 id="selectedOptionText"></h3>
     <p>We will review your report as soon as possible and take appropriate action if we believe this has broken our community guidelines</p>
