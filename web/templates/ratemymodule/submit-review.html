@@ -24,7 +24,8 @@
                     {% endfor %}
                 </select>
                 <label for="academicYearSelect">Year:</label>
-                <select id="academicYearSelect" name="academic_year_start" required>
+                <select id="academicYearSelect" name="academic_year_start"
+                        required>
                     <option value="" disabled selected>Select academic
                         year...
                     </option>
@@ -34,48 +35,59 @@
                 </select>
             </div>
             {{ form.content }}
-            <div class="rating-container">
-                <label>Star Rating:</label>
+            <div class="rating-container" aria-labelledby="overallRatingLabel">
+                <label id="overallRatingLabel">Overall Rating:</label>
                 <div class="rating">
                     {% for value, star in form.overall_rating.field.choices reversed %}
                         <input type="radio" id="star{{ value }}"
                                name="{{ form.overall_rating.html_name }}"
-                               value="{{ value }}">
+                               value="{{ value }}"
+                               aria-label="Overall Rating {{ value }}">
                         <label for="star{{ value }}"></label>
                     {% endfor %}
                 </div>
             </div>
 
             <div class="sliders-container">
-                <div class="rating-container small-rating">
-                    <label>Difficulty:</label>
-                    <div class="rating">
+                <div class="rating-container small-rating"
+                     aria-labelledby="difficultyRatingLabel">
+                    <label id="difficultyRatingLabel">Difficulty:</label>
+                    <div class="rating" role="radiogroup"
+                         aria-labelledby="difficultyRatingLabel">
                         {% for value, star in form.difficulty_rating.field.choices reversed %}
                             <input type="radio" id="difficulty_star{{ value }}"
                                    name="{{ form.difficulty_rating.html_name }}"
-                                   value="{{ value }}">
+                                   value="{{ value }}" tabindex="0"
+                                   aria-label="Difficulty Rating {{ value }}">
                             <label for="difficulty_star{{ value }}"></label>
                         {% endfor %}
                     </div>
                 </div>
-                <div class="rating-container small-rating">
-                    <label>Teaching Quality:</label>
-                    <div class="rating">
+                <div class="rating-container small-rating"
+                     aria-labelledby="teachingQualityLabel">
+                    <label id="teachingQualityLabel">Teaching Quality:</label>
+                    <div class="rating" role="radiogroup"
+                         aria-labelledby="teachingQualityLabel">
                         {% for value, star in form.teaching_rating.field.choices reversed %}
                             <input type="radio" id="teaching_star{{ value }}"
                                    name="{{ form.teaching_rating.html_name }}"
-                                   value="{{ value }}">
+                                   value="{{ value }}" tabindex="0"
+                                   aria-label="Teaching Quality Rating {{ value }}">
                             <label for="teaching_star{{ value }}"></label>
                         {% endfor %}
                     </div>
                 </div>
-                <div class="rating-container small-rating">
-                    <label>Assessment Quality:</label>
-                    <div class="rating">
+                <div class="rating-container small-rating"
+                     aria-labelledby="assessmentQualityLabel">
+                    <label id="assessmentQualityLabel">Assessment
+                        Quality:</label>
+                    <div class="rating" role="radiogroup"
+                         aria-labelledby="assessmentQualityLabel">
                         {% for value, star in form.assessment_rating.field.choices reversed %}
                             <input type="radio" id="assessment_star{{ value }}"
                                    name="{{ form.assessment_rating.html_name }}"
-                                   value="{{ value }}">
+                                   value="{{ value }}" tabindex="0"
+                                   aria-label="Assessment Quality Rating {{ value }}">
                             <label for="assessment_star{{ value }}"></label>
                         {% endfor %}
                     </div>
@@ -83,33 +95,99 @@
             </div>
 
 
-
             <div class="tags-container">
-                <div class="tag-input-container">
-                    <label for="id_tool_tags">Tools Used:</label>
-                    {{ form.tool_tags }}
+                <div class="tag-input-container" data-tag-type="tool_tags">
+                    <label for="tool_tags_autocomplete">Tools Used:</label>
+                    <input type="text" id="tool_tags_autocomplete"
+                           autocomplete="off" aria-label="Tools Used">
+                    <input type="hidden" name="tool_tags" id="id_tool_tags">
+                    <div class="selected-tags-container"></div>
                 </div>
 
-                <div class="tag-input-container">
-                    <label for="id_topic_tags">Main Topics:</label>
-                    {{ form.topic_tags }}
+                <div class="tag-input-container" data-tag-type="topic_tags">
+                    <label for="topic_tags_autocomplete">Main Topics:</label>
+                    <input type="text" id="topic_tags_autocomplete"
+                           autocomplete="off" aria-label="Main Topics">
+                    <input type="hidden" name="topic_tags" id="id_topic_tags">
+                    <div class="selected-tags-container"></div>
                 </div>
 
-                <div class="tag-input-container">
-                    <label for="id_other_tags">Other Tags:</label>
-                    {{ form.other_tags }}
+                <div class="tag-input-container" data-tag-type="other_tags">
+                    <label for="other_tags_autocomplete">Other Tags:</label>
+                    <input type="text" id="other_tags_autocomplete"
+                           autocomplete="off" aria-label="Other Tags">
+                    <input type="hidden" name="other_tags" id="id_other_tags">
+                    <div class="selected-tags-container"></div>
                 </div>
             </div>
 
-
-            {% if form.errors %}
-                <div class="form-errors">
-                    Please correct the following errors:
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
-
-            <button type="submit">Submit Review</button>
+            <button type="submit" aria-label="Submit Review">Submit Review
+            </button>
         </form>
     </div>
+
+    {% if form.non_field_errors or form.errors %}
+        <div class="form-errors-container" aria-live="assertive">
+            <strong>Please correct the following errors:</strong>
+            <!-- Display non-field errors -->
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            <!-- Display field-specific errors -->
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p><strong>{{ field.label }}:</strong> {{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{#    <div id="disclaimerModal" class="disclaimer-modal"#}
+{#         aria-labelledby="disclaimerTitle" aria-modal="true" role="dialog">#}
+{#        <div class="disclaimer-modal-content">#}
+{#            <span class="disclaimer-close" aria-label="Close disclaimer">&times;</span>#}
+{#            <p id="disclaimerTitle">We currently only accept submissions in <b>English</b>#}
+{#                and hope to expand to other languages soon.</p>#}
+{#        </div>#}
+{#    </div>#}
+
 {% endblock %}
+
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'ratemymodule/scripts/autocomplete-tags.js' %}"></script>
+    <script>
+        document.querySelectorAll('.rating input[type="radio"]').forEach(radio => {
+            radio.addEventListener('focus', function () {
+                this.nextElementSibling.classList.add('focus');
+            });
+            radio.addEventListener('blur', function () {
+                this.nextElementSibling.classList.remove('focus');
+            });
+        });
+
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var disclaimerModal = document.getElementById('disclaimerModal');
+            var closeButton = document.getElementsByClassName('disclaimer-close')[0];
+
+            closeButton.onclick = function () {
+                disclaimerModal.style.display = 'none';
+            }
+
+            window.onclick = function (event) {
+                if (event.target == disclaimerModal) {
+                    disclaimerModal.style.display = 'none';
+                }
+            }
+
+            setTimeout(function () {
+                disclaimerModal.style.display = 'none';
+            }, 5000);
+
+            disclaimerModal.style.display = 'block';
+        });
+    </script>
+{% endblock scripts %}

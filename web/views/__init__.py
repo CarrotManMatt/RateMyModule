@@ -22,15 +22,17 @@ from allauth.account.views import LogoutView as AllAuthLogoutView
 from allauth.account.views import SignupView as AllAuthSignupView
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, QueryDict
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, \
+    QueryDict, JsonResponse
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, View
 
 from django.db.models import Count, Q
 
-from ratemymodule.models import Module, Post, University, User
+from ratemymodule.models import Module, Post, University, User, TopicTag, \
+    ToolTag, OtherTag
 from web.forms import PostForm, SignupForm
 from web.views import graph_utils
 
@@ -48,7 +50,8 @@ class LoginView(AllAuthLoginView):  # type: ignore[misc,no-any-unimported]
     prefix = "login"
 
     @override
-    def form_invalid(self, form: LoginForm) -> HttpResponseRedirect:  # type: ignore[misc,no-any-unimported]
+    def form_invalid(self,
+                     form: LoginForm) -> HttpResponseRedirect:  # type: ignore[misc,no-any-unimported]
         if "login_form" in self.request.session:
             self.request.session.pop("login_form")
 
@@ -66,7 +69,8 @@ class SignupView(AllAuthSignupView):  # type: ignore[misc,no-any-unimported]
     prefix = "signup"
 
     @override
-    def form_invalid(self, form: SignupForm) -> HttpResponseRedirect:  # type: ignore[misc]
+    def form_invalid(self,
+                     form: SignupForm) -> HttpResponseRedirect:  # type: ignore[misc]
         if "signup_form" in self.request.session:
             self.request.session.pop("signup_form")
 
@@ -85,14 +89,16 @@ class HomeView(TemplateView):
     http_method_names = ("get",)
 
     @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: object,
+            **kwargs: object) -> HttpResponse:
         # noinspection PyArgumentList
         signup_action: str | None = self.request.GET.get("action")
         if signup_action == "signup":
             # noinspection PyArgumentList
             signup_get_params: QueryDict = self.request.GET.copy()
             signup_get_params["action"] = "login"
-            return redirect(f"{self.request.path}?{signup_get_params.urlencode()}")
+            return redirect(
+                f"{self.request.path}?{signup_get_params.urlencode()}")
 
         # noinspection PyArgumentList
         module_code: str | None = self.request.GET.get("module")
@@ -100,7 +106,8 @@ class HomeView(TemplateView):
             university: University = (
                 self.request.user.university
                 if self.request.user.is_authenticated and self.request.user.university
-                else University.objects.get(name="The University of Birmingham")
+                else University.objects.get(
+                    name="The University of Birmingham")
             )
             if university.module_set.exists():
                 get_params: QueryDict = QueryDict(mutable=True)
@@ -116,7 +123,8 @@ class HomeView(TemplateView):
         return super().get(request, *args, **kwargs)
 
     # noinspection PyMethodMayBeStatic
-    def _get_graphs_context_data(self, context_data: dict[str, object]) -> dict[str, object]:
+    def _get_graphs_context_data(self, context_data: dict[str, object]) -> \
+            dict[str, object]:
         if not Post.objects.exists():
             return {
                 **context_data,
@@ -128,7 +136,8 @@ class HomeView(TemplateView):
 
         try:
             # noinspection PyTypeChecker
-            module: Module = Module.objects.get(code=unquote_plus(self.request.GET["module"]))
+            module: Module = Module.objects.get(
+                code=unquote_plus(self.request.GET["module"]))
         except Module.DoesNotExist:
             return {**context_data, "error": _("Error: Module Not Found")}
 
@@ -197,10 +206,12 @@ class HomeView(TemplateView):
             ),
         }
 
-    def _get_post_list_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
+    def _get_post_list_context_data(self, context_data: dict[str, object]) -> \
+            dict[str, object]:  # noqa: E501
         try:
             # noinspection PyTypeChecker
-            module: Module = Module.objects.get(code=unquote_plus(self.request.GET["module"]))
+            module: Module = Module.objects.get(
+                code=unquote_plus(self.request.GET["module"]))
         except Module.DoesNotExist:
             return {**context_data, "error": _("Error: Module Not Found")}
 
@@ -217,15 +228,18 @@ class HomeView(TemplateView):
         # noinspection PyArgumentList
         raw_search_string: str | None = self.request.GET.get("q")
         if raw_search_string:
-            post_set = post_set.filter(content__icontains=unquote_plus(raw_search_string))
+            post_set = post_set.filter(
+                content__icontains=unquote_plus(raw_search_string))
 
         # noinspection PyArgumentList
         raw_rating: str | None = self.request.GET.get("rating")
         if raw_rating:
             try:
-                rating: Post.Ratings = Post.Ratings(int(unquote_plus(raw_rating)))
+                rating: Post.Ratings = Post.Ratings(
+                    int(unquote_plus(raw_rating)))
             except ValueError:
-                return {**context_data, "error": _("Error: Incorrect rating value")}
+                return {**context_data,
+                        "error": _("Error: Incorrect rating value")}
 
             post_set = post_set.filter(overall_rating=rating)
 
@@ -235,13 +249,15 @@ class HomeView(TemplateView):
             try:
                 year: int = int(unquote_plus(raw_year))
             except ValueError:
-                return {**context_data, "error": _("Error: Incorrect rating value")}
+                return {**context_data,
+                        "error": _("Error: Incorrect rating value")}
 
             post_set = post_set.filter(academic_year_start=year)
 
         return {**context_data, "post_list": post_set}
 
-    def _get_login_forms_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
+    def _get_login_forms_context_data(self, context_data: dict[str, object]) -> \
+            dict[str, object]:  # noqa: E501
         if "login_form" not in context_data:
             if "login_form" not in self.request.session:
                 context_data["login_form"] = LoginForm(prefix="login")
@@ -283,7 +299,8 @@ class HomeView(TemplateView):
             (
                 self.request.user.university
                 if self.request.user.is_authenticated and self.request.user.university
-                else University.objects.get(name="The University of Birmingham")
+                else University.objects.get(
+                    name="The University of Birmingham")
             ).course_set.prefetch_related("module_set").all()
         )
 
@@ -305,14 +322,39 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
     model = Post
     http_method_names = ("get", "post")
 
+    @override
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if 'data' in kwargs:
+            data = kwargs['data'].copy()
+            for field in ('tool_tags', 'topic_tags', 'other_tags'):
+                if field in data and data[field]:
+                    data.setlist(field, data[field].split(','))
+            kwargs['data'] = data
+        return kwargs
+
     # noinspection PyOverrides
     @override
-    def form_valid(self, form: PostForm) -> HttpResponse:
-        obj = form.save(commit=False)
-        if not User.objects.exists():
-            raise User.DoesNotExist
-        obj.user = User.objects.all()[0]
-        return super().form_valid(form)
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+
+        # Associate tags with the post
+        tag_fields = {
+            'tool_tags': self.object.tool_tag_set,
+            'topic_tags': self.object.topic_tag_set,
+            'other_tags': self.object.other_tag_set,
+        }
+
+        for field, related_manager in tag_fields.items():
+            tag_ids = form.cleaned_data.get(field)
+            if tag_ids:
+                related_manager.set(
+                    tag_ids)
+
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     # noinspection PyOverrides
     @override
@@ -323,6 +365,36 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
             self.form_class.ACADEMIC_YEAR_CHOICES
         )
         return context
+
+
+class TopicTagAutocompleteView(View):
+    def get(self, request):
+        if 'term' in request.GET:
+            term = request.GET['term']
+            tags = TopicTag.objects.filter(name__icontains=term).values('id',
+                                                                        'name')
+            return JsonResponse(list(tags), safe=False)
+        return JsonResponse([], safe=False)
+
+
+class ToolTagAutocompleteView(View):
+    def get(self, request):
+        if 'term' in request.GET:
+            term = request.GET['term']
+            tags = ToolTag.objects.filter(name__icontains=term).values('id',
+                                                                       'name')
+            return JsonResponse(list(tags), safe=False)
+        return JsonResponse([], safe=False)
+
+
+class OtherTagAutocompleteView(View):
+    def get(self, request):
+        if 'term' in request.GET:
+            term = request.GET['term']
+            tags = OtherTag.objects.filter(name__icontains=term).values('id',
+                                                                        'name')
+            return JsonResponse(list(tags), safe=False)
+        return JsonResponse([], safe=False)
 
 
 class UserSettingsView(LoginRequiredMixin, TemplateView):

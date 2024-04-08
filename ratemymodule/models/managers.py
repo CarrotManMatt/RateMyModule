@@ -120,7 +120,7 @@ class PostFilteredByTagManager(Manager["Post"]):
     """
     Manager class to create & retrieve instances of the `Post` model.
 
-    Post objects are selected by whether they have one of the given tags.
+    Post-objects are selected by whether they have one of the given tags.
     """
 
     @override

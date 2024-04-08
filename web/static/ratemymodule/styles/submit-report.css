@@ -19,6 +19,7 @@
     border-radius: 1vw; /* Use relative units for border-radius */
     width: 40vw; /* Use relative units for width */
     font-size: 1vw;
+    align-content: center;
 }
 
 .close {

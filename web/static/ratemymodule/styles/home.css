@@ -197,6 +197,7 @@
     color: white;
 }
 
+
 .contents {
     font-size: 14px;
     font-family: 'Source Sans Pro', sans-serif;
@@ -247,20 +248,19 @@
 
 /* Adjust the following styles as needed for the flag and SVG container */
 .svg-container {
-    width: 15px; /* Set the desired width for the SVG container */
-    height: 15px; /* Set the desired height for the SVG container */
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 2px;
+}
+
+.flag-container {
     display: flex; /* Center content horizontally */
     align-items: center; /* Center content vertically */
     justify-content: center; /* Center content horizontally */
 }
-
-.flag {
-    /* Add any necessary styles for the flag SVG */
-    width: 100%; /* Make the SVG fill the available width */
-    height: auto; /* Maintain aspect ratio */
-}
-
-
 
 .right-sidebar-lower-content {
     padding: 15px;
