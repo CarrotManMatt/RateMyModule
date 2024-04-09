@@ -360,7 +360,14 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
     @override
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context = super().get_context_data(**kwargs)
-        context["module_choices"] = Module.objects.all()
+
+        # Fetch the current user's enrolled courses
+        user_enrolled_courses = self.request.user.enrolled_course_set.all()
+
+        # Fetch modules for the user's enrolled courses
+        user_module_choices = Module.objects.filter(course_set__in=user_enrolled_courses).distinct()
+
+        context["module_choices"] = user_module_choices
         context["academic_year_choices"] = (
             self.form_class.ACADEMIC_YEAR_CHOICES
         )
