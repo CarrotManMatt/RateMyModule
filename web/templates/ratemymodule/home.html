@@ -213,6 +213,22 @@
 {% block right_sidebar_lower %}
     <div class="right-sidebar-lower-content">
         {# Content for lower part of the right sidebar #}
+        <style> {# TODO: put styling in css, where it currently doesnt work #}
+            .analytics-button {
+                display: inline-block;
+                text-decoration: none;
+                padding: 10px 10px;
+                background-color: var(--button-color);
+                color: white;
+                border-radius: 8px;
+                transition: background-color 0.3s;
+                text-align: center;
+                cursor: pointer;
+            }
+        </style>
+        <button class="analytics-button" id="advanced-analytics" onclick="openAAModal()">Advanced Analytics</button>
+
+        {# sidebar graphs #}
         <div class="graphs">
             {{ overall_rating_bar_graph }}
             {{ difficulty_bar_graph }}
@@ -224,6 +240,49 @@
 
 {% block modals %}
     {{ block.super }}
+{#  advanced analytics graph modal#}
+    <div class="modal" id="analytics-modal" >
+        <div class="modal-content">
+            <span class="close" onclick="closeAAModal()" tabindex="0" role="button" id="aa-close">
+                X
+            </span>
+            <h2> Advanced Analytics</h2>
+            <div id="aa-graph-div">
+            {{ advanced_analytics_graph }}
+            </div>
+            <form method="get" action={% url 'ratemymodule:home' %}>
+                <table class="analytics-table">
+                    <tr>
+                        <td>{{ analytics_form.overall_rating }}</td>
+                        <td class="analytics-form-text"> Overall Rating</td>
+                        <td class="analytics-form-text">&emsp;&emsp;Start Year:</td>
+                        <td>{{ analytics_form.start_year }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ analytics_form.difficulty_rating }} </td>
+                        <td class="analytics-form-text">Difficulty Rating</td>
+                    </tr>
+                    <tr>
+                        <td>{{ analytics_form.teaching_quality }}</td>
+                        <td class="analytics-form-text">Teaching Quality</td>
+                        <td class="analytics-form-text">&emsp;&emsp;End Year:</td>
+                        <td>{{ analytics_form.end_year }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ analytics_form.assessment_quality }}</td>
+                        <td class="analytics-form-text">Assessment Quality</td>
+                    </tr>
+                    <input type="hidden" name="module" value="{{ module_code|urlencode }}">
+                    <input type="hidden" name="action" value="generate_graph">
+                </table>
+               <button class="analytics-button">
+                   <input class="analytics-button-text" type="submit" value="Submit">
+               </button>
+            </form>
+
+        </div>
+    </div>
+
     <div class="modal" id="report-modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -253,23 +312,6 @@
             </button>
         </div>
     </div>
-{{ block.super }}
-<div class="modal" id="report-modal">
-  <div class="modal-content">
-    <button class="close" onclick="closeModal()">&times;</button>
-    <h2>Select an Option</h2>
-    <div class="options">
-      <button onclick="selectOption('Hate Speech of Language')">Hate Speech or Language</button>
-      <button onclick="selectOption('Identifying Information')">Identifying Information</button>
-      <button onclick="selectOption('Assignment Answers')">Assignment Answers</button>
-      <button onclick="selectOption('Spam')">Spam</button>
-      <button onclick="selectOption('Bullying or Harassment')">Bullying or Harassment</button>
-      <button onclick="selectOption('False Information')">False Information</button>
-      <button onclick="selectOption('Sexual Content')">Sexual Content</button>
-    </div>
-    <button class="cancel-button" onclick="closeModal()">Cancel</button>
-  </div>
-</div>
 
     <div class="modal confirmation-modal" id="confirmation-modal">
         <div class="modal-content confirmation-modal-content">
@@ -287,24 +329,50 @@
             </button>
         </div>
     </div>
-<div class="modal confirmation-modal" id="confirmation-modal">
-  <div class="modal-content confirmation-modal-content">
-    <button class="close" onclick="closeConfirmationModal()">&times;</button>
-    <h2>You are reporting this post for:</h2>
-    <h3 id="selectedOptionText"></h3>
-    <p>We will review your report as soon as possible and take appropriate action if we believe this has broken our community guidelines</p>
-    <button class="confirm-button" onclick="confirmSelection()">Confirm Report</button>
-    <button class="cancel-button" onclick="cancelConfirmation()">Back</button>
-  </div>
-</div>
 {% endblock modals %}
 
 {% block scripts %}
 {{ block.super }}
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("confirmation-modal").style.display = "none";
+        document.addEventListener("DOMContentLoaded", function() {
+              document.getElementById("confirmation-modal").style.display = "none";
+              if(document.getElementById("aa-graph-div").innerText.trim()){
+                  openAAModal()
+              }
         });
+
+        {# when trying to put letters in AA year boxes, removes them #}
+        document.addEventListener("DOMContentLoaded", function() {
+            const startYearInput = document.getElementById("id_start_year");
+            startYearInput.addEventListener("input", function() {
+                this.value = this.value.replace(/\D/g, "");
+            });
+            const endYearInput = document.getElementById("id_end_year");
+            endYearInput.addEventListener("input", function() {
+                this.value = this.value.replace(/\D/g, "");
+            });
+        });
+
+        document.getElementById("aa-close").addEventListener("keydown", function(event){
+            if(event.key === "Enter"){
+                closeAAModal()
+            }
+        });
+
+        {# closes the advanced analytics modal on esc pressed, could make this close all modals #}
+        document.addEventListener("keydown", function(event) {
+          if (event.key === "Escape") {
+            closeAAModal();
+          }
+        });
+
+        function openAAModal() {  {# opens the advanced analytics modal #}
+          document.getElementById("analytics-modal").style.display = "block";
+        }
+
+        function closeAAModal() {   {# closes the advanced analytics modal #}
+            document.getElementById("analytics-modal").style.display = "none";
+        }
 
         function openModal() {
             document.getElementById("report-modal").style.display = "block";

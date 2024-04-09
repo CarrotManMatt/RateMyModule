@@ -22,6 +22,7 @@ from allauth.account.views import LogoutView as AllAuthLogoutView
 from allauth.account.views import SignupView as AllAuthSignupView
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count, Q
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, \
     QueryDict, JsonResponse
 from django.shortcuts import redirect
@@ -29,11 +30,9 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, TemplateView, View
 
-from django.db.models import Count, Q
-
 from ratemymodule.models import Module, Post, University, User, TopicTag, \
     ToolTag, OtherTag
-from web.forms import PostForm, SignupForm
+from web.forms import AnalyticsForm, PostForm, SignupForm
 from web.views import graph_utils
 
 if TYPE_CHECKING:
@@ -134,12 +133,13 @@ class HomeView(TemplateView):
                 "assessment_graph": "",
             }
 
-        try:
-            # noinspection PyTypeChecker
-            module: Module = Module.objects.get(
-                code=unquote_plus(self.request.GET["module"]))
-        except Module.DoesNotExist:
-            return {**context_data, "error": _("Error: Module Not Found")}
+        if self.request.method == "GET":
+            try:
+                # noinspection PyTypeChecker
+                module: Module = Module.objects.get(
+                    code=unquote_plus(self.request.GET["module"]))
+            except Module.DoesNotExist:
+                return {**context_data, "error": _("Error: Module Not Found")}
 
         # noinspection SpellCheckingInspection
         return {
@@ -204,6 +204,8 @@ class HomeView(TemplateView):
                     ),
                 )  # noqa: COM812
             ),
+            "module_name": module.__getattribute__("name"),
+            "module_code": module.__getattribute__("code"),
         }
 
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> \
@@ -255,6 +257,42 @@ class HomeView(TemplateView):
             post_set = post_set.filter(academic_year_start=year)
 
         return {**context_data, "post_list": post_set}
+
+    def _get_advanced_analytics_form_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
+
+        if "analytics_form" not in context_data:
+            action: str | None = self.request.GET.get("action")
+
+            if action != "generate_graph":
+                context_data["analytics_form"] = AnalyticsForm()
+            else:
+                context_data["analytics_form"] = AnalyticsForm()
+
+                context_data["advanced_analytics_graph"] = mark_safe(  # noqa: S308
+                    re.sub("#000002", "var(--button-hover)",  # defines colour of border of legend box
+                        re.sub("#000001", "var(--secondary-color)",  # defines color of legend box
+                            re.sub("#aaaaaa", "var(--text-color)",
+                                graph_utils.advanced_analytics_graph(
+                                module=Module.objects.get(
+                                    code=unquote_plus(self.request.GET.get("module"))
+                                ),
+                                difficulty_rating=graph_utils.is_on(
+                                    self.request.GET.get("difficulty_rating")),
+                                teaching_rating=graph_utils.is_on(
+                                    self.request.GET.get("teaching_quality")),
+                                assessment_quality=graph_utils.is_on(
+                                    self.request.GET.get("assessment_quality")),
+                                overall_rating=graph_utils.is_on(
+                                    self.request.GET.get("overall_rating")),
+                                start_year=int(self.request.GET.get("start_year")),
+                                end_year=int(self.request.GET.get("end_year")),
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+
+        return context_data
 
     def _get_login_forms_context_data(self, context_data: dict[str, object]) -> \
             dict[str, object]:  # noqa: E501
@@ -309,6 +347,7 @@ class HomeView(TemplateView):
         context_data = self._get_graphs_context_data(context_data)
         context_data = self._get_post_list_context_data(context_data)
         context_data = self._get_login_forms_context_data(context_data)
+        context_data = self._get_advanced_analytics_form_context_data(context_data)
 
         return context_data  # noqa: RET504
 

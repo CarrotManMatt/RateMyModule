@@ -147,3 +147,34 @@ class SignupForm(AllAuthSignupForm): # type: ignore[misc,no-any-unimported]
             ]
 
         return self.cleaned_data  # type: ignore[no-any-return]
+
+
+class AnalyticsForm(forms.Form):
+    """get the data to make the advanced analytics graph."""
+
+    difficulty_rating = forms.BooleanField(
+        label="Difficulty Rating?",
+        required=False,
+    )
+    overall_rating = forms.BooleanField(
+        label="Overall Rating?",
+        required=False,
+    )
+    teaching_quality = forms.BooleanField(
+        label="Teaching Quality?",
+        required=False,
+    )
+    assessment_quality = forms.BooleanField(
+        label="Assessment Quality?",
+        required=False,
+    )
+    start_year = forms.IntegerField(
+        label="From year?",
+        widget=forms.TextInput(),
+    )
+    start_year.widget.attrs.update({"class": "year-input-box", "type": "text"})
+    end_year = forms.IntegerField(
+        label="To year?",
+        widget=forms.TextInput(),
+    )
+    end_year.widget.attrs.update({"class": "year-input-box", "type": "text"})

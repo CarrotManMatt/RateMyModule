@@ -1,4 +1,5 @@
 """Contains a selection of graph generating functions."""
+import datetime
 from collections.abc import Sequence
 
 __all__: Sequence[str] = (
@@ -8,6 +9,7 @@ __all__: Sequence[str] = (
     "overall_rating_bar_graph",
 )
 
+from calendar import monthrange
 from io import StringIO
 from math import ceil
 from typing import Final
@@ -55,6 +57,7 @@ def custom_line_graph(x__points: list[int], y__points: list[int], x_label: str, 
 def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str, _label_color: str) -> str:  # noqa: E501
     """Make a bar graph outputted to string svg."""
     label_color = _label_color
+    flag_nodata = False
 
     fig, ax = plt.subplots()
     rating_levels = [1, 2, 3, 4, 5]
@@ -64,33 +67,35 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
     for counter in range(5):
         total = total + array_of_in_ratings[counter]
 
-    if total == 0:
-        return ""
-
     array_of_ratings: list[float] = [0, 0, 0, 0, 0]
-    for counter in range(5):
-        array_of_ratings[counter] = 0.0025 + ((array_of_in_ratings[counter] / total) * 100)
-        # adds small offset to bars, so they don't become weird after curving ends
+    if total == 0:
+        flag_nodata = True
+
+    else:
+        for counter in range(5):
+            array_of_ratings[counter] = 0.0025 + ((array_of_in_ratings[counter] / total) * 100)
+            # adds small offset to bars, so they don't become weird after curving ends
 
     rects = ax.barh(rating_levels, array_of_ratings,
                     color=_bar_color, label=array_of_in_ratings  # noqa: COM812
                     )
 
     # make curved corners on bar ends
-    new_patches = []
-    for patch in reversed(ax.patches):
-        bb = patch.get_bbox()
-        color = patch.get_facecolor()
-        p_bbox = FancyBboxPatch((bb.xmin, bb.ymin), abs(bb.width),
-                                abs(bb.height),
-                                boxstyle="round,pad=-0.0080,rounding_size=0.1",
-                                ec="none", fc=color,
-                                mutation_aspect=4,
-                                )
-        patch.remove()
-        new_patches.append(p_bbox)
-    for patch in new_patches:
-        ax.add_patch(patch)
+    if not flag_nodata:
+        new_patches = []
+        for patch in reversed(ax.patches):
+            bb = patch.get_bbox()
+            color = patch.get_facecolor()
+            p_bbox = FancyBboxPatch((bb.xmin, bb.ymin), abs(bb.width),
+                                    abs(bb.height),
+                                    boxstyle="round,pad=-0.0080,rounding_size=0.1",
+                                    ec="none", fc=color,
+                                    mutation_aspect=4,
+                                    )
+            patch.remove()
+            new_patches.append(p_bbox)
+        for patch in new_patches:
+            ax.add_patch(patch)
 
     # remove frame lines
     ax.spines["top"].set_visible(False)
@@ -133,9 +138,17 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
         if out_of_bar_texts[counter] != "":
             out_of_bar_texts[counter] = array_of_bar_labels[counter]
 
+    if flag_nodata:
+        out_of_bar_texts[3] = "No posts = (\n be the first to \nRateThisModule!"
+
     ax.bar_label(rects, out_of_bar_texts, padding=5, color=label_color, fontweight="bold")
     # has white text on purple always
-    ax.bar_label(rects, inside_of_bar_texts, padding=-75, color="#f0f0f0", fontweight="bold")
+    if flag_nodata:
+        ax.bar_label(
+            rects, inside_of_bar_texts, padding=-75, color=label_color, fontweight="bold")
+    else:
+        ax.bar_label(
+            rects, inside_of_bar_texts, padding=-75, color="#f0f0f0", fontweight="bold")
 
     # recolour axis to taste
     ax.tick_params(axis="x", colors=label_color)
@@ -193,3 +206,147 @@ def assessment_quality_bar_graph(module: Module, button_colour: str, text_colour
     for counter in range(1, 6):
         data.insert(counter, len(module.post_set.filter(assessment_rating=counter)))
     return rating_bar_graph(data, title, bar_colour, label_colour)
+
+
+def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment_quality: bool, teaching_rating: bool, overall_rating: bool, start_year: int, end_year: int) -> str:  # noqa: E501, FBT001
+    """Plot a custom line graph for the analytics modal."""
+    # work out axis
+
+    # input sanitisation, no reviews before 1900, no invalid date settings, no massive ranges
+    if start_year > end_year:
+        return "Invalid year parameters, please check your inputs\n"
+    if start_year < 1900:
+        return "Earliest date option is 1900\n"
+    if end_year-start_year > 50:
+        return "Date range too large, try focusing your query\n"
+    end_year = end_year+1
+
+    months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    date_list: list[str] = []
+    guide_bar = [1]
+    i = 0
+    x_axis: list[int] =[]
+    for counter in range(start_year, end_year):
+        for counter2 in range(12):
+            date_list.append(str(months[counter2] + str(counter)))
+            guide_bar.append(None)
+            x_axis.append(i)
+            i += 1
+
+    guide_bar.pop(1)
+    guide_bar[len(guide_bar) - 1] = 1
+
+    label_color = "#aaaaaa"
+    fig, ax = plt.subplots(sharex=True, sharey=True)
+
+    ax.plot(x_axis, guide_bar, visible=False)
+    background_line_colour = "#888888"
+
+    if overall_rating:
+        ax.plot(get_module_averages(
+            start_year, end_year, module, "overall_rating"),
+            label="Overall Rating",
+        )
+
+    if difficulty_rating:
+        ax.plot(get_module_averages(
+            start_year, end_year, module, "difficulty_rating"),
+            label="Difficulty Rating",
+        )
+
+    if teaching_rating:
+        ax.plot(get_module_averages(
+            start_year, end_year, module, "teaching_rating"),
+            label="Teaching Quality",
+        )
+
+    if assessment_quality:
+        ax.plot(get_module_averages(
+            start_year, end_year, module, "assessment_rating"),
+            label="Assessment Quality",
+        )
+
+    y_pos = np.arange(start=1, stop=5.5, step=0.5)
+    rating_levels_ticks = [
+        "1★", "1.5★", "2★", "2.5★",
+        "3★", "3.5★", "4★", "4.5★", "5★"]
+    title = f"Graph of {module.name},\nfrom 1/1/{start_year} to 31/12/{end_year-1}"
+    ax.set_yticks(y_pos, labels=([""]*9))
+    ax.set_title(title, color=label_color, weight="bold", loc="left")
+    ax.margins(x=0)
+
+    for tick in ax.get_xticklabels():
+        tick.set_fontweight("bold")
+
+    ax.tick_params(axis="x", colors=label_color)
+    ax.set_ylim([0.5, 5.5])
+
+    y_value: float = 1
+    i = 0
+    ENDCAP: float = 5.5
+    while y_value != ENDCAP:
+        ax.axhline(y=y_value, color=background_line_colour, zorder=0, lw=0.5)
+        ax.text(-0.5, y_value, rating_levels_ticks[i],
+                ha="right", va="center", color=label_color, weight="bold")
+        y_value += 0.5
+        i += 1
+
+    if len(date_list) > 12:
+        length_of_dates = len(date_list)
+        x_ticks = [""] * length_of_dates
+
+        div = int(length_of_dates / 12)
+        divarray = np.arange(start=0, stop=len(date_list), step=div)
+
+        for value in divarray:
+            x_ticks[value] = date_list[value]
+
+        x_ticks[length_of_dates-2] = ""
+        x_ticks[length_of_dates-1] = date_list[length_of_dates-1]
+        ax.set_xticks(
+            np.arange(length_of_dates), labels=x_ticks, color=label_color,
+            rotation=-45, rotation_mode="anchor", horizontalalignment="left",
+            verticalalignment="center",
+        )
+
+    else:
+        ax.set_xticks(
+            np.arange(len(date_list)), labels=date_list, color=label_color, rotation=-45,
+            rotation_mode="anchor", horizontalalignment="left",
+            verticalalignment="center",
+        )
+    #legend processing
+    ax.legend(labelcolor="#aaaaaa", facecolor="#000001", edgecolor="#000002")
+
+    fig.set_size_inches(6.5, 4.35)
+    image_format = "svg"
+    out_string = StringIO()
+    fig.savefig(
+        out_string, format=image_format, transparent=True, bbox_inches="tight", dpi=80)
+    return out_string.getvalue()
+
+
+def get_module_averages(start_year: int, end_year: int, module: Module, attribute: str) -> list[float]:  # noqa: E501
+    set_of_averages: list[float] = []
+    for year in range(start_year, end_year):
+        for month in range(1, 13):
+            start_band = datetime.datetime(year, month, 1).astimezone(tz=None)
+            end_band = datetime.datetime(
+                year, month, monthrange(year, month)[1]).astimezone(tz=None)
+            # gets last day of the month, normalize to timezone
+
+            this_months_reviews = [getattr(post, attribute) for post in module.post_set.all()
+                                   if start_band <= post.date_time_created <= end_band]
+
+            if this_months_reviews:
+                set_of_averages.append(sum(this_months_reviews) / len(this_months_reviews))
+            else:
+                set_of_averages.append(0.55)
+    return set_of_averages
+
+
+def is_on(text) -> bool:
+    if text == "on":
+        return True
+    return False
