@@ -62,11 +62,8 @@ raw_log_level: str
 
 if env("PRODUCTION"):
     production_env: Env = EnvClass(  # type: ignore[no-any-unimported]
-        ALLOWED_HOSTS=(list, ["team55.bham.team", "team55.dev.bham.team", "ratemymodule"]),
-        CSRF_TRUSTED_ORIGINS=(
-            list,
-            ["https://team55.bham.team", "https://team55.dev.bham.team"]  # noqa: COM812
-        ),
+        ALLOWED_HOSTS=(list, []),
+        CSRF_TRUSTED_ORIGINS=(list, []),
         LOG_LEVEL=(str, "WARNING"),
     )
 
@@ -88,8 +85,6 @@ else:
                 "127.0.0.1",
                 "[::1]"
                 ".localhost",
-                "team55.dev.bham.team",
-                "ratemymodule",
             ]  # noqa: COM812
         ),
         CSRF_TRUSTED_ORIGINS=(
@@ -99,7 +94,6 @@ else:
                 "https://127.0.0.1",
                 "https://[::1]",
                 "https://.localhost",
-                "https://team55.dev.bham.team",
             ]  # noqa: COM812
         ),
         LOG_LEVEL=(str, "INFO"),
@@ -115,7 +109,7 @@ else:
     if DEBUG:
         debug_env: Env = EnvClass(  # type: ignore[no-any-unimported]
             EMAIL_TO_CONSOLE=(bool, True),
-            TEST_DATA_JSON_FILE_PATH=(str, None),
+            TEST_DATA_JSON_FILE_PATH=(str, ""),
         )
 
         if debug_env("EMAIL_TO_CONSOLE"):
@@ -133,7 +127,7 @@ else:
 
 # Environment Variables Validation
 
-if env("SECRET_KEY").strip().lower() == "[replace with your generated secret key]":
+if env("SECRET_KEY", cast=str).strip().lower() == "[replace with your generated secret key]":  # noqa: E501
     SECRET_KEY_NOT_SET_MESSAGE: Final[str] = (
         "Set the SECRET_KEY environment variable"
     )
@@ -159,7 +153,7 @@ if not env("ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS") > 0:
 REPLACE_OAUTH_GOOGLE_CLIENT_ID_MESSAGE: Final[str] = (
     "[replace with your Google OAuth client ID]"
 )
-if env("OAUTH_GOOGLE_CLIENT_ID").strip().lower() == REPLACE_OAUTH_GOOGLE_CLIENT_ID_MESSAGE:
+if env("OAUTH_GOOGLE_CLIENT_ID", cast=str).strip().lower() == REPLACE_OAUTH_GOOGLE_CLIENT_ID_MESSAGE:  # noqa: E501
     OAUTH_GOOGLE_CLIENT_ID_NOT_SET_MESSAGE: Final[str] = (
         "Set the OAUTH_GOOGLE_CLIENT_ID environment variable"
     )
@@ -168,7 +162,7 @@ if env("OAUTH_GOOGLE_CLIENT_ID").strip().lower() == REPLACE_OAUTH_GOOGLE_CLIENT_
 OAUTH_GOOGLE_CLIENT_ID_IS_VALID: Final[bool] = bool(
     re.match(
         r"\A[0-9]{12}-[0-9a-z]{32}\.apps\.googleusercontent\.com\Z",
-        env("OAUTH_GOOGLE_CLIENT_ID").strip(),
+        env("OAUTH_GOOGLE_CLIENT_ID", cast=str).strip(),
     )  # noqa: COM812
 )
 if not OAUTH_GOOGLE_CLIENT_ID_IS_VALID:
@@ -180,7 +174,7 @@ if not OAUTH_GOOGLE_CLIENT_ID_IS_VALID:
 REPLACE_OAUTH_MICROSOFT_CLIENT_ID_MESSAGE: Final[str] = (
     "[replace with your Microsoft OAuth client ID]"
 )
-if env("OAUTH_MICROSOFT_CLIENT_ID").strip().lower() == REPLACE_OAUTH_MICROSOFT_CLIENT_ID_MESSAGE:  # noqa: E501
+if env("OAUTH_MICROSOFT_CLIENT_ID", cast=str).strip().lower() == REPLACE_OAUTH_MICROSOFT_CLIENT_ID_MESSAGE:  # noqa: E501
     OAUTH_MICROSOFT_CLIENT_ID_NOT_SET_MESSAGE: Final[str] = (
         "Set the OAUTH_MICROSOFT_CLIENT_ID environment variable"
     )
@@ -189,7 +183,7 @@ if env("OAUTH_MICROSOFT_CLIENT_ID").strip().lower() == REPLACE_OAUTH_MICROSOFT_C
 OAUTH_MICROSOFT_CLIENT_ID_IS_VALID: Final[bool] = bool(
     re.match(
         r"\A[0-9a-z]{8}-[0-9]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}\Z",
-        env("OAUTH_MICROSOFT_CLIENT_ID").strip(),
+        env("OAUTH_MICROSOFT_CLIENT_ID", cast=str).strip(),
     )  # noqa: COM812
 )
 if not OAUTH_MICROSOFT_CLIENT_ID_IS_VALID:
@@ -198,12 +192,12 @@ if not OAUTH_MICROSOFT_CLIENT_ID_IS_VALID:
     )
     raise ImproperlyConfigured(INVALID_OAUTH_MICROSOFT_CLIENT_ID_MESSAGE)
 
-if env("OAUTH_GOOGLE_SECRET").strip().lower() == "[replace with your Google OAuth secret]":
+if env("OAUTH_GOOGLE_SECRET", cast=str).strip().lower() == "[replace with your Google OAuth secret]":  # noqa: E501
     OAUTH_GOOGLE_SECRET_NOT_SET_MESSAGE: Final[str] = (
         "Set the OAUTH_GOOGLE_SECRET environment variable"
     )
     raise ImproperlyConfigured(OAUTH_GOOGLE_SECRET_NOT_SET_MESSAGE)
-if not re.match(r"\A[A-Z]{6}-[0-9A-Za-z]{28}\Z", env("OAUTH_GOOGLE_SECRET").strip()):
+if not re.match(r"\A[A-Z]{6}-[0-9A-Za-z]{28}\Z", env("OAUTH_GOOGLE_SECRET", cast=str).strip()):  # noqa: E501
     INVALID_OAUTH_GOOGLE_SECRET_MESSAGE: Final[str] = (
         "OAUTH_GOOGLE_SECRET must be a valid Google OAuth secret."
     )
@@ -212,12 +206,12 @@ if not re.match(r"\A[A-Z]{6}-[0-9A-Za-z]{28}\Z", env("OAUTH_GOOGLE_SECRET").stri
 REPLACE_OAUTH_MICROSOFT_SECRET_MESSAGE: Final[str] = (
     "[replace with your Microsoft OAuth secret]"
 )
-if env("OAUTH_MICROSOFT_SECRET").strip().lower() == REPLACE_OAUTH_MICROSOFT_SECRET_MESSAGE:
+if env("OAUTH_MICROSOFT_SECRET", cast=str).strip().lower() == REPLACE_OAUTH_MICROSOFT_SECRET_MESSAGE:  # noqa: E501
     OAUTH_MICROSOFT_SECRET_NOT_SET_MESSAGE: Final[str] = (
         "Set the OAUTH_MICROSOFT_SECRET environment variable"
     )
     raise ImproperlyConfigured(OAUTH_MICROSOFT_SECRET_NOT_SET_MESSAGE)
-if not re.match(r"\A[0-9A-Za-z.~_-]{40}\Z", env("OAUTH_MICROSOFT_SECRET").strip()):
+if not re.match(r"\A[0-9A-Za-z.~_-]{40}\Z", env("OAUTH_MICROSOFT_SECRET", cast=str).strip()):  # noqa: E501
     INVALID_OAUTH_MICROSOFT_SECRET_MESSAGE: Final[str] = (
         "OAUTH_MICROSOFT_SECRET must be a valid Microsoft Graph OAuth secret."
     )
@@ -264,7 +258,7 @@ ROOT_URLCONF = "core.urls"
 # noinspection PyUnresolvedReferences
 STATIC_ROOT = "/static/"
 STATIC_URL = "static/"
-SECRET_KEY = env("SECRET_KEY").strip()  # NOTE: Security Warning - The secret key is used for important secret stuff (keep the one used in production a secret!)
+SECRET_KEY = env("SECRET_KEY", cast=str).strip()  # NOTE: Security Warning - The secret key is used for important secret stuff (keep the one used in production a secret!)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SITE_ID = 1
@@ -354,8 +348,8 @@ SOCIALACCOUNT_PROVIDERS = {
         "SCOPE": ["email"],
         "APP": {
             "name": "Google",
-            "client_id": env("OAUTH_GOOGLE_CLIENT_ID").strip(),
-            "secret": env("OAUTH_GOOGLE_SECRET").strip(),
+            "client_id": env("OAUTH_GOOGLE_CLIENT_ID", cast=str).strip(),
+            "secret": env("OAUTH_GOOGLE_SECRET", cast=str).strip(),
             "key": "",
         },
     },
@@ -365,8 +359,8 @@ SOCIALACCOUNT_PROVIDERS = {
         "SCOPE": ["openid"],
         "APP": {
             "name": "Microsoft",
-            "client_id": env("OAUTH_MICROSOFT_CLIENT_ID").strip(),
-            "secret": env("OAUTH_MICROSOFT_SECRET").strip(),
+            "client_id": env("OAUTH_MICROSOFT_CLIENT_ID", cast=str).strip(),
+            "secret": env("OAUTH_MICROSOFT_SECRET", cast=str).strip(),
             "key": "",
             "settings": {"tenant": "organizations"},
         },
@@ -377,7 +371,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # noinspection PyUnboundLocalVariable
 if "EMAIL_BACKEND" not in locals() or "smtp" in EMAIL_BACKEND.lower():
-    EMAIL_HOST = env("EMAIL_HOST")
+    EMAIL_HOST = env("EMAIL_HOST", cast=str)
 
     if not 0 <= env("EMAIL_PORT") <= 65353:
         INVALID_EMAIL_PORT_MESSAGE: Final[str] = (

@@ -34,7 +34,7 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
     """Custom implementation of `Env` class that will not raise an error for invalid keys."""
 
     @override  # type: ignore[misc]
-    def get_value(self, var: str, cast: Callable[[object], T] | None = None, default: T | environ.NoValue = Env.NOTSET, parse_default: bool = False) -> T:  # type: ignore[no-any-unimported] # noqa: E501
+    def get_value(self, var: str, cast: Callable[[object], T] | None = None, default: T | environ.NoValue = Env.NOTSET, parse_default: bool = False) -> T | None:  # type: ignore[no-any-unimported] # noqa: E501
         """
         Return value for given environment variable.
 
@@ -49,69 +49,95 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
                 parse_default=parse_default,
             )
         except ImproperlyConfigured:
-            value: str
             if var == "OAUTH_GOOGLE_CLIENT_ID":
                 # noinspection SpellCheckingInspection
-                value = (
-                    f"{"".join(random.choices(string.digits, k=12))}-"
-                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=32))}"
-                    f".apps.googleusercontent.com"
+                return self.parse_value(  # type: ignore[no-any-return]
+                    (
+                        f"{
+                            "".join(random.choices(string.digits, k=12))
+                        }-"
+                        f"{
+                            "".join(
+                                random.choices(string.digits + string.ascii_lowercase, k=32)
+                            )
+                        }"
+                        f".apps.googleusercontent.com"
+                    ),
+                    cast
                 )
             elif var == "OAUTH_MICROSOFT_CLIENT_ID":
-                value = (
-                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=8))}-"
-                    f"{"".join(random.choices(string.digits, k=4))}-"
-                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=4))}-"
-                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=4))}-"
-                    f"{"".join(random.choices(string.digits + string.ascii_lowercase, k=12))}"
+                return self.parse_value(  # type: ignore[no-any-return]
+                    (
+                        f"{
+                            "".join(
+                                random.choices(string.digits + string.ascii_lowercase, k=8)
+                            )
+                        }-"
+                        f"{"".join(random.choices(string.digits, k=4))}-"
+                        f"{
+                            "".join(
+                                random.choices(string.digits + string.ascii_lowercase, k=4)
+                            )
+                        }-"
+                        f"{
+                            "".join(
+                                random.choices(string.digits + string.ascii_lowercase, k=4)
+                            )
+                        }-"
+                        f"{
+                            "".join(
+                                random.choices(string.digits + string.ascii_lowercase, k=12)
+                            )
+                        }"
+                    ),
+                    cast
                 )
             elif var == "OAUTH_GOOGLE_SECRET":
-                value = (
-                    f"{"".join(random.choices(string.ascii_uppercase, k=6))}-"
-                    f"{
-                        "".join(
-                            random.choices(
-                                (
-                                    string.digits
-                                    + string.ascii_uppercase
-                                    + string.ascii_lowercase
-                                ),
-                                k=28
+                return self.parse_value(  # type: ignore[no-any-return]
+                    (
+                        f"{"".join(random.choices(string.ascii_uppercase, k=6))}-"
+                        f"{
+                            "".join(
+                                random.choices(
+                                    (
+                                        string.digits
+                                        + string.ascii_uppercase
+                                        + string.ascii_lowercase
+                                    ),
+                                    k=28
+                                )
                             )
-                        )
-                    }"
+                        }"
+                    ),
+                    cast
                 )
             elif var == "OAUTH_MICROSOFT_SECRET":
-                value = (
-                    f"{
-                        "".join(
-                            random.choices(
-                                (
-                                    string.digits
-                                    + string.ascii_uppercase
-                                    + string.ascii_lowercase
-                                    + ".~_-"
-                                ),
-                                k=40
+                return self.parse_value(  # type: ignore[no-any-return]
+                    (
+                        f"{
+                            "".join(
+                                random.choices(
+                                    (
+                                        string.digits
+                                        + string.ascii_uppercase
+                                        + string.ascii_lowercase
+                                        + ".~_-"
+                                    ),
+                                    k=40
+                                )
                             )
-                        )
-                    }"
+                        }"
+                    ),
+                    cast
                 )
-            elif cast in (str, tuple, list, urlparse, None):
-                value = "value"
-            elif cast in (bool, int, float, json.loads):
-                value = "0"
-            elif cast == dict:
-                value = "key,value"
-            elif cast == Path:
-                return Path()  # type: ignore[return-value]
+            elif cast in (str, tuple, list, bool, int, float, dict, Path):  # type: ignore[comparison-overlap]
+                return cast()  # type: ignore[call-arg]
+            elif cast in (urlparse, json.loads):
+                return cast("")
+            elif cast is None:
+                return None
             else:
                 raise NotImplementedError from None
-
-            return self.parse_value(  # type: ignore[no-any-return]
-                value=value,
-                cast=cast,
-            )
 
 
 # noinspection SpellCheckingInspection
