@@ -6,11 +6,22 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description"
-          content="Enhanced student feedback for university modules; a dynamic and user-friendly platform for honest reviews."/>
+          content="Enhanced student feedback for university modules; A dynamic and user-friendly platform for honest reviews."/>
     <meta name="keywords"
-          content="university modules,student,feedback,anonymous,RateMyModule"/>
+          content="university modules,student,feedback,anonymous,{{ request.site.name }}"/>
+    <meta property="og:title" content="{{ request.site.name }}" />
+    <meta property="og:description"
+          content="Enhanced student feedback for university modules; A dynamic and user-friendly platform for honest reviews."/>
+    <meta property="og:url" content="https://{{ request.site.domain }}" />
+    <meta property="og:image"
+          content="https://{{ request.site.domain }}{% static 'ratemymodule/icons/logo.svg' %}" />
+    <meta property="og:type" content="website">
+    <meta itemprop="name" content="{{ request.site.name }}" />
+    <meta itemprop="description"
+          content="Enhanced student feedback for university modules; A dynamic and user-friendly platform for honest reviews." />
 
-    <title>{% block title %}RateMyModule{% endblock title %}</title>
+
+    <title>{% block title %}{{ request.site.name }}{% endblock title %}</title>
 
     <link rel="apple-touch-icon"
           sizes="180x180"
@@ -32,7 +43,7 @@
           href="{% static 'ratemymodule/favicon/safari-pinned-tab.svg' %}"
           color="#b295e8"/>
     <meta name="msapplication-TileColor" content="#b295e8"/>
-    <meta name="theme-color" content="#b295e8"/>
+    <meta name="theme-color" content="#b295e8" data-react-helmet="true" />
 
     <link rel="stylesheet" href="{% static 'ratemymodule/styles/base.css' %}"/>
     <link rel="stylesheet" href="{% static 'ratemymodule/styles/login-modals.css' %}"/>
@@ -60,9 +71,12 @@
         <div class="logo-container">
             <a href="{% url 'default' %}"
                style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                <img src="{% static 'ratemymodule/icons/logo.svg' %}"
-                     alt="RateMyModule Logo" class="logo"/>
-                <span class="name">RateMyModule</span>
+                <svg role="img" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo">
+                    <title>{{ request.site.name }} Logo</title>
+                    <rect x="0.5" y="0.5" width="39" height="39" rx="7.5" fill="var(--button-color)" stroke="var(--button-color)" />
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M32.1071 10H22.2857L21.6607 10.2532L20.5 11.3333L19.3393 10.2532L18.7143 10H8.89286L8 10.8439V27.7215L8.89286 28.5654H18.3393L19.875 30H21.125L22.6607 28.5654H32.1071L33 27.7215V10.8439L32.1071 10ZM19.6071 27.4177L19.2857 27.1308L18.7143 26.8776H9.78571V11.6878H18.3393L19.6607 12.9367L19.6071 27.4177ZM31.2143 26.8776H22.2857L21.6607 27.1308L21.4107 27.3502V12.8692L22.6607 11.6878H31.2143V26.8776ZM16.9286 15.0633H11.5714V16.7511H16.9286V15.0633ZM16.9286 21.8143H11.5714V23.5021H16.9286V21.8143ZM11.5714 18.4388H16.9286V20.1266H11.5714V18.4388ZM29.4286 15.0633H24.0714V16.7511H29.4286V15.0633ZM24.0714 18.4388H29.4286V20.1266H24.0714V18.4388ZM24.0714 21.8143H29.4286V23.5021H24.0714V21.8143Z" fill="white" />
+                </svg>
+                <span class="name">{{ request.site.name }}</span>
             </a>
         </div>
 

@@ -127,7 +127,7 @@ body.loaded {
     font-size: 1.8em;
     font-weight: 700;
     line-height: 1.4615384615;
-    color: var(--button-color-light);
+    color: var(--button-color);
     white-space: nowrap;
     flex-shrink: 0;
     flex-grow: 0;

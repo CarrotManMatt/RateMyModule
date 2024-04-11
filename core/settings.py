@@ -53,6 +53,7 @@ env: Env = EnvClass(  # type: ignore[no-any-unimported]
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(bool, False),
     EMAIL_USE_SSL=(bool, False),
+    SITE_ID=(int, 1),
 )
 
 
@@ -217,6 +218,10 @@ if not re.match(r"\A[0-9A-Za-z.~_-]{40}\Z", env("OAUTH_MICROSOFT_SECRET", cast=s
     )
     raise ImproperlyConfigured(INVALID_OAUTH_MICROSOFT_SECRET_MESSAGE)
 
+if not env("SITE_ID") > 0:
+    INVALID_SITE_ID_MESSAGE: Final[str] = "SITE_ID must be an integer greater than 0."
+    raise ImproperlyConfigured(INVALID_SITE_ID_MESSAGE)
+
 
 # Logging Settings
 
@@ -261,7 +266,7 @@ STATIC_URL = "static/"
 SECRET_KEY = env("SECRET_KEY", cast=str).strip()  # NOTE: Security Warning - The secret key is used for important secret stuff (keep the one used in production a secret!)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-SITE_ID = 1
+SITE_ID = env("SITE_ID")
 WSGI_APPLICATION = "core.wsgi.APPLICATION"
 
 
@@ -295,6 +300,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
 

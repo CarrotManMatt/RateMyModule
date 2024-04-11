@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %}User Settings{% endblock title %}
+{% block title %}{{ block.super }} | User Settings{% endblock title %}
 
 {% block styles %}
     {{ block.super }}
