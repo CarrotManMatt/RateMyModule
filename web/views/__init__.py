@@ -23,15 +23,19 @@ from allauth.account.views import SignupView as AllAuthSignupView
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, \
-    QueryDict, JsonResponse
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+    QueryDict,
+)
 from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, TemplateView, View
 
-from ratemymodule.models import Module, Post, University, User, TopicTag, \
-    ToolTag, OtherTag
+from ratemymodule.models import Module, OtherTag, Post, ToolTag, TopicTag, University, User
 from web.forms import AnalyticsForm, PostForm, SignupForm
 from web.views import graph_utils
 
@@ -209,7 +213,7 @@ class HomeView(TemplateView):
         }
 
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> \
-            dict[str, object]:  # noqa: E501
+            dict[str, object]:
         try:
             # noinspection PyTypeChecker
             module: Module = Module.objects.get(
@@ -295,7 +299,7 @@ class HomeView(TemplateView):
         return context_data
 
     def _get_login_forms_context_data(self, context_data: dict[str, object]) -> \
-            dict[str, object]:  # noqa: E501
+            dict[str, object]:
         if "login_form" not in context_data:
             if "login_form" not in self.request.session:
                 context_data["login_form"] = LoginForm(prefix="login")

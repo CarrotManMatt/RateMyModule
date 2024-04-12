@@ -9,7 +9,7 @@ from django import forms
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from ratemymodule.models import Post, User, ToolTag, TopicTag, OtherTag
+from ratemymodule.models import OtherTag, Post, ToolTag, TopicTag, User
 
 
 class PostForm(ModelForm[Post]):

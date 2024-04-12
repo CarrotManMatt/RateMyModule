@@ -13,15 +13,15 @@ from django.views.generic import RedirectView
 
 from web.views import (
     HomeView,
+    LikeDislikePostView,
     LoginView,
     LogoutView,
+    OtherTagAutocompleteView,
     SignupView,
     SubmitPostView,
-    UserSettingsView,
-    LikeDislikePostView,
-    TopicTagAutocompleteView,
     ToolTagAutocompleteView,
-    OtherTagAutocompleteView,
+    TopicTagAutocompleteView,
+    UserSettingsView,
 )
 
 app_name: Final[str] = "ratemymodule"

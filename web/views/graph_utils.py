@@ -123,7 +123,7 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
         else:
             array_of_bar_labels[counter] = f"({array_of_in_ratings[counter]} Reviews)"
 
-    forty_max = ceil(max(array_of_in_ratings) * 0.4)
+    forty_max = ceil(max(array_of_in_ratings) * 0.5)
     inside_of_bar_texts = [p if p >= forty_max
                            else "" for p in array_of_in_ratings
                            ]
@@ -141,14 +141,18 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
     if flag_nodata:
         out_of_bar_texts[3] = "No posts = (\n be the first to \nRateThisModule!"
 
-    ax.bar_label(rects, out_of_bar_texts, padding=5, color=label_color, fontweight="bold")
+    ax.bar_label(rects, out_of_bar_texts, padding=5, color=label_color,
+                 fontweight="light",
+                 )
     # has white text on purple always
     if flag_nodata:
         ax.bar_label(
-            rects, inside_of_bar_texts, padding=-75, color=label_color, fontweight="bold")
+            rects, inside_of_bar_texts, padding=-50, color=label_color, fontweight="light",
+        )
     else:
         ax.bar_label(
-            rects, inside_of_bar_texts, padding=-75, color="#f0f0f0", fontweight="bold")
+            rects, inside_of_bar_texts, padding=-75, color="#f0f0f0", fontweight="light",
+            )
 
     # recolour axis to taste
     ax.tick_params(axis="x", colors=label_color)
@@ -210,15 +214,17 @@ def assessment_quality_bar_graph(module: Module, button_colour: str, text_colour
 
 def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment_quality: bool, teaching_rating: bool, overall_rating: bool, start_year: int, end_year: int) -> str:  # noqa: E501, FBT001
     """Plot a custom line graph for the analytics modal."""
-    # work out axis
-
-    # input sanitisation, no reviews before 1900, no invalid date settings, no massive ranges
+    # input sanitization, no reviews before 1900, no invalid date settings, no massive ranges
     if start_year > end_year:
         return "Invalid year parameters, please check your inputs\n"
     if start_year < 1900:
         return "Earliest date option is 1900\n"
     if end_year-start_year > 50:
         return "Date range too large, try focusing your query\n"
+    now = datetime.datetime.now(tz=datetime.UTC)
+    if end_year > now.year:
+        return "End date is in the future"
+
     end_year = end_year+1
 
     months = [
@@ -227,7 +233,15 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
     guide_bar = [1]
     i = 0
     x_axis: list[int] =[]
-    for counter in range(start_year, end_year):
+    for counter in range(start_year, end_year):  # set up the month labels
+        if counter == now.year:
+            for counter2 in range(now.month):
+                date_list.append(str(months[counter2] + str(counter)))
+                guide_bar.append(None)
+                x_axis.append(i)
+                i += 1
+            break
+
         for counter2 in range(12):
             date_list.append(str(months[counter2] + str(counter)))
             guide_bar.append(None)
@@ -271,7 +285,12 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
     rating_levels_ticks = [
         "1★", "1.5★", "2★", "2.5★",
         "3★", "3.5★", "4★", "4.5★", "5★"]
-    title = f"Graph of {module.name},\nfrom 1/1/{start_year} to 31/12/{end_year-1}"
+    if end_year-1 == now.year:
+        title = (f"Graph of {module.name},\nfrom 1/1/{start_year} to "
+                 f"{now.day}/{now.month}/"
+                 f"{now.year}")
+    else:
+        title = f"Graph of {module.name},\nfrom 1/1/{start_year} to 31/12/{end_year-1}"
     ax.set_yticks(y_pos, labels=([""]*9))
     ax.set_title(title, color=label_color, weight="bold", loc="left")
     ax.margins(x=0)
@@ -330,14 +349,40 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
 def get_module_averages(start_year: int, end_year: int, module: Module, attribute: str) -> list[float]:  # noqa: E501
     set_of_averages: list[float] = []
     for year in range(start_year, end_year):
+        if year == datetime.datetime.now(tz=datetime.UTC).date().year:
+            for month in range(
+                    1, datetime.datetime.now(tz=datetime.UTC).date().month+1,
+            ):
+                start_band = datetime.datetime(year, month, 1).astimezone(
+                    tz=datetime.UTC,
+                )
+                end_band = datetime.datetime(
+                    year, month, monthrange(year, month)[1]).astimezone(
+                    tz=datetime.UTC,
+                )
+                # gets last day of the month, normalize to timezone
+
+                this_months_reviews = [
+                    getattr(post, attribute) for post in module.post_set.all()
+                                       if start_band <= post.date_time_created <= end_band
+                ]
+
+                if this_months_reviews:
+                    set_of_averages.append(sum(this_months_reviews) / len(this_months_reviews))
+                else:
+                    set_of_averages.append(0.55)
+            return set_of_averages
+
         for month in range(1, 13):
             start_band = datetime.datetime(year, month, 1).astimezone(tz=None)
             end_band = datetime.datetime(
                 year, month, monthrange(year, month)[1]).astimezone(tz=None)
             # gets last day of the month, normalize to timezone
 
-            this_months_reviews = [getattr(post, attribute) for post in module.post_set.all()
-                                   if start_band <= post.date_time_created <= end_band]
+            this_months_reviews = [
+                getattr(post, attribute) for post in module.post_set.all()
+                if start_band <= post.date_time_created <= end_band
+            ]
 
             if this_months_reviews:
                 set_of_averages.append(sum(this_months_reviews) / len(this_months_reviews))
