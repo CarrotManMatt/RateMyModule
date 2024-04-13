@@ -12,7 +12,8 @@ __all__: Sequence[str] = (
 )
 
 import re
-from typing import TYPE_CHECKING, override
+from collections.abc import Container
+from typing import Final, TYPE_CHECKING, override
 from urllib.parse import unquote_plus
 
 import django
@@ -22,6 +23,7 @@ from allauth.account.views import LogoutView as AllAuthLogoutView
 from allauth.account.views import SignupView as AllAuthSignupView
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import BadRequest
 from django.db.models import Count, Q
 from django.http import (
     HttpRequest,
@@ -30,12 +32,12 @@ from django.http import (
     JsonResponse,
     QueryDict,
 )
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, TemplateView, View
 
-from ratemymodule.models import Module, OtherTag, Post, ToolTag, TopicTag, University, User
+from ratemymodule.models import Course, Module, OtherTag, Post, ToolTag, TopicTag, University
 from web.forms import AnalyticsForm, PostForm, SignupForm
 from web.views import graph_utils
 
@@ -92,36 +94,107 @@ class HomeView(TemplateView):
     http_method_names = ("get",)
 
     @override
-    def get(self, request: HttpRequest, *args: object,
-            **kwargs: object) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         # noinspection PyArgumentList
-        signup_action: str | None = self.request.GET.get("action")
-        if signup_action == "signup":
-            # noinspection PyArgumentList
-            signup_get_params: QueryDict = self.request.GET.copy()
-            signup_get_params["action"] = "login"
-            return redirect(
-                f"{self.request.path}?{signup_get_params.urlencode()}")
+        returned_get_params: QueryDict = self.request.GET.copy()
 
-        # noinspection PyArgumentList
-        module_code: str | None = self.request.GET.get("module")
-        if module_code is None:
-            university: University = (
-                self.request.user.university
-                if self.request.user.is_authenticated and self.request.user.university
-                else University.objects.get(
-                    name="The University of Birmingham")
+        # noinspection PyTypeChecker
+        action: str | None = self.request.GET.get("action", None)
+
+        if action is not None:
+            new_action: str = action.strip().replace("-", "_").strip()
+
+            if not new_action:
+                returned_get_params.pop("action", None)
+                return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+
+            if new_action != action:
+                returned_get_params["action"] = new_action
+                return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+
+            ALLOWED_ACTIONS: Final[Container[str]] = (
+                "signup",
+                "login",
+                "select_university",
+                "generate_graph",
+                "like",
+                "dislike",
             )
-            if university.module_set.exists():
-                get_params: QueryDict = QueryDict(mutable=True)
-                get_params["module"] = university.module_set.all()[0].code
+            if action not in ALLOWED_ACTIONS:
+                raise BadRequest
 
-                # noinspection PyArgumentList
-                action: str | None = self.request.GET.get("action")
-                if action is not None:
-                    get_params["action"] = action
+        if action == "signup":
+            returned_get_params["action"] = "login"
+            return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
 
-                return redirect(f"{self.request.path}?{get_params.urlencode()}")
+        if action == "select_university":
+            if not request.user.is_authenticated:
+                # noinspection PyTypeChecker
+                raw_university_pk: str | None = self.request.GET.get(
+                    "university",
+                    None
+                )
+                if not raw_university_pk:
+                    return render(
+                        request,
+                        "ratemymodule/university-selector.html",
+                        {"university_choices": University.objects.all()}
+                    )
+
+                try:
+                    selected_university: University = University.objects.get(
+                        pk=raw_university_pk
+                    )
+                except University.DoesNotExist:
+                    returned_get_params.pop("university", None)
+                    return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+
+                self.request.session["selected_university_pk"] = selected_university.pk
+
+            returned_get_params.pop("action", None)
+            returned_get_params.pop("university", None)
+
+        # noinspection PyTypeChecker
+        module_code: str | None = self.request.GET.get("module", None)
+        if not module_code:
+            # noinspection PyUnusedLocal
+            university: University | None = None
+
+            if self.request.user.is_authenticated:
+                university = self.request.user.university
+
+                if not university:
+                    raise Course.DoesNotExist
+
+            else:
+                try:
+                    university = University.objects.get(
+                        pk=self.request.session.get("selected_university_pk", None)
+                    )
+                except University.DoesNotExist:
+                    returned_get_params["action"] = "select_university"
+                    returned_get_params.pop("university", None)
+                    return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+
+            if not university:
+                raise RuntimeError
+
+            if not university.module_set.exists():
+                raise Module.DoesNotExist
+
+            returned_get_params["module"] = university.module_set.all()[0].code
+
+            return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+
+        else:
+            NO_SELECTED_UNIVERSITY: bool = (
+                not self.request.user.is_authenticated
+                and not self.request.session.get("selected_university_pk", None)
+            )
+            if NO_SELECTED_UNIVERSITY:
+                returned_get_params["action"] = "select_university"
+                returned_get_params.pop("university", None)
+                return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
 
         return super().get(request, *args, **kwargs)
 
@@ -263,7 +336,6 @@ class HomeView(TemplateView):
         return {**context_data, "post_list": post_set}
 
     def _get_advanced_analytics_form_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
-
         if "analytics_form" not in context_data:
             action: str | None = self.request.GET.get("action")
 
@@ -333,18 +405,46 @@ class HomeView(TemplateView):
 
         return context_data
 
+    def _get_university_selection_context_data(self, university: University, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
+        context_data["selected_university"] = university
+
+        # noinspection PyArgumentList
+        select_university_get_params: QueryDict = self.request.GET.copy()
+        select_university_get_params["action"] = "select_university"
+
+        context_data["select_university_url"] = (
+            f"{self.request.path}?{select_university_get_params.urlencode()}"
+        )
+
+        return context_data
+
     @override
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context_data: dict[str, object] = super().get_context_data(**kwargs)
 
+        # noinspection PyUnusedLocal
+        university: University | None = None
+        if self.request.user.is_authenticated:
+            university = self.request.user.university
+
+            if not university:
+                raise Course.DoesNotExist
+
+        else:
+            try:
+                university = University.objects.get(
+                    pk=self.request.session.get("selected_university_pk", None)
+                )
+            except University.DoesNotExist:
+                raise RuntimeError
+
+        if not university:
+            raise RuntimeError
+
         context_data["course_list"] = (
-            (
-                self.request.user.university
-                if self.request.user.is_authenticated and self.request.user.university
-                else University.objects.get(
-                    name="The University of Birmingham")
-            ).course_set.prefetch_related("module_set").all()
+            university.course_set.prefetch_related("module_set").all()
         )
+        context_data = self._get_university_selection_context_data(university, context_data)
 
         context_data["LOGIN_URL"] = settings.LOGIN_URL
 

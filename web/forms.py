@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("PostForm", "SignupForm")
+__all__: Sequence[str] = ("AnalyticsForm", "PostForm", "SignupForm")
 
 from typing import Final, override
 
@@ -8,6 +8,7 @@ from allauth.account.forms import SignupForm as AllAuthSignupForm
 from django import forms
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from ratemymodule.models import OtherTag, Post, ToolTag, TopicTag, User
 
@@ -102,9 +103,9 @@ class PostForm(ModelForm[Post]):
         )
 
 
-class SignupForm(AllAuthSignupForm): # type: ignore[misc,no-any-unimported]
+class SignupForm(AllAuthSignupForm):  # type: ignore[misc,no-any-unimported]
     # Overriding the __init__ method to set placeholders
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super(SignupForm, self).__init__(*args, **kwargs)
         self.fields['email'].widget.attrs[
             'placeholder'] = 'University Email Address'

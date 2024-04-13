@@ -1,7 +1,7 @@
 import random
 import datetime
 import numpy as np
-from models import Course, Post, User
+from ratemymodule.models import Course, Post, User
 
 
 def populate_database() -> None:

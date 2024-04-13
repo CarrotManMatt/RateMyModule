@@ -1,0 +1,31 @@
+{% extends "ratemymodule/base.html" %}
+{% load static %}
+
+{% block title %}Select a University | {{ block.super }}{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'ratemymodule/styles/university-selector.css' %}">
+{% endblock styles %}
+
+{% block user_profile %}{% endblock user_profile %}
+
+{% block content %}
+    <div class="container">
+        <h1>Select Your University</h1>
+
+        <form id="university-form" method="get">
+            <input type="hidden" name="action" value="select_university">
+            <label for="universitySelect" style="display: none;">Select a University:</label>
+            <select name="university" id="universitySelect" required>
+                <option value="" disabled selected>Select a University...
+                </option>
+                {% for university in university_choices %}
+                    <option value="{{ university.pk }}">{{ university.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" aria-label="Submit">Submit</button>
+        </form>
+    </div>
+
+{% endblock content %}
