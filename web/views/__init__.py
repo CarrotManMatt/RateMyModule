@@ -13,7 +13,7 @@ __all__: Sequence[str] = (
 
 import re
 from collections.abc import Container
-from typing import Final, TYPE_CHECKING, override
+from typing import TYPE_CHECKING, Final, override
 from urllib.parse import unquote_plus
 
 import django
@@ -281,8 +281,6 @@ class HomeView(TemplateView):
                     ),
                 )  # noqa: COM812
             ),
-            "module_name": module.__getattribute__("name"),
-            "module_code": module.__getattribute__("code"),
         }
 
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> \
@@ -446,7 +444,21 @@ class HomeView(TemplateView):
         )
         context_data = self._get_university_selection_context_data(university, context_data)
 
-        context_data["LOGIN_URL"] = settings.LOGIN_URL
+        original_login_path: str
+        original_login_seperator: str
+        original_login_params: str
+        original_login_path, original_login_seperator, original_login_params = (
+            settings.LOGIN_URL.partition("?")
+        )
+
+        login_url_params: QueryDict = QueryDict("", mutable=True)
+        # noinspection PyArgumentList
+        login_url_params.update(
+            self.request.GET.dict() | QueryDict(original_login_params).dict()
+        )
+        context_data["LOGIN_URL"] = (
+            f"{original_login_path}{original_login_seperator}{login_url_params.urlencode()}"
+        )
 
         context_data = self._get_graphs_context_data(context_data)
         context_data = self._get_post_list_context_data(context_data)

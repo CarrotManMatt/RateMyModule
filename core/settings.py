@@ -128,7 +128,7 @@ else:
 
 # Environment Variables Validation
 
-if env("SECRET_KEY", cast=str).strip().lower() == "[replace with your generated secret key]":  # noqa: E501
+if env("SECRET_KEY", cast=str).strip().lower() == "[replace with your generated secret key]":
     SECRET_KEY_NOT_SET_MESSAGE: Final[str] = (
         "Set the SECRET_KEY environment variable"
     )
@@ -198,7 +198,7 @@ if env("OAUTH_GOOGLE_SECRET", cast=str).strip().lower() == "[replace with your G
         "Set the OAUTH_GOOGLE_SECRET environment variable"
     )
     raise ImproperlyConfigured(OAUTH_GOOGLE_SECRET_NOT_SET_MESSAGE)
-if not re.match(r"\A[A-Z]{6}-[0-9A-Za-z]{28}\Z", env("OAUTH_GOOGLE_SECRET", cast=str).strip()):  # noqa: E501
+if not re.match(r"\A[A-Z]{6}-[0-9A-Za-z]{28}\Z", env("OAUTH_GOOGLE_SECRET", cast=str).strip()):
     INVALID_OAUTH_GOOGLE_SECRET_MESSAGE: Final[str] = (
         "OAUTH_GOOGLE_SECRET must be a valid Google OAuth secret."
     )
@@ -212,7 +212,7 @@ if env("OAUTH_MICROSOFT_SECRET", cast=str).strip().lower() == REPLACE_OAUTH_MICR
         "Set the OAUTH_MICROSOFT_SECRET environment variable"
     )
     raise ImproperlyConfigured(OAUTH_MICROSOFT_SECRET_NOT_SET_MESSAGE)
-if not re.match(r"\A[0-9A-Za-z.~_-]{40}\Z", env("OAUTH_MICROSOFT_SECRET", cast=str).strip()):  # noqa: E501
+if not re.match(r"\A[0-9A-Za-z.~_-]{40}\Z", env("OAUTH_MICROSOFT_SECRET", cast=str).strip()):
     INVALID_OAUTH_MICROSOFT_SECRET_MESSAGE: Final[str] = (
         "OAUTH_MICROSOFT_SECRET must be a valid Microsoft Graph OAuth secret."
     )

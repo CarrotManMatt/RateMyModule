@@ -1,6 +1,8 @@
-import random
 import datetime
+import random
+
 import numpy as np
+
 from ratemymodule.models import Course, Post, User
 
 

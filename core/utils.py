@@ -163,7 +163,7 @@ def reverse_url_with_get_params(viewname: Callable[[], str] | str | None = None,
         else:
             qdict[key] = str(val)
 
-    return url + "?" + qdict.urlencode()
+    return f"{url}?{qdict.urlencode()}"
 
 
 reverse_url_with_get_params_lazy = lazy(reverse_url_with_get_params, str)

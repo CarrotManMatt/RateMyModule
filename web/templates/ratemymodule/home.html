@@ -1,6 +1,7 @@
 {% extends "ratemymodule/base-with-content.html" %}
 
 {% load static %}
+{% load ratemymodule_extras %}
 
 {% block styles %}
     {{ block.super }}
@@ -291,7 +292,7 @@
                         <td>{{ analytics_form.assessment_quality }}</td>
                         <td class="analytics-form-text">Assessment Quality</td>
                     </tr>
-                    <input type="hidden" name="module" value="{{ module_code|urlencode }}">
+                    <input type="hidden" name="module" value="{{ request.GET.module }}">
                     <input type="hidden" name="action" value="generate_graph">
                 </table>
                <button class="analytics-button">

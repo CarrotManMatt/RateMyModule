@@ -35,6 +35,7 @@ from django.core.validators import (
 )
 from django.db import models
 from django.db.models import Manager
+from django.http import HttpRequest, QueryDict
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 from django_stubs_ext.db.models.manager import RelatedManager
@@ -481,10 +482,13 @@ class Module(CustomBaseModel):
     @override  # type: ignore[misc]
     def get_absolute_url(self) -> str:
         """Return the canonical URL for a given `Module` object instance."""
-        return reverse_url_with_get_params(
-            "ratemymodule:home",
-            get_params={"module": self.code},
-        )
+        return self.get_search_url(request=None)
+
+    def get_search_url(self, request: HttpRequest | None) -> str:
+        # noinspection PyArgumentList
+        url_params: QueryDict | dict[str, object] = request.GET.copy() if request else {}
+        url_params["module"] = self.code
+        return reverse_url_with_get_params("ratemymodule:home", get_params=url_params)
 
     @override
     def __str__(self) -> str:

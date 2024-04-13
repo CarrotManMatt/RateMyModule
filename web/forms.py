@@ -6,9 +6,9 @@ from typing import Final, override
 
 from allauth.account.forms import SignupForm as AllAuthSignupForm
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
 
 from ratemymodule.models import OtherTag, Post, ToolTag, TopicTag, User
 
