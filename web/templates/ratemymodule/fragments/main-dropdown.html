@@ -1,7 +1,7 @@
 {% load ratemymodule_extras %}
 
 {% for course in course_list %}
-    <div class="dropdown
+    <div title="Course: {{ course.name }}" class="dropdown
             {% for module in course.module_set.all %}{% if request.GET.module == module.code %}active{% endif %}{% endfor %}">
         <button class="dropbtn">
             {{ course.name }}
@@ -9,7 +9,8 @@
         </button>
         <div class="dropdown-content">
             {% for module in course.module_set.all %}
-                <a href="{{ module|get_module_search_url:request }}"
+                <a title="Module: {{ module.name }}"
+                   href="{{ module|get_module_search_url:request }}"
                    class="{% if request.GET.module == module.code %}selected{% endif %}">{{ module.name }}</a>
             {% endfor %}
         </div>

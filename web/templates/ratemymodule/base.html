@@ -69,11 +69,10 @@
 </div>
 <header>
     <div class="banner">
-        <div class="logo-container">
+        <div title="RateMyModule | {{ selected_university }}" class="logo-container">
             <a href="{% url 'default' %}"
                style="display: flex; align-items: center; text-decoration: none; color: inherit;">
                 <svg role="img" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo">
-                    <title>{{ request.site.name }} Logo</title>
                     <rect x="0.5" y="0.5" width="39" height="39" rx="7.5" fill="var(--button-color)" stroke="var(--button-color)" />
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M32.1071 10H22.2857L21.6607 10.2532L20.5 11.3333L19.3393 10.2532L18.7143 10H8.89286L8 10.8439V27.7215L8.89286 28.5654H18.3393L19.875 30H21.125L22.6607 28.5654H32.1071L33 27.7215V10.8439L32.1071 10ZM19.6071 27.4177L19.2857 27.1308L18.7143 26.8776H9.78571V11.6878H18.3393L19.6607 12.9367L19.6071 27.4177ZM31.2143 26.8776H22.2857L21.6607 27.1308L21.4107 27.3502V12.8692L22.6607 11.6878H31.2143V26.8776ZM16.9286 15.0633H11.5714V16.7511H16.9286V15.0633ZM16.9286 21.8143H11.5714V23.5021H16.9286V21.8143ZM11.5714 18.4388H16.9286V20.1266H11.5714V18.4388ZM29.4286 15.0633H24.0714V16.7511H29.4286V15.0633ZM24.0714 18.4388H29.4286V20.1266H24.0714V18.4388ZM24.0714 21.8143H29.4286V23.5021H24.0714V21.8143Z" fill="white" />
                 </svg>
@@ -92,11 +91,11 @@
             {% endif %}
         </div>
 
-        <div class="search-container">{% block search_bar %}{% endblock search_bar %}</div>
+        <div title="Search for a post" class="search-container">{% block search_bar %}{% endblock search_bar %}</div>
 
         <div class="user-profile-container">
             {% block user_profile %}
-                <a href="{% url 'ratemymodule:submit-review' %}"
+                <a title="Create Post" href="{% url 'ratemymodule:submit-review' %}"
                    class="create-post">Create Post</a>
                 {% if user.is_authenticated %}
                     <div class="user-dropdown">
@@ -106,16 +105,16 @@
                                  alt="Dropdown Icon" class="dropdown-icon"/>
                         </button>
                         <div class="user-dropdown-content">
-                            <a href="{% url 'ratemymodule:user-settings' %}">
+                            <a title="User Settings" href="{% url 'ratemymodule:user-settings' %}">
                                 User Settings
                             </a>
                             {% if user.is_staff %}
-                                <a href="{% url 'admin:index' %}">Admin Site</a>
+                                <a title="Admin Site" href="{% url 'admin:index' %}">Admin Site</a>
                             {% endif %}
-                            <a href="{% url 'api_rest:root' %}">Browsable API</a>
+                            <a title="Browsable API" href="{% url 'api_rest:root' %}">Browsable API</a>
                             <form method="post" action="{% url 'ratemymodule:post-logout' %}">
                                 {% csrf_token %}
-                                <button type="submit">Logout</button>
+                                <button title="Logout" type="submit">Logout</button>
                             </form>
                         </div>
                     </div>
@@ -126,6 +125,7 @@
         </div>
         <div class="toggle-container">
             <svg class="theme-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <title>Toggle Theme</title>
                 <g clip-path="url(#a)">
                     <path d="M12 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM4.929 3.515a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 0 0 1.414-1.414L4.93 3.515ZM1 11a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H1ZM18 12a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1ZM17.657 16.243a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 1 0 1.414-1.414l-2.828-2.828ZM7.757 17.657a1 1 0 1 0-1.414-1.414L3.515 19.07a1 1 0 1 0 1.414 1.414l2.828-2.828ZM20.485 4.929a1 1 0 0 0-1.414-1.414l-2.828 2.828a1 1 0 1 0 1.414 1.414l2.828-2.828ZM13 19a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"></path>
                 </g>

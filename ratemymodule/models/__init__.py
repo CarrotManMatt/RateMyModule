@@ -406,9 +406,9 @@ class Course(CustomBaseModel):
     @override
     def __str__(self) -> str:
         try:
-            return f"{self.name} - {self.university}"
+            return f"{self.pk} {self.name} - {self.university}"
         except (Course.DoesNotExist, University.DoesNotExist):
-            return f"{self.name} ({self.pk})"
+            return f"{self.pk} {self.name}"
 
 
 class Module(CustomBaseModel):
@@ -492,9 +492,9 @@ class Module(CustomBaseModel):
     @override
     def __str__(self) -> str:
         try:
-            return f"{self.name} - {self.university}"
+            return f"{self.pk} {self.name} - {self.university}"
         except (Course.DoesNotExist, University.DoesNotExist):
-            return f"{self.name} ({self.pk})"
+            return f"{self.pk} {self.name}"
 
 
 class BaseTag(CustomBaseModel):
@@ -807,9 +807,9 @@ class Post(CustomBaseModel):
     @override
     def __str__(self) -> str:
         try:
-            return self.display_user
+            return f"{self.pk} {self.user.short_username} ({self.module})"
         except (self.module.DoesNotExist, Course.DoesNotExist, University.DoesNotExist):
-            return f"Post #{self.pk}"
+            return str(self.pk)
 
     @classmethod
     def filter_by_tags(cls, names: Iterable[str]) -> Manager["Post"]:
@@ -914,6 +914,6 @@ class Report(CustomBaseModel):
     @override
     def __str__(self) -> str:
         try:
-            return f"Report by {self.reporter} for {self.reason} on post {self.post}"
+            return f"{self.pk} {self.reporter.short_username} - {self.reason} ({self.post})"
         except self.reporter.DoesNotExist:
-            return f"Report #{self.pk} for {self.reason} on post {self.post}"
+            return f"{self.pk} {self.reason} ({self.post})"
