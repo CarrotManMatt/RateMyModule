@@ -1,5 +1,5 @@
 """Contains a selection of graph generating functions for RateMyModule."""
-import datetime
+
 from collections.abc import Sequence
 
 __all__: Sequence[str] = (
@@ -9,6 +9,7 @@ __all__: Sequence[str] = (
     "overall_rating_bar_graph",
 )
 
+import datetime
 from calendar import monthrange
 from io import StringIO
 from math import ceil
@@ -231,7 +232,7 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
     months = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     date_list: list[str] = []
-    guide_bar = [1]
+    guide_bar: list[int | None] = [1]
     i = 0
     x_axis: list[int] =[]
     for counter in range(start_year, end_year):  # set up the month labels
@@ -244,7 +245,7 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
             break
 
         for counter2 in range(12):
-            date_list.append(str(months[counter2] + str(counter)))
+            date_list.append(f"{months[counter2]}{counter}")
             guide_bar.append(None)
             x_axis.append(i)
             i += 1

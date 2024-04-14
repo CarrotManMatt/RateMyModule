@@ -4,7 +4,8 @@ import datetime
 import random
 
 import numpy as np
-from models import Course, Post, User
+
+from ratemymodule.models import Course, Post, User
 
 
 def populate_database() -> None:
@@ -16,8 +17,8 @@ def populate_database() -> None:
     YEARS_BACK = 5   # how many years of data
     REVIEWS_PER_MONTH = 5  # how many reviews per month of said years
     CURRENT_YEAR = 2025  # what year to start and work back from
-    COURSE = Course.objects.first()  # for first course in database
-    for module in COURSE.module_set.all():
+    course = Course.objects.all()[0]  # for first course in database
+    for module in course.module_set.all():
         trends: list[list[int]] = []
         for counter in range(4):
             trends.append(generate_quality_trend(YEARS_BACK, REVIEWS_PER_MONTH))
@@ -29,7 +30,7 @@ def populate_database() -> None:
                 ).astimezone(tz=None)
                 for review in range(REVIEWS_PER_MONTH):
                     tempUser = User.objects.create_user(email=f"filler{i}@test.bham.ac.uk")
-                    tempUser.enrolled_course_set.add(COURSE)
+                    tempUser.enrolled_course_set.add(course)
                     tempPost = Post.objects.create(
                         module=module, user=tempUser,
                         overall_rating=trends[0].pop(0),

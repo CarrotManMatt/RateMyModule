@@ -56,7 +56,7 @@ class CustomBaseModel(Model):
         proxy_fields: MutableMapping[str, object] = {
             field_name: kwargs.pop(field_name)
             for field_name
-            in set(kwargs.keys()) & self.get_proxy_field_names()
+            in set(kwargs.keys()) & self._get_proxy_field_names()
         }
 
         super().__init__(*args, **kwargs)
@@ -81,7 +81,7 @@ class CustomBaseModel(Model):
         unexpected_kwargs: MutableSet[str] = set()
 
         field_name: str
-        for field_name in set(kwargs.keys()) - self.get_proxy_field_names():
+        for field_name in set(kwargs.keys()) - self._get_proxy_field_names():
             try:
                 self._meta.get_field(field_name)
             except FieldDoesNotExist:
@@ -109,7 +109,7 @@ class CustomBaseModel(Model):
     update.alters_data: bool = True  # type: ignore[attr-defined, misc]
 
     @classmethod
-    def get_proxy_field_names(cls) -> ImmutableSet[str]:
+    def _get_proxy_field_names(cls) -> ImmutableSet[str]:
         """
         Return the set of extra names of properties that can be saved to the database.
 

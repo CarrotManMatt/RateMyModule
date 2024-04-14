@@ -297,7 +297,7 @@ class PostModelForm(DjangoModelForm[Post]):
         if not isinstance(module, Module):
             raise TypeError
 
-        if module not in user.module_set.all():
+        if module not in user.possible_module_set.all():
             raise ValidationError(
                 {
                     "module": _(

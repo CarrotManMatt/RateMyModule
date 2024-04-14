@@ -96,10 +96,7 @@
                     <div>
                         {# Post Header Content #}
                         <div class="header">
-                            <div class="title">
-                                From {{ post.student_type }}
-                                | {{ post.module.university.short_name }}
-                            </div>
+                            <div class="title">{{ post }}</div>
                             <div class="module-year">
                                 {{ post.academic_year_start }}
                             </div>
@@ -172,12 +169,12 @@
                                     {% endfor %}
                                 </div>
                                 {# Displaying all tags #}
-                                {% for tag in post.topic_tag_set.all %}
+                                {% for tag in post.tool_tag_set.all %}
                                     <div class="item-element can-hover">
                                         {{ tag }}
                                     </div>
                                 {% endfor %}
-                                {% for tag in post.tool_tag_set.all %}
+                                {% for tag in post.topic_tag_set.all %}
                                     <div class="item-element can-hover">
                                         {{ tag }}
                                     </div>

@@ -31,6 +31,7 @@ from ratemymodule.models import (
 )
 
 from .filters import (
+    PostHasSuspiciousUserListFilter,
     ReportIsSolvedListFilter,
     ReportReasonListFilter,
     TagIsVerifiedListFilter,
@@ -63,8 +64,8 @@ admin.site.site_title = f"RateMyModule {_("Admin")}"
 admin.site.index_title = _("Overview")
 admin.site.empty_value_display = "- - - - -"
 
-# TODO: Add admin autocomplete search filtering for many-to-many connections
-# TODO: Make tag "is_verified" true by default on admin site
+# TODO: Matt: Add admin autocomplete search filtering for many-to-many connections
+# TODO: Matt: Make tag "is_verified" true by default on admin site
 
 
 @admin.register(User)
@@ -519,11 +520,6 @@ class BaseTagAdmin(UnchangeableModelAdmin[T_tag]):
         return obj.post_count  # type: ignore[attr-defined,no-any-return]
 
 
-@admin.register(OtherTag)
-class OtherTagAdmin(BaseTagAdmin[OtherTag]):
-    pass
-
-
 @admin.register(ToolTag)
 class ToolTagAdmin(BaseTagAdmin[ToolTag]):
     pass
@@ -531,6 +527,11 @@ class ToolTagAdmin(BaseTagAdmin[ToolTag]):
 
 @admin.register(TopicTag)
 class TopicTagAdmin(BaseTagAdmin[TopicTag]):
+    pass
+
+
+@admin.register(OtherTag)
+class OtherTagAdmin(BaseTagAdmin[OtherTag]):
     pass
 
 
@@ -553,7 +554,7 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
         (
             "Tags",
             {
-                "fields": ("other_tag_set", "tool_tag_set", "topic_tag_set", "tags_count"),
+                "fields": ("tool_tag_set", "topic_tag_set", "other_tag_set", "tags_count"),
                 "classes": ("collapse",),
             }  # noqa: COM812
         ),
@@ -567,7 +568,13 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
                 "classes": ("collapse",),
             }  # noqa: COM812
         ),
-        ("Extra", {"fields": ("date_time_posted", "hidden"), "classes": ("collapse",)}),
+        (
+            "Extra",
+            {
+                "fields": ("date_time_posted", "hidden", "is_user_suspicious"),
+                "classes": ("collapse",),
+            }  # noqa: COM812
+        ),
     )
     list_display = (
         "pk",
@@ -589,9 +596,9 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
     autocomplete_fields = (
         "user",
         "module",
-        "other_tag_set",
         "tool_tag_set",
         "topic_tag_set",
+        "other_tag_set",
     )
     search_fields = (
         "user__email",
@@ -610,6 +617,7 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
         "tags_count",
         "liked_user_count",
         "disliked_user_count",
+        "is_user_suspicious",
     )
     # noinspection PyUnresolvedReferences
     list_filter = (
@@ -617,6 +625,7 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
         post_rating_list_filter_builder(Post.difficulty_rating.field),
         post_rating_list_filter_builder(Post.assessment_rating.field),
         post_rating_list_filter_builder(Post.teaching_rating.field),
+        PostHasSuspiciousUserListFilter,
         ("date_time_created", DateTimeRangeFilterBuilder(title=_("Date & Time Posted"))),
     )
     inlines = (PostReportsInline,)
@@ -673,6 +682,13 @@ class PostAdmin(CustomBaseModelAdmin[Post]):
             return admin.site.empty_value_display
 
         return obj.disliked_user_count  # type: ignore[attr-defined,no-any-return]
+
+    @admin.display(description=_("Is User Suspicious?"))
+    def is_user_suspicious(self, obj: Post | None) -> str:
+        if not obj:
+            return admin.site.empty_value_display
+
+        return "Yes" if obj.is_user_suspicious else "No"
 
 
 @admin.register(Report)

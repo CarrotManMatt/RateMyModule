@@ -72,14 +72,14 @@ class _TestDataWrapper:
             "name": set(_TEST_DATA["module"]["name"]),
             "code": lambda: (f"000{count}" for count in itertools.count(start=1)),
         },
-        "other_tag": {
-            "name": set(_TEST_DATA["other_tag"]["name"]),
-        },
         "tool_tag": {
             "name": set(_TEST_DATA["tool_tag"]["name"]),
         },
         "topic_tag": {
             "name": set(_TEST_DATA["topic_tag"]["name"]),
+        },
+        "other_tag": {
+            "name": set(_TEST_DATA["other_tag"]["name"]),
         },
         "post": {
             "content": set(_TEST_DATA["post"]["content"]),

@@ -9,7 +9,7 @@ authors = [
     "Arthur Crymble <axc1277@student.bham.ac.uk>",
     "Charles Wilson <cxw304@student.bham.ac.uk>",
     "Thomas Rose <txr244@student.bham.ac.uk>",
-    "Delilah Lawes <dxl288@student.bham.ac.uk>"
+    "Delilah Lawes <dxl288@student.bham.ac.uk>",
 ]
 readme = "README.adoc"
 repository = "https://git.cs.bham.ac.uk/team-projects-2023-24/team55.git"
@@ -20,7 +20,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.12",
     "Typing :: Typed",
-    "Topic :: Internet"
+    "Topic :: Internet",
 ]
 
 [tool.poetry.dependencies]
@@ -29,6 +29,7 @@ django = "~4.2"  # NOTE: Django is pinned below version 5.0 because the django-s
 django-allauth = "^0.61"
 django-environ = "^0.11"
 django-admin-rangefilter = "^0.12"
+djangorestframework = "^3.15"
 confusable-homoglyphs = "^3.3"
 tldextract = "^5.1"
 classproperties = {git = "https://github.com/hottwaj/classproperties.git"}
@@ -36,12 +37,13 @@ setuptools = "^69.2"
 django-stubs-ext = "~4.2"
 regex = "^2023.12"
 matplotlib = "^3.8"
-docutils = "^0.20"
+docutils = "^0.21"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.6"
+pre-commit = "^3.7"
 mypy = "~1.7"
 django-stubs = {extras = ["compatible-mypy"], version = "~4.2"}
+djangorestframework-stubs = {extras = ["compatible-mypy"], version = "^3.14"}
 types-regex = "^2023.12"
 ruff = "^0.3"
 djlint = "^1.34"
@@ -54,7 +56,7 @@ gunicorn = "^21.2"
 
 
 [tool.mypy]
-plugins = ["mypy_django_plugin.main"]
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 exclude = ["core/settings\\.py$", "venv/"]
 extra_checks = true
 warn_unused_configs = true
@@ -83,7 +85,7 @@ module = [
     "allauth.account.forms",
     "allauth.socialaccount.models",
     "rangefilter.filters",
-    "allauth.account.views"
+    "allauth.account.views",
 ]
 ignore_missing_imports = true
 
@@ -101,7 +103,7 @@ extend-exclude = [
     ".idea",
     ".mypy_cache",
     ".ruff_cache",
-    "__pycache__"
+    "__pycache__",
 ]
 
 [tool.ruff.lint]
@@ -149,7 +151,7 @@ select = [
     "TRY",
     "FLY",
     "PERF",
-    "RUF"
+    "RUF",
 ]
 fixable = ["I001", "TCH", "F401", "RUF100"]
 ignore = [
@@ -165,7 +167,7 @@ ignore = [
     "S311",
     "UP040",  # NOTE: Mypy does not currently support PEP 695 type aliases, so they should not be used
     "PT009",
-    "PT027"
+    "PT027",
 ]
 task-tags = [
     "TODO",
@@ -177,7 +179,7 @@ task-tags = [
     "IDEA",
     "NOTE",
     "ISSUE",
-    "DONE"
+    "DONE",
 ]
 
 
@@ -197,6 +199,7 @@ max-doc-length = 95
 [tool.ruff.lint.pylint]
 allow-magic-value-types = ["str", "bytes", "int"]
 max-args = 7
+max-returns = 10
 max-branches = 19
 
 [tool.ruff.lint.pyupgrade]

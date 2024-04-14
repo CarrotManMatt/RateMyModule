@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("urlpatterns",)
+__all__: Sequence[str] = ("urlpatterns", "app_name")
 
 from collections.abc import MutableSequence
 from typing import Final
@@ -41,16 +41,26 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(r"logout/", LogoutView.as_view(), name="post-logout"),
     django.urls.path(r"login/", LoginView.as_view(), name="post-login"),
     django.urls.path(r"signup/", SignupView.as_view(), name="post-signup"),
-    django.urls.path('autocomplete/topic_tags',
-                     TopicTagAutocompleteView.as_view(),
-                     name='autocomplete_topic_tags'),
-    django.urls.path('autocomplete/tool_tags',
-                     ToolTagAutocompleteView.as_view(),
-                     name='autocomplete_tool_tags'),
-    django.urls.path('autocomplete/other_tags',
-                     OtherTagAutocompleteView.as_view(),
-                     name='autocomplete_other_tags'),
-    django.urls.path(r"like-dislike-post/", LikeDislikePostView.as_view(), name="like-dislike-post"),
+    django.urls.path(
+        "autocomplete/tool_tags",
+        ToolTagAutocompleteView.as_view(),
+        name="autocomplete_tool_tags",
+    ),
+    django.urls.path(
+        "autocomplete/topic_tags",
+        TopicTagAutocompleteView.as_view(),
+        name="autocomplete_topic_tags",
+    ),
+    django.urls.path(
+        "autocomplete/other_tags",
+        OtherTagAutocompleteView.as_view(),
+        name="autocomplete_other_tags",
+    ),
+    django.urls.path(
+        r"like-dislike-post/",
+        LikeDislikePostView.as_view(),
+        name="like-dislike-post",
+    ),
 ]
 
 favicon_urlpatterns: MutableSequence[URLResolver | URLPattern] = [

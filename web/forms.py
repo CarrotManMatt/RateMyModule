@@ -60,17 +60,17 @@ class PostForm(ModelForm[Post]):
     )
     tool_tags = forms.ModelMultipleChoiceField(
         queryset=ToolTag.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'autocomplete'}),
+        widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),
         required=False,
     )
     topic_tags = forms.ModelMultipleChoiceField(
         queryset=TopicTag.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'autocomplete'}),
+        widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),
         required=False,
     )
     other_tags = forms.ModelMultipleChoiceField(
         queryset=OtherTag.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'autocomplete'}),
+        widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),
         required=False,
     )
 
@@ -108,15 +108,14 @@ class PostForm(ModelForm[Post]):
 class SignupForm(AllAuthSignupForm):  # type: ignore[misc,no-any-unimported]
     # Overriding the __init__ method to set placeholders
     def __init__(self, *args: object, **kwargs: object) -> None:
-        super(SignupForm, self).__init__(*args, **kwargs)
-        self.fields['email'].widget.attrs[
-            'placeholder'] = 'University Email Address'
-        self.fields['password1'].widget.attrs['placeholder'] = 'Password'
-        self.fields['password2'].widget.attrs[
-            'placeholder'] = 'Confirm Password'
+        super().__init__(*args, **kwargs)
+
+        self.fields["email"].widget.attrs["placeholder"] = "University Email Address"
+        self.fields["password1"].widget.attrs["placeholder"] = "Password"
+        self.fields["password2"].widget.attrs["placeholder"] = "Confirm Password"
 
         for field_name in self.fields:
-            self.fields[field_name].label = ''
+            self.fields[field_name].label = ""
 
     @override
     def clean(self) -> dict[str, object]:  # type: ignore[misc]

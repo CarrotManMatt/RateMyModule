@@ -7,6 +7,7 @@ __all__: Sequence[str] = (
     "UserGroupListFilter",
     "UserIsActiveListFilter",
     "TagIsVerifiedListFilter",
+    "PostHasSuspiciousUserListFilter",
     "ReportIsSolvedListFilter",
     "ReportReasonListFilter",
     "post_rating_list_filter_builder",
@@ -129,6 +130,35 @@ class TagIsVerifiedListFilter(admin.SimpleListFilter):
 
         if self.value() == "0":
             return queryset.filter(is_verified=False)
+
+        return queryset
+
+
+class PostHasSuspiciousUserListFilter(admin.SimpleListFilter):
+    """
+    Admin filter to limit the `Post` objects shown on the admin list view.
+
+    `Post` objects are filtered by whether the post's user's account is marked as suspicious.
+    """
+
+    title = _("Suspicious Users")
+    parameter_name = "is_user_suspicious"
+
+    @override
+    def lookups(self, request: HttpRequest, model_admin: ModelAdmin[Post]) -> Iterable[tuple[object, StrOrPromise]] | None:  # type: ignore[override]  # noqa: E501
+        return ("1", _("User Is Suspicious")), ("0", _("User Is Not Suspicious"))
+
+    @override
+    def queryset(self, request: HttpRequest, queryset: QuerySet[Post]) -> QuerySet[Post]:
+        if self.value() == "1":
+            return Post.objects.filter(
+                pk__in=(post.pk for post in queryset if post.is_user_suspicious),
+            )
+
+        if self.value() == "0":
+            return Post.objects.filter(
+                pk__in=(post.pk for post in queryset if not post.is_user_suspicious),
+            )
 
         return queryset
 

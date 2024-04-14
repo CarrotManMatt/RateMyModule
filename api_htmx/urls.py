@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("urlpatterns",)
+__all__: Sequence[str] = ("urlpatterns", "app_name")
 
 from collections.abc import MutableSequence
 from typing import Final

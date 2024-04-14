@@ -9,7 +9,7 @@ because this file is used before both of those operations are completed
 from collections.abc import Sequence
 
 __all__: Sequence[str] = (
-    "MyPyEnv",
+    "CIPipelineEnv",
     "reverse_url_with_get_params",
     "reverse_url_with_get_params_lazy",
 )
@@ -30,7 +30,7 @@ from environ import Env, FileAwareEnv, ImproperlyConfigured, environ
 T = TypeVar("T")
 
 
-class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
+class CIPipelineEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
     """Custom implementation of `Env` class that will not raise an error for invalid keys."""
 
     @override  # type: ignore[misc]
@@ -41,6 +41,7 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
         If no Env variable value was set with the given name, return an arbitrary default value
         to prevent errors when type-checking with mypy.
         """
+        improperly_configured_error: ImproperlyConfigured  # type: ignore[no-any-unimported]
         try:
             return super().get_value(  # type: ignore[no-any-return]
                 var=var,
@@ -48,7 +49,10 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
                 default=default,
                 parse_default=parse_default,
             )
-        except ImproperlyConfigured:
+        except ImproperlyConfigured as improperly_configured_error:
+            if var == "TEST_DATA_JSON_FILE_PATH":
+                raise improperly_configured_error from improperly_configured_error
+
             if var == "OAUTH_GOOGLE_CLIENT_ID":
                 # noinspection SpellCheckingInspection
                 return self.parse_value(  # type: ignore[no-any-return]
@@ -63,9 +67,10 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
                         }"
                         f".apps.googleusercontent.com"
                     ),
-                    cast
+                    cast,
                 )
-            elif var == "OAUTH_MICROSOFT_CLIENT_ID":
+
+            if var == "OAUTH_MICROSOFT_CLIENT_ID":
                 return self.parse_value(  # type: ignore[no-any-return]
                     (
                         f"{
@@ -90,9 +95,10 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
                             )
                         }"
                     ),
-                    cast
+                    cast,
                 )
-            elif var == "OAUTH_GOOGLE_SECRET":
+
+            if var == "OAUTH_GOOGLE_SECRET":
                 return self.parse_value(  # type: ignore[no-any-return]
                     (
                         f"{"".join(random.choices(string.ascii_uppercase, k=6))}-"
@@ -109,9 +115,10 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
                             )
                         }"
                     ),
-                    cast
+                    cast,
                 )
-            elif var == "OAUTH_MICROSOFT_SECRET":
+
+            if var == "OAUTH_MICROSOFT_SECRET":
                 return self.parse_value(  # type: ignore[no-any-return]
                     (
                         f"{
@@ -128,16 +135,19 @@ class MyPyEnv(FileAwareEnv):  # type: ignore[no-any-unimported,misc]
                             )
                         }"
                     ),
-                    cast
+                    cast,
                 )
-            elif cast in (str, tuple, list, bool, int, float, dict, Path):  # type: ignore[comparison-overlap]
+
+            if cast in (str, tuple, list, bool, int, float, dict, Path):  # type: ignore[comparison-overlap]
                 return cast()  # type: ignore[call-arg]
-            elif cast in (urlparse, json.loads):
+
+            if cast in (urlparse, json.loads):
                 return cast("")
-            elif cast is None:
+
+            if cast is None:
                 return None
-            else:
-                raise NotImplementedError from None
+
+            raise NotImplementedError from None
 
 
 # noinspection SpellCheckingInspection

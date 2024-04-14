@@ -18,7 +18,7 @@ import django.urls
 import django_stubs_ext
 from environ import Env, FileAwareEnv, ImproperlyConfigured
 
-from core.utils import MyPyEnv, reverse_url_with_get_params_lazy
+from core.utils import CIPipelineEnv, reverse_url_with_get_params_lazy
 
 # Monkeypatching Django, so stubs will work for all generics,
 # see: https://github.com/typeddjango/django-stubs
@@ -30,7 +30,7 @@ BASE_DIR: Path = Path(__file__).resolve().parent.parent
 
 
 # NOTE: settings.py is parsed when setting up the mypy_django_plugin. When mypy runs, no environment variables are set, so they should not be accessed
-IMPORTED_BY_MYPY_OR_CHECK_OR_MIGRATE: Final[bool] = (
+RUNNING_IN_CI: Final[bool] = (
     any(
         "mypy_django_plugin" in frame.filename
         for frame
@@ -40,13 +40,14 @@ IMPORTED_BY_MYPY_OR_CHECK_OR_MIGRATE: Final[bool] = (
     or "check" in sys.argv
     or "migrate" in sys.argv
     or "makemigrations" in sys.argv
+    or "test" in sys.argv
 )
 
-EnvClass: type[Env] = MyPyEnv if IMPORTED_BY_MYPY_OR_CHECK_OR_MIGRATE else FileAwareEnv  # type: ignore[no-any-unimported]
+EnvClass: type[Env] = CIPipelineEnv if RUNNING_IN_CI else FileAwareEnv  # type: ignore[no-any-unimported]
 
 EnvClass.read_env(BASE_DIR / ".env")
 env: Env = EnvClass(  # type: ignore[no-any-unimported]
-    PRODUCTION=(bool, True),
+    PRODUCTION=(bool, not RUNNING_IN_CI),
     ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=(int, 1),
     EMAIL_PORT=(int, 25),
     EMAIL_HOST_USER=(str, ""),
@@ -62,6 +63,12 @@ env: Env = EnvClass(  # type: ignore[no-any-unimported]
 raw_log_level: str
 
 if env("PRODUCTION"):
+    if "test" in sys.argv:
+        TRYING_TO_TEST_IN_PRODUCTION_MESSAGE: Final[str] = (
+            "You cannot run tests when PRODUCTION=True"
+        )
+        raise ImproperlyConfigured(TRYING_TO_TEST_IN_PRODUCTION_MESSAGE)
+
     production_env: Env = EnvClass(  # type: ignore[no-any-unimported]
         ALLOWED_HOSTS=(list, []),
         CSRF_TRUSTED_ORIGINS=(list, []),
@@ -110,7 +117,7 @@ else:
     if DEBUG:
         debug_env: Env = EnvClass(  # type: ignore[no-any-unimported]
             EMAIL_TO_CONSOLE=(bool, True),
-            TEST_DATA_JSON_FILE_PATH=(str, ""),
+            TEST_DATA_JSON_FILE_PATH=(str, "ratemymodule/tests/test_data.json"),
         )
 
         if debug_env("EMAIL_TO_CONSOLE"):
@@ -283,6 +290,7 @@ INSTALLED_APPS = [
     "ratemymodule.apps.RateMyModuleConfig",
     "api_htmx.apps.APIHTMXAppConfig",
     "web.apps.WebServerConfig",
+    "api_rest.apps.APIRESTAppConfig",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -290,6 +298,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.admindocs",
     "rangefilter",
+    "rest_framework",
 ]
 # noinspection PyUnresolvedReferences
 MIDDLEWARE = [
@@ -396,7 +405,7 @@ if "EMAIL_BACKEND" not in locals() or "smtp" in EMAIL_BACKEND.lower():
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "override-templates"],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

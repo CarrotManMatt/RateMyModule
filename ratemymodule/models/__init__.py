@@ -43,10 +43,11 @@ from django_stubs_ext.db.models.manager import RelatedManager
 from core.utils import reverse_url_with_get_params
 
 from .managers import (
+    ModuleOrRequestVisiblePostsManager,
     PostFilteredByTagManager,
     UniversityModuleManager,
     UserManager,
-    UserModuleManager,
+    UserPossibleModuleManager,
 )
 from .utils import AttributeDeleter, CustomBaseModel
 from .validators import (
@@ -199,7 +200,10 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
 
-        self.module_set: UserModuleManager = UserModuleManager(self, Module)
+        self.possible_module_set: UserPossibleModuleManager = UserPossibleModuleManager(
+            self,
+            Module,
+        )
 
     @override
     def __str__(self) -> str:
@@ -254,8 +258,8 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
 
     @classmethod
     @override
-    def get_proxy_field_names(cls) -> ImmutableSet[str]:
-        return super().get_proxy_field_names() | {"date_time_joined"}
+    def _get_proxy_field_names(cls) -> ImmutableSet[str]:
+        return super()._get_proxy_field_names() | {"date_time_joined"}
 
     def like_post(self, post: "Post") -> None:
         """Like a given post, by this user, ensuring it's not disliked at the same time."""
@@ -455,6 +459,8 @@ class Module(CustomBaseModel):
         blank=False,
     )
 
+    post_set: RelatedManager["Post"]
+
     class Meta:
         """Metadata options about this model."""
 
@@ -524,6 +530,32 @@ class BaseTag(CustomBaseModel):
         return self.name
 
 
+class ToolTag(BaseTag):
+    """Model class for tags about the tools used in a module, that can be added to posts."""
+
+    class Meta:
+        """Metadata options about this model."""
+
+        verbose_name = _("Tool Tag")
+
+    @override
+    def clean(self) -> None:
+        TAG_NAME_EXISTS: Final[bool] = (
+            (
+                ToolTag.objects.exclude(pk=self.pk).filter(
+                    name__iexact=self.name.casefold(),
+                ).exists()
+            )
+            or TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            or OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
+        )
+        if TAG_NAME_EXISTS:
+            raise ValidationError(
+                {"name": _("A tag with this name already exists.")},
+                code="unique",
+            )
+
+
 class TopicTag(BaseTag):
     """Model class for tags about the topics within a module, that can be added to posts."""
 
@@ -535,13 +567,13 @@ class TopicTag(BaseTag):
     @override
     def clean(self) -> None:
         TAG_NAME_EXISTS: Final[bool] = (
-            OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
-            or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
             or (
                 TopicTag.objects.exclude(pk=self.pk).filter(
                     name__iexact=self.name.casefold(),
                 ).exists()
             )
+            or OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
         )
         if TAG_NAME_EXISTS:
             raise ValidationError(
@@ -561,36 +593,10 @@ class OtherTag(BaseTag):
     @override
     def clean(self) -> None:
         TAG_NAME_EXISTS: Final[bool] = (
-            TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
-            or ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
-            or (
-                OtherTag.objects.exclude(pk=self.pk).filter(
-                    name__iexact=self.name.casefold(),
-                ).exists()
-            )
-        )
-        if TAG_NAME_EXISTS:
-            raise ValidationError(
-                {"name": _("A tag with this name already exists.")},
-                code="unique",
-            )
-
-
-class ToolTag(BaseTag):
-    """Model class for tags about the tools used in a module, that can be added to posts."""
-
-    class Meta:
-        """Metadata options about this model."""
-
-        verbose_name = _("Tool Tag")
-
-    @override
-    def clean(self) -> None:
-        TAG_NAME_EXISTS: Final[bool] = (
-            OtherTag.objects.filter(name__iexact=self.name.casefold()).exists()
+            ToolTag.objects.filter(name__iexact=self.name.casefold()).exists()
             or TopicTag.objects.filter(name__iexact=self.name.casefold()).exists()
             or (
-                ToolTag.objects.exclude(pk=self.pk).filter(
+                OtherTag.objects.exclude(pk=self.pk).filter(
                     name__iexact=self.name.casefold(),
                 ).exists()
             )
@@ -669,12 +675,6 @@ class Post(CustomBaseModel):
     )
     hidden = models.BooleanField(default=False, verbose_name=_("Is Hidden?"),)  # noqa: COM819
 
-    other_tag_set = models.ManyToManyField(
-        OtherTag,
-        blank=True,
-        related_name="post_set",
-        verbose_name=_("Other Tags"),
-    )
     tool_tag_set = models.ManyToManyField(
         ToolTag,
         blank=True,
@@ -686,6 +686,12 @@ class Post(CustomBaseModel):
         blank=True,
         related_name="post_set",
         verbose_name=_("Topic Tags"),
+    )
+    other_tag_set = models.ManyToManyField(
+        OtherTag,
+        blank=True,
+        related_name="post_set",
+        verbose_name=_("Other Tags"),
     )
 
     report_set: RelatedManager["Report"]
@@ -738,7 +744,7 @@ class Post(CustomBaseModel):
         except Module.DoesNotExist:
             pass
         else:
-            if self.pk and module not in self.user.module_set.all():
+            if self.pk and module not in self.user.possible_module_set.all():
                 raise ValidationError(
                     {
                         "module": _(
@@ -750,8 +756,8 @@ class Post(CustomBaseModel):
 
     @classmethod
     @override
-    def get_proxy_field_names(cls) -> ImmutableSet[str]:
-        return super().get_proxy_field_names() | {"date_time_posted"}
+    def _get_proxy_field_names(cls) -> ImmutableSet[str]:
+        return super()._get_proxy_field_names() | {"date_time_posted"}
 
     @property
     def date_time_posted(self) -> datetime.datetime:
@@ -815,7 +821,7 @@ class Post(CustomBaseModel):
     @override
     def __str__(self) -> str:
         try:
-            return f"Post by {self.student_type} for {self.module}"
+            return self.display_user
         except (self.module.DoesNotExist, Course.DoesNotExist, University.DoesNotExist):
             return f"Post #{self.pk}"
 
@@ -826,7 +832,19 @@ class Post(CustomBaseModel):
 
         Searches for tag names within the ToolTag, TopicTag & OtherTag models.
         """
-        return PostFilteredByTagManager(tag_names=names, model=cls)
+        return PostFilteredByTagManager(tag_names=names, post_model=cls)
+
+    @classmethod
+    def filter_by_viewable(cls, module: Module | None = None, request: HttpRequest | None = None) -> Manager["Post"]:  # noqa: E501
+        return ModuleOrRequestVisiblePostsManager(
+            post_model=cls,
+            module=module,
+            request=request,
+        )
+
+    @property
+    def display_user(self) -> str:
+        return f"From {self.student_type} | {self.module.university.short_name}"
 
     @property
     def is_user_suspicious(self) -> bool:

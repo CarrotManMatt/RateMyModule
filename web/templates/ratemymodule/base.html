@@ -64,166 +64,167 @@
 </head>
 
 <body>
-    <div id="loading-overlay"
-         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000;">
-    </div>
-    <header>
-        <div class="banner">
-            <div class="logo-container">
-                <a href="{% url 'default' %}"
-                   style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                    <svg role="img" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo">
-                        <title>{{ request.site.name }} Logo</title>
-                        <rect x="0.5" y="0.5" width="39" height="39" rx="7.5" fill="var(--button-color)" stroke="var(--button-color)" />
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M32.1071 10H22.2857L21.6607 10.2532L20.5 11.3333L19.3393 10.2532L18.7143 10H8.89286L8 10.8439V27.7215L8.89286 28.5654H18.3393L19.875 30H21.125L22.6607 28.5654H32.1071L33 27.7215V10.8439L32.1071 10ZM19.6071 27.4177L19.2857 27.1308L18.7143 26.8776H9.78571V11.6878H18.3393L19.6607 12.9367L19.6071 27.4177ZM31.2143 26.8776H22.2857L21.6607 27.1308L21.4107 27.3502V12.8692L22.6607 11.6878H31.2143V26.8776ZM16.9286 15.0633H11.5714V16.7511H16.9286V15.0633ZM16.9286 21.8143H11.5714V23.5021H16.9286V21.8143ZM11.5714 18.4388H16.9286V20.1266H11.5714V18.4388ZM29.4286 15.0633H24.0714V16.7511H29.4286V15.0633ZM24.0714 18.4388H29.4286V20.1266H24.0714V18.4388ZM24.0714 21.8143H29.4286V23.5021H24.0714V21.8143Z" fill="white" />
-                    </svg>
-                    <span class="name">{{ request.site.name }}</span>
-                    {% if request.user.is_authenticated %}
-                        <p id="uni-name">{{ selected_university.short_name }}</p>
-                    {% endif %}
-                </a>
-                {% if selected_university %}
-                    {% if not request.user.is_authenticated %}
-                        <a style="display: flex; align-items: center; text-decoration: none; color: inherit;"
-                           href="{{ select_university_url }}">
-                            <p id="uni-name">{{ selected_university.short_name }}</p>
-                        </a>
-                    {% endif %}
-                {% endif %}
-            </div>
-
-            <div class="search-container">{% block search_bar %}{% endblock search_bar %}</div>
-
-            <div class="user-profile-container">
-                {% block user_profile %}
-                    <a href="{% url 'ratemymodule:submit-review' %}"
-                       class="create-post">Create Post</a>
-                    {% if user.is_authenticated %}
-                        <div class="user-dropdown">
-                            <button class="user-dropbtn">
-                                <span class="short-username">{{ user.short_username }}</span>
-                                <img src="{% static 'ratemymodule/icons/down-arrow-dark.svg' %}"
-                                     alt="Dropdown Icon" class="dropdown-icon"/>
-                            </button>
-                            <div class="user-dropdown-content">
-                                <a href="{% url 'ratemymodule:user-settings' %}">
-                                    User Settings
-                                </a>
-                                {% if user.is_staff %}
-                                    <a href="{% url 'admin:index' %}">Admin Site</a>
-                                {% endif %}
-                                <form method="post" action="{% url 'ratemymodule:post-logout' %}">
-                                    {% csrf_token %}
-                                    <button type="submit">Logout</button>
-                                </form>
-                            </div>
-                        </div>
-                    {% else %}
-                        <a href="{{ LOGIN_URL }}" class="login-button">Login/Register</a>
-                    {% endif %}
-                {% endblock user_profile %}
-            </div>
-            <div class="toggle-container">
-                <svg class="theme-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#a)">
-                        <path d="M12 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM4.929 3.515a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 0 0 1.414-1.414L4.93 3.515ZM1 11a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H1ZM18 12a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1ZM17.657 16.243a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 1 0 1.414-1.414l-2.828-2.828ZM7.757 17.657a1 1 0 1 0-1.414-1.414L3.515 19.07a1 1 0 1 0 1.414 1.414l2.828-2.828ZM20.485 4.929a1 1 0 0 0-1.414-1.414l-2.828 2.828a1 1 0 1 0 1.414 1.414l2.828-2.828ZM13 19a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"></path>
-                    </g>
-                    <defs>
-                        <clipPath id="a">
-                            <path d="M0 0h24v24H0z"></path>
-                        </clipPath>
-                    </defs>
+<div id="loading-overlay"
+     style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000;">
+</div>
+<header>
+    <div class="banner">
+        <div class="logo-container">
+            <a href="{% url 'default' %}"
+               style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <svg role="img" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo">
+                    <title>{{ request.site.name }} Logo</title>
+                    <rect x="0.5" y="0.5" width="39" height="39" rx="7.5" fill="var(--button-color)" stroke="var(--button-color)" />
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M32.1071 10H22.2857L21.6607 10.2532L20.5 11.3333L19.3393 10.2532L18.7143 10H8.89286L8 10.8439V27.7215L8.89286 28.5654H18.3393L19.875 30H21.125L22.6607 28.5654H32.1071L33 27.7215V10.8439L32.1071 10ZM19.6071 27.4177L19.2857 27.1308L18.7143 26.8776H9.78571V11.6878H18.3393L19.6607 12.9367L19.6071 27.4177ZM31.2143 26.8776H22.2857L21.6607 27.1308L21.4107 27.3502V12.8692L22.6607 11.6878H31.2143V26.8776ZM16.9286 15.0633H11.5714V16.7511H16.9286V15.0633ZM16.9286 21.8143H11.5714V23.5021H16.9286V21.8143ZM11.5714 18.4388H16.9286V20.1266H11.5714V18.4388ZM29.4286 15.0633H24.0714V16.7511H29.4286V15.0633ZM24.0714 18.4388H29.4286V20.1266H24.0714V18.4388ZM24.0714 21.8143H29.4286V23.5021H24.0714V21.8143Z" fill="white" />
                 </svg>
-            </div>
+                <span class="name">{{ request.site.name }}</span>
+                {% if request.user.is_authenticated %}
+                    <p id="uni-name">{{ selected_university.short_name }}</p>
+                {% endif %}
+            </a>
+            {% if selected_university %}
+                {% if not request.user.is_authenticated %}
+                    <a style="display: flex; align-items: center; text-decoration: none; color: inherit;"
+                       href="{{ select_university_url }}">
+                        <p id="uni-name">{{ selected_university.short_name }}</p>
+                    </a>
+                {% endif %}
+            {% endif %}
         </div>
-    </header>
 
-    <main>
-        {% block content %}
-            {# content goes here i.e. base-with-content.html #}
-        {% endblock content %}
-    </main>
+        <div class="search-container">{% block search_bar %}{% endblock search_bar %}</div>
 
-    {% block modals %}
-        {% include "ratemymodule/fragments/login-modals.html" %}
-    {% endblock modals %}
+        <div class="user-profile-container">
+            {% block user_profile %}
+                <a href="{% url 'ratemymodule:submit-review' %}"
+                   class="create-post">Create Post</a>
+                {% if user.is_authenticated %}
+                    <div class="user-dropdown">
+                        <button class="user-dropbtn">
+                            <span class="short-username">{{ user.short_username }}</span>
+                            <img src="{% static 'ratemymodule/icons/down-arrow-dark.svg' %}"
+                                 alt="Dropdown Icon" class="dropdown-icon"/>
+                        </button>
+                        <div class="user-dropdown-content">
+                            <a href="{% url 'ratemymodule:user-settings' %}">
+                                User Settings
+                            </a>
+                            {% if user.is_staff %}
+                                <a href="{% url 'admin:index' %}">Admin Site</a>
+                            {% endif %}
+                            <a href="{% url 'api_rest:root' %}">Browsable API</a>
+                            <form method="post" action="{% url 'ratemymodule:post-logout' %}">
+                                {% csrf_token %}
+                                <button type="submit">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ LOGIN_URL }}" class="login-button">Login/Register</a>
+                {% endif %}
+            {% endblock user_profile %}
+        </div>
+        <div class="toggle-container">
+            <svg class="theme-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#a)">
+                    <path d="M12 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM4.929 3.515a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 0 0 1.414-1.414L4.93 3.515ZM1 11a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H1ZM18 12a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1ZM17.657 16.243a1 1 0 0 0-1.414 1.414l2.828 2.828a1 1 0 1 0 1.414-1.414l-2.828-2.828ZM7.757 17.657a1 1 0 1 0-1.414-1.414L3.515 19.07a1 1 0 1 0 1.414 1.414l2.828-2.828ZM20.485 4.929a1 1 0 0 0-1.414-1.414l-2.828 2.828a1 1 0 1 0 1.414 1.414l2.828-2.828ZM13 19a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0v-4ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"></path>
+                </g>
+                <defs>
+                    <clipPath id="a">
+                        <path d="M0 0h24v24H0z"></path>
+                    </clipPath>
+                </defs>
+            </svg>
+        </div>
+    </div>
+</header>
 
-    <footer>
-        <p>
-            You are accessing an experimental web application developed by
-            participants of the Team Project 2024 module.
-        </p>
-    </footer>
+<main>
+    {% block content %}
+        {# content goes here i.e. base-with-content.html #}
+    {% endblock content %}
+</main>
 
-    {# HTMX script here #}
-    <script src="https://unpkg.com/htmx.org@1.9.10"
-            integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-            crossorigin="anonymous"></script>
+{% block modals %}
+    {% include "ratemymodule/fragments/login-modals.html" %}
+{% endblock modals %}
 
-        {% block scripts %}
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    document.getElementById("loginModal").style.display = "{% if request.GET.action == "login" %}block{% else %}none{% endif %}";
-                    document.getElementById("manualSignupModal").style.display = "none";
-                    document.getElementById("manualLoginModal").style.display = "none";
-                });
+<footer>
+    <p>
+        You are accessing an experimental web application developed by
+        participants of the Team Project 2024 module.
+    </p>
+</footer>
 
-                function closeLoginModal() {
-                    const currentURL = new URL(window.location.href);
-                    currentURL.searchParams.delete("action", "login");
-                    window.location.href = currentURL.toString();
-                }
-                function openLoginModal() {
-                    document.getElementById("manualSignupModal").style.display = "none";
-                    document.getElementById("manualLoginModal").style.display = "none";
-                    document.getElementById("loginModal").style.display = "block";
-                }
-                function openManualSignupModal() {
-                  document.getElementById("loginModal").style.display = "none";
-                  document.getElementById("manualLoginModal").style.display = "none";
-                  document.getElementById("manualSignupModal").style.display = "block";
-                }
-                function openManualLoginModal() {
-                  document.getElementById("manualSignupModal").style.display = "none";
-                  document.getElementById("manualLoginModal").style.display = "block";
-                }
-            </script>
-            <script>
-                function toggleTheme() {
-                    const currentTheme = document.documentElement.getAttribute('data-theme');
-                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', newTheme);
-                    localStorage.setItem('theme', newTheme);
-                    setDropdownIconTheme(newTheme);
-                    // You might want to call any function here that updates the SVG fill based on the theme
-                }
+{# HTMX script here #}
+<script src="https://unpkg.com/htmx.org@1.9.10"
+        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+        crossorigin="anonymous"></script>
 
-            function setDropdownIconTheme(theme) {
-                const dropdownIcons = document.querySelectorAll('.dropdown-icon');
-                dropdownIcons.forEach(icon => {
-                    icon.src = `/static/ratemymodule/icons/down-arrow-${theme}.svg`;
-                });
+{% block scripts %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById("loginModal").style.display = "{% if request.GET.action == "login" %}block{% else %}none{% endif %}";
+                document.getElementById("manualSignupModal").style.display = "none";
+                document.getElementById("manualLoginModal").style.display = "none";
+            });
+
+            function closeLoginModal() {
+                const currentURL = new URL(window.location.href);
+                currentURL.searchParams.delete("action", "login");
+                window.location.href = currentURL.toString();
+            }
+            function openLoginModal() {
+                document.getElementById("manualSignupModal").style.display = "none";
+                document.getElementById("manualLoginModal").style.display = "none";
+                document.getElementById("loginModal").style.display = "block";
+            }
+            function openManualSignupModal() {
+              document.getElementById("loginModal").style.display = "none";
+              document.getElementById("manualLoginModal").style.display = "none";
+              document.getElementById("manualSignupModal").style.display = "block";
+            }
+            function openManualLoginModal() {
+              document.getElementById("manualSignupModal").style.display = "none";
+              document.getElementById("manualLoginModal").style.display = "block";
+            }
+        </script>
+        <script>
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                setDropdownIconTheme(newTheme);
+                // You might want to call any function here that updates the SVG fill based on the theme
             }
 
-            // Add click event listener to the SVG for theme toggling
-            document.addEventListener('DOMContentLoaded', () => {
-                const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                setDropdownIconTheme(savedTheme);
-                // Update this part to target the SVG container instead of an input element
-                const themeToggleSvg = document.querySelector('.toggle-container');
-                if (themeToggleSvg) {
-                    themeToggleSvg.addEventListener('click', toggleTheme);
-                }
-
-                // Hide the loading overlay if it exists
-                const loadingOverlay = document.getElementById('loading-overlay');
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'none';
-                }
-                document.body.classList.add('loaded');
+        function setDropdownIconTheme(theme) {
+            const dropdownIcons = document.querySelectorAll('.dropdown-icon');
+            dropdownIcons.forEach(icon => {
+                icon.src = `/static/ratemymodule/icons/down-arrow-${theme}.svg`;
             });
-        </script>
-    {% endblock scripts %}
+        }
+
+        // Add click event listener to the SVG for theme toggling
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            setDropdownIconTheme(savedTheme);
+            // Update this part to target the SVG container instead of an input element
+            const themeToggleSvg = document.querySelector('.toggle-container');
+            if (themeToggleSvg) {
+                themeToggleSvg.addEventListener('click', toggleTheme);
+            }
+
+            // Hide the loading overlay if it exists
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+            document.body.classList.add('loaded');
+        });
+    </script>
+{% endblock scripts %}
 </body>
 </html>
