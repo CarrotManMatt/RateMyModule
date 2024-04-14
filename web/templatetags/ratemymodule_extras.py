@@ -1,3 +1,5 @@
+"""A set of extra Django template tags for RateMyModule."""
+
 from collections.abc import Sequence
 
 # noinspection SpellCheckingInspection
@@ -17,6 +19,7 @@ register: template.Library = template.Library()
 
 @register.filter(name="get_module_search_url", needs_autoescape=True, is_safe=True)
 def get_module_search_url(module: object, request: object, *, autoescape: bool = True) -> SafeString:  # noqa: E501
+    """Process a request to get the url for a module."""
     url: str = ""
 
     if isinstance(module, Module) and isinstance(request, HttpRequest):

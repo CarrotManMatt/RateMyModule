@@ -1,1 +1,1 @@
-"""A selection of utils for RateMyModule."""
+"""Contains common utils within the ratemymodule app."""

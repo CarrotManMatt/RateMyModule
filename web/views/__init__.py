@@ -58,10 +58,14 @@ if TYPE_CHECKING:
 
 
 class LogoutView(AllAuthLogoutView):  # type: ignore[misc,no-any-unimported]
+    """The view for logging out the user."""
+
     http_method_name = ("post",)
 
 
 class LoginView(AllAuthLoginView):  # type: ignore[misc,no-any-unimported]
+    """The view for processing login requests."""
+
     http_method_names = ("post",)
     redirect_authenticated_user = True
     prefix = "login"
@@ -80,6 +84,8 @@ class LoginView(AllAuthLoginView):  # type: ignore[misc,no-any-unimported]
 
 
 class SignupView(AllAuthSignupView):  # type: ignore[misc,no-any-unimported]
+    """A view for signing up a new user."""
+
     http_method_names = ("post",)
     redirect_authenticated_user = True
     prefix = "signup"
@@ -333,12 +339,26 @@ class HomeView(TemplateView):
                 context_data["analytics_form"] = AnalyticsForm()
             else:
                 # first extract all data
-                difficulty_rating = self.request.GET["aa_difficulty_rating"]
-                teaching_rating = self.request.GET["aa_teaching_quality"]
-                assessment_quality = self.request.GET["aa_assessment_quality"]
-                overall_rating = self.request.GET["aa_overall_rating"]
-                start_year = int(self.request.GET["aa_start_year"])
-                end_year = int(self.request.GET["aa_end_year"])
+
+                # noinspection PyTypeChecker
+                difficulty_rating: str | None = self.request.GET.get(
+                    "aa_difficulty_rating", None,
+                )
+                # noinspection PyTypeChecker
+                teaching_rating: str | None = self.request.GET.get(
+                    "aa_teaching_quality", None,
+                )
+                # noinspection PyTypeChecker
+                assessment_quality: str | None = self.request.GET.get(
+                    "aa_assessment_quality", None,
+                )
+                # noinspection PyTypeChecker
+                overall_rating: str | None = self.request.GET.get(
+                    "aa_overall_rating", None,
+                )
+                # note: warning for next two lines, should be put in as int, if not int, die
+                start_year: int = int(self.request.GET.get("aa_start_year"))
+                end_year: int = int(self.request.GET.get("aa_end_year"))
                 # repopulate form
                 context_data["analytics_form"] = AnalyticsForm(
                     initial={
@@ -547,6 +567,8 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
 
 
 class ToolTagAutocompleteView(View):
+    """A view for processing get requests for Tool tags."""
+
     # noinspection PyOverrides
     @override
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
@@ -558,6 +580,8 @@ class ToolTagAutocompleteView(View):
 
 
 class TopicTagAutocompleteView(View):
+    """A view for processing get requests about topic tags."""
+
     # noinspection PyOverrides
     @override
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
@@ -569,6 +593,8 @@ class TopicTagAutocompleteView(View):
 
 
 class OtherTagAutocompleteView(View):
+    """A view for processing get requests for other tags."""
+
     # noinspection PyOverrides
     @override
     def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]

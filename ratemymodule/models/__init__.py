@@ -185,9 +185,7 @@ class User(CustomBaseModel, AbstractBaseUser, PermissionsMixin):
 
             raise
 
-    class Meta:
-        """Metadata options about this model."""
-
+    class Meta:  # noqa: D106
         verbose_name = _("User")
         constraints = (
             models.CheckConstraint(
@@ -326,9 +324,7 @@ class University(CustomBaseModel):
 
     course_set: RelatedManager["Course"]
 
-    class Meta:
-        """Metadata options about this model."""
-
+    class Meta:  # noqa: D106
         verbose_name = _("University")
         verbose_name_plural = _("Universities")
         constraints = (
@@ -398,9 +394,7 @@ class Course(CustomBaseModel):
     module_set: RelatedManager["Module"]
     enrolled_user_set: RelatedManager["User"]
 
-    class Meta:
-        """Metadata options about this model."""
-
+    class Meta:  # noqa: D106
         verbose_name = _("Course")
         constraints = (
             models.UniqueConstraint(
@@ -461,9 +455,7 @@ class Module(CustomBaseModel):
 
     post_set: RelatedManager["Post"]
 
-    class Meta:
-        """Metadata options about this model."""
-
+    class Meta:  # noqa: D106
         verbose_name = _("Module")
 
     @override
@@ -491,6 +483,7 @@ class Module(CustomBaseModel):
         return self.get_search_url(request=None)
 
     def get_search_url(self, request: HttpRequest | None) -> str:
+        """Return the correct URL to search for this Module."""
         # noinspection PyArgumentList
         url_params: QueryDict | dict[str, object] = request.GET.copy() if request else {}
         url_params["module"] = self.code
@@ -520,9 +513,7 @@ class BaseTag(CustomBaseModel):
 
     post_set: RelatedManager["Post"]
 
-    class Meta:
-        """Metadata options about this model."""
-
+    class Meta:  # noqa: D106
         abstract = True
 
     @override
@@ -533,8 +524,7 @@ class BaseTag(CustomBaseModel):
 class ToolTag(BaseTag):
     """Model class for tags about the tools used in a module, that can be added to posts."""
 
-    class Meta:
-        """Metadata options about this model."""
+    class Meta:  # noqa: D106
 
         verbose_name = _("Tool Tag")
 
@@ -559,8 +549,7 @@ class ToolTag(BaseTag):
 class TopicTag(BaseTag):
     """Model class for tags about the topics within a module, that can be added to posts."""
 
-    class Meta:
-        """Metadata options about this model."""
+    class Meta:  # noqa: D106
 
         verbose_name = _("Topic Tag")
 
@@ -585,8 +574,7 @@ class TopicTag(BaseTag):
 class OtherTag(BaseTag):
     """Model class for other tags describing a module, that can be added to posts."""
 
-    class Meta:
-        """Metadata options about this model."""
+    class Meta:  # noqa: D106
 
         verbose_name = _("Other Tag")
 
@@ -698,9 +686,7 @@ class Post(CustomBaseModel):
     liked_user_set: RelatedManager[User]
     disliked_user_set: RelatedManager[User]
 
-    class Meta:
-        """Metadata options about this model."""
-
+    class Meta:  # noqa: D106
         verbose_name = _("Post")
         constraints = (
             models.UniqueConstraint(
@@ -836,6 +822,7 @@ class Post(CustomBaseModel):
 
     @classmethod
     def filter_by_viewable(cls, module: Module | None = None, request: HttpRequest | None = None) -> Manager["Post"]:  # noqa: E501
+        """Return only viewable posts."""
         return ModuleOrRequestVisiblePostsManager(
             post_model=cls,
             module=module,
@@ -844,6 +831,7 @@ class Post(CustomBaseModel):
 
     @property
     def display_user(self) -> str:
+        """Returns the formatted display value for this post's creator."""
         return f"From {self.student_type} | {self.module.university.short_name}"
 
     @property
@@ -906,9 +894,7 @@ class Report(CustomBaseModel):
         default=False,
     )
 
-    class Meta:
-        """Metadata options about this model."""
-
+    class Meta:  # noqa: D106
         verbose_name = _("Report")
         constraints = (
             models.CheckConstraint(

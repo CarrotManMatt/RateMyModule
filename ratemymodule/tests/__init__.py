@@ -1,4 +1,4 @@
-"""Automated test suite for `ratemymodule` app."""
+"""Utility functions & classes for use within the test suite."""
 
 from collections.abc import Sequence
 

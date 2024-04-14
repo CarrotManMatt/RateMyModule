@@ -64,9 +64,7 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
     rating_levels = [1, 2, 3, 4, 5]
 
     # transform input to normalized percentages
-    total = 0
-    for counter in range(5):
-        total = total + array_of_in_ratings[counter]
+    total = sum(array_of_in_ratings)
 
     array_of_ratings: list[float] = [0, 0, 0, 0, 0]
     if total == 0:
@@ -78,7 +76,7 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
             # adds small offset to bars, so they don't become weird after curving ends
 
     rects = ax.barh(rating_levels, array_of_ratings,
-                    color=_bar_color, label=array_of_in_ratings  # noqa: COM812
+                    color=_bar_color, label=array_of_in_ratings,
                     )
 
     # make curved corners on bar ends
@@ -114,30 +112,12 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
         tick.set_fontweight("bold")
 
     # attach labels on the bar's tips
-    # if bar less than 40% value of largest bar put text outside it
-    array_of_bar_labels = ["", "", "", "", ""]
-    for counter in range(5):
-        if array_of_in_ratings[counter] == 1:
-            array_of_bar_labels[counter] = "(1 Review)"
-        elif array_of_in_ratings[counter] == 0:
-            array_of_bar_labels[counter] = "(0 Reviews)"
-        else:
-            array_of_bar_labels[counter] = f"({array_of_in_ratings[counter]} Reviews)"
+    # if bar less than 40% value of the largest bar put the text outside it
+    array_of_bar_labels = sb_format_reviews_string(array_of_in_ratings)
 
-    forty_max = ceil(max(array_of_in_ratings) * 0.5)
-    inside_of_bar_texts = [p if p >= forty_max
-                           else "" for p in array_of_in_ratings
-                           ]
-    for counter in range(5):
-        if inside_of_bar_texts[counter] != "":
-            inside_of_bar_texts[counter] = array_of_bar_labels[counter]
-
-    out_of_bar_texts = [p if p < forty_max
-                        else "" for p in array_of_in_ratings
-                        ]
-    for counter in range(5):
-        if out_of_bar_texts[counter] != "":
-            out_of_bar_texts[counter] = array_of_bar_labels[counter]
+    out_of_bar_texts, inside_of_bar_texts = decide_in_or_out_of_bars(
+        array_of_in_ratings, array_of_bar_labels,
+    )
 
     if flag_nodata:
         out_of_bar_texts[3] = "No posts = (\n be the first to \nRateThisModule!"
@@ -167,6 +147,38 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
     fig.savefig(out_string, format=image_format, transparent=True, bbox_inches="tight", dpi=80)
     plt.close(fig)
     return out_string.getvalue()
+
+
+def sb_format_reviews_string(array_of_in_ratings: list[int]) -> list[str]:
+    array_of_bar_labels: list[str] = ["", "", "", "", ""]
+    for counter in range(5):
+        if array_of_in_ratings[counter] == 1:
+            array_of_bar_labels[counter] = "(1 Review)"
+        elif array_of_in_ratings[counter] == 0:
+            array_of_bar_labels[counter] = "(0 Reviews)"
+        else:
+            array_of_bar_labels[counter] = f"({array_of_in_ratings[counter]} Reviews)"
+    return array_of_bar_labels
+
+
+def decide_in_or_out_of_bars(array_of_in_ratings: list[int], array_of_bar_labels: list[str]) -> (list[str], list[str]):  # noqa: E501
+    # if bar less than 40% value of the largest bar, then put the text outside it
+    forty_max = ceil(max(array_of_in_ratings) * 0.5)
+    inside_of_bar_texts = [p if p >= forty_max
+                           else "" for p in array_of_in_ratings
+                           ]
+    for counter in range(5):
+        if inside_of_bar_texts[counter] != "":
+            inside_of_bar_texts[counter] = array_of_bar_labels[counter]
+
+    out_of_bar_texts = [p if p < forty_max
+                        else "" for p in array_of_in_ratings
+                        ]
+    for counter in range(5):
+        if out_of_bar_texts[counter] != "":
+            out_of_bar_texts[counter] = array_of_bar_labels[counter]
+
+    return out_of_bar_texts, inside_of_bar_texts
 
 
 def overall_rating_bar_graph(module: Module, button_colour: str, text_colour: str) -> str:
@@ -214,41 +226,24 @@ def assessment_quality_bar_graph(module: Module, button_colour: str, text_colour
     return rating_bar_graph(data, title, bar_colour, label_colour)
 
 
-def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment_quality: bool, teaching_rating: bool, overall_rating: bool, start_year: int, end_year: int) -> str:  # noqa: E501, FBT001
+def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment_quality: bool, teaching_rating: bool, overall_rating: bool, start_year: int, end_year: int) -> str:  # noqa: E501, FBT001, PLR0915
     """Plot a custom line graph for the analytics modal."""
+    """
+    This function is "too complex" according to ruff,
+    sadly I (tom) can't reasonably untangle it anymore than it is
+    This function ignores: passing bool as parameter, line too long and function too complex
+    """
+
     # input sanitization, no reviews before 1900, no invalid date settings, no massive ranges
-    if start_year > end_year:
-        return "Invalid year parameters, please check your inputs\n"
-    if start_year < 1900:
-        return "Earliest date option is 1900\n"
-    if end_year-start_year > 50:
-        return "Date range too large, try focusing your query\n"
+    errors = validate_dates(start_year, end_year)
+    if errors != "":
+        return errors
+
     now = datetime.datetime.now(tz=datetime.UTC)
-    if end_year > now.year:
-        return "End date is in the future"
 
     end_year = end_year+1
 
-    months = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    date_list: list[str] = []
-    guide_bar: list[int | None] = [1]
-    i = 0
-    x_axis: list[int] =[]
-    for counter in range(start_year, end_year):  # set up the month labels
-        if counter == now.year:
-            for counter2 in range(now.month):
-                date_list.append(str(months[counter2] + str(counter)))
-                guide_bar.append(None)
-                x_axis.append(i)
-                i += 1
-            break
-
-        for counter2 in range(12):
-            date_list.append(f"{months[counter2]}{counter}")
-            guide_bar.append(None)
-            x_axis.append(i)
-            i += 1
+    date_list, guide_bar, x_axis = aa_set_up_axis(start_year, end_year)
 
     guide_bar.pop(1)
     guide_bar[len(guide_bar) - 1] = 1
@@ -337,7 +332,7 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
             rotation_mode="anchor", horizontalalignment="left",
             verticalalignment="center",
         )
-    #legend processing
+    # legend processing
     ax.legend(labelcolor="#aaaaaa", facecolor="#000001", edgecolor="#000002")
 
     fig.set_size_inches(6.5, 4.35)
@@ -349,7 +344,48 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
     return out_string.getvalue()
 
 
+def validate_dates(start_year: int, end_year: int) -> str:
+    errors = ""
+    now = datetime.datetime.now(tz=datetime.UTC)
+    if start_year > end_year:
+        errors += "Invalid year parameters, please check your inputs.\n"
+    if start_year < 1900:
+        errors += "Earliest date option is 1900.\n"
+    if end_year-start_year > 50:
+        errors += "Date range too large, try focusing your query.\n"
+    if end_year > now.year:
+        errors += "End date is in the future.\n"
+    return errors
+
+
+def aa_set_up_axis(start_year: int, end_year: int) -> (list[str], list[None], list[int]):
+    months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ]
+    i = 0
+    date_list: list[str] = []
+    guide_bar: list[None] = [None]
+    x_axis: list[int] = []
+    now = datetime.datetime.now(tz=datetime.UTC)
+    for counter in range(start_year, end_year):  # set up the month labels
+        if counter == now.year:
+            for counter2 in range(now.month):
+                date_list.append(str(months[counter2] + str(counter)))
+                guide_bar.append(None)
+                x_axis.append(i)
+                i += 1
+            break
+
+        for counter2 in range(12):
+            date_list.append(f"{months[counter2]}{counter}")
+            guide_bar.append(None)
+            x_axis.append(i)
+            i += 1
+    return date_list, guide_bar, x_axis
+
+
 def get_module_averages(start_year: int, end_year: int, module: Module, attribute: str) -> list[float]:  # noqa: E501
+    """Get the average of each month's reviews for a module in a specified date range."""
     set_of_averages: list[float] = []
     for year in range(start_year, end_year):
         if year == datetime.datetime.now(tz=datetime.UTC).date().year:
@@ -367,7 +403,7 @@ def get_module_averages(start_year: int, end_year: int, module: Module, attribut
 
                 this_months_reviews = [
                     getattr(post, attribute) for post in module.post_set.all()
-                                       if start_band <= post.date_time_created <= end_band
+                    if start_band <= post.date_time_created <= end_band
                 ]
 
                 if this_months_reviews:

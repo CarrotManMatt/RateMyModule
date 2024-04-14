@@ -1,3 +1,5 @@
+"""A set of utility functions for RateMyModule."""
+
 from collections.abc import Sequence
 
 __all__: Sequence[str] = ("TestCase", "TestDataGenerator")
@@ -139,10 +141,13 @@ class _TestDataWrapper:
 
 
 class TestDataGenerator:
+    """Makes test data of all varieties to be used in automated tests."""
+
     _test_data_iterators: _TestDataWrapper
 
     @classmethod
     def create_user_email(cls, *, with_new_university: bool = False) -> str:
+        """Create a fake email for a test data user for automated tests."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a user email because the test data has not been loaded. "
@@ -176,6 +181,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_user(cls, *, save: bool = True) -> User:
+        """Create a user for automated tests."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a User because the test data has not been loaded. "
@@ -202,6 +208,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_university_name(cls) -> str:
+        """Create a university name for automated tests."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a university name because the test data has not been loaded. "
@@ -230,6 +237,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_university_short_name(cls) -> str:
+        """Create a university short name for the purposes of test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a university short name "
@@ -259,6 +267,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_university_email_domain(cls) -> str:
+        """Create a test email domain."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a university email domain "
@@ -288,6 +297,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_university(cls, *, save: bool = True) -> University:
+        """Create a university for test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a University because the test data has not been loaded. "
@@ -319,6 +329,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_course_name(cls) -> str:
+        """Create a course name for test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a course name because the test data has not been loaded. "
@@ -347,6 +358,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_course_student_type(cls) -> str:
+        """Create the generic name of a student on a course for test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a course student type "
@@ -376,6 +388,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_course(cls, *, save: bool = True) -> Course:
+        """Create a course for test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a Course because the test data has not been loaded. "
@@ -405,6 +418,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_module_name(cls) -> str:
+        """Create a module name for test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a module name because the test data has not been loaded. "
@@ -433,6 +447,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_module_code(cls) -> str:
+        """Create a module code for test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a module code because the test data has not been loaded. "
@@ -461,6 +476,7 @@ class TestDataGenerator:
 
     @classmethod
     def create_module(cls, *, save: bool = True) -> Module:
+        """Create a module for test data."""
         if not hasattr(cls, "_test_data_iterators"):
             NO_TEST_DATA_ERROR_MESSAGE: Final[str] = (
                 "Cannot create a Module because the test data has not been loaded. "
@@ -493,10 +509,13 @@ class TestDataGenerator:
 
     @classmethod
     def set_up(cls) -> None:
+        """Set _test_data_iterators in TestDataGenerator."""
         cls._test_data_iterators = _TestDataWrapper()
 
 
 class TestCase(DjangoTestCase):
+    """A class for test cases."""
+
     @override
     def setUp(self) -> None:
         TestDataGenerator.set_up()
@@ -516,6 +535,7 @@ class TestCase(DjangoTestCase):
         # noinspection SpellCheckingInspection
         @functools.wraps(func)
         def helper(*args: object, **kwds: object) -> _SubTestContextManager:
+            """Return you _SubTestContextManager, whatever that may be."""
             return _SubTestContextManager(func, args, kwds)
 
         return helper

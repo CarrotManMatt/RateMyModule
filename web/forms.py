@@ -1,4 +1,4 @@
-"""contains forms for getting data from the user of RateMyModule"""
+"""Contains forms for getting data from the user of RateMyModule."""
 
 from collections.abc import Sequence
 
@@ -16,6 +16,8 @@ from ratemymodule.models import OtherTag, Post, ToolTag, TopicTag, User
 
 
 class PostForm(ModelForm[Post]):
+    """The form for getting the data for a post from a user."""
+
     ACADEMIC_YEAR_CHOICES: Final[Sequence[tuple[int, str]]] = [
         (year, f"{year}/{year + 1}")
         for year
@@ -89,7 +91,8 @@ class PostForm(ModelForm[Post]):
             self.add_error("overall_rating", _("This field is required."))
         return cleaned_data
 
-    class Meta:
+    class Meta:  # noqa: D106
+
         model = Post
         fields = (
             "module",
@@ -106,8 +109,11 @@ class PostForm(ModelForm[Post]):
 
 
 class SignupForm(AllAuthSignupForm):  # type: ignore[misc,no-any-unimported]
+    """The form for signing up a new user."""
+
     # Overriding the __init__ method to set placeholders
     def __init__(self, *args: object, **kwargs: object) -> None:
+        """Initialize the signup form with password and email widgets."""
         super().__init__(*args, **kwargs)
 
         self.fields["email"].widget.attrs["placeholder"] = "University Email Address"

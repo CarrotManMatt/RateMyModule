@@ -142,6 +142,8 @@ class PostFilteredByTagManager(Manager["Post"]):
 
 
 class ModuleOrRequestVisiblePostsManager(Manager["Post"]):
+    """Get the posts of a module, filtered by the given request context."""
+
     @override
     def __init__(self, post_model: type["Post"], module: "Module | None" = None, request: HttpRequest | None = None) -> None:  # noqa: E501
         if not module and not request:

@@ -1,3 +1,5 @@
+"""Model serializers for REST API."""
+
 from collections.abc import Sequence
 
 __all__: Sequence[str] = (
@@ -42,6 +44,8 @@ from .fields import RelatedOtherTagField, RelatedToolTagField, RelatedTopicTagFi
 
 
 class UserSerializer(HyperlinkedModelSerializer):
+    """A class for serializing users."""
+
     university: HyperlinkedRelatedField[University] = HyperlinkedRelatedField(
         read_only=True,
         view_name="api_rest:university-detail",
@@ -51,7 +55,7 @@ class UserSerializer(HyperlinkedModelSerializer):
         read_only=True,
     )
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = User
         # noinspection PyUnresolvedReferences
         fields = (
@@ -116,13 +120,15 @@ class UserSerializer(HyperlinkedModelSerializer):
 
 
 class UniversitySerializer(HyperlinkedModelSerializer):
+    """A class for serializing universities."""
+
     module_set: HyperlinkedRelatedField[Module] = HyperlinkedRelatedField(
         many=True,
         read_only=True,
         view_name="api_rest:module-detail",
     )
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = University
         # noinspection PyUnresolvedReferences
         fields = (
@@ -170,7 +176,9 @@ class UniversitySerializer(HyperlinkedModelSerializer):
 
 
 class CourseSerializer(HyperlinkedModelSerializer):
-    class Meta:
+    """A class for serializing courses."""
+
+    class Meta:  # noqa: D106
         model = Course
         # noinspection PyUnresolvedReferences
         fields = (
@@ -220,6 +228,8 @@ class CourseSerializer(HyperlinkedModelSerializer):
 
 
 class ModuleSerializer(HyperlinkedModelSerializer):
+    """A class for serializing Modules."""
+
     university: HyperlinkedRelatedField[University] = HyperlinkedRelatedField(
         read_only=True,
         view_name="api_rest:university-detail",
@@ -230,7 +240,7 @@ class ModuleSerializer(HyperlinkedModelSerializer):
         source="year_started",
     )
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Module
         # noinspection PyUnresolvedReferences
         fields = (
@@ -322,7 +332,9 @@ class _BaseTagSerializer(ModelSerializer[BaseTag]):
 
 
 class ToolTagSerializer(HyperlinkedModelSerializer):
-    class Meta:
+    """A class for serializing Tool Tags."""
+
+    class Meta:  # noqa: D106
         model = ToolTag
         # noinspection PyUnresolvedReferences
         fields = (
@@ -335,7 +347,9 @@ class ToolTagSerializer(HyperlinkedModelSerializer):
 
 
 class TopicTagSerializer(HyperlinkedModelSerializer):
-    class Meta:
+    """A class for serializing topic tags."""
+
+    class Meta:  # noqa: D106
         model = TopicTag
         # noinspection PyUnresolvedReferences
         fields = (
@@ -348,7 +362,9 @@ class TopicTagSerializer(HyperlinkedModelSerializer):
 
 
 class OtherTagSerializer(HyperlinkedModelSerializer):
-    class Meta:
+    """A class for serializing other tags."""
+
+    class Meta:  # noqa: D106
         model = OtherTag
         # noinspection PyUnresolvedReferences
         fields = (
@@ -361,6 +377,8 @@ class OtherTagSerializer(HyperlinkedModelSerializer):
 
 
 class PostSerializer(HyperlinkedModelSerializer):
+    """A class for serializing Posts."""
+
     user_display: serializers.CharField = serializers.CharField(
         read_only=True,
         source="display_user",
@@ -382,7 +400,7 @@ class PostSerializer(HyperlinkedModelSerializer):
         slug_field="name",
     )
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Post
         # noinspection PyUnresolvedReferences
         fields = (
@@ -475,7 +493,9 @@ class PostSerializer(HyperlinkedModelSerializer):
 
 
 class ReportSerializer(HyperlinkedModelSerializer):
-    class Meta:
+    """A class for serializing reports."""
+
+    class Meta:  # noqa: D106
         model = Report
         # noinspection PyUnresolvedReferences
         fields = (

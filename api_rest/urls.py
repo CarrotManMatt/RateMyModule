@@ -34,6 +34,7 @@ app_name: Final[str] = "api_rest"
 
 
 def create_router() -> BaseRouter:
+    """Create the router for the rest API."""
     class CustomRouter(DefaultRouter):
         root_view_name = "root"
         APIRootView = CustomAPIRootView
