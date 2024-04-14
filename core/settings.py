@@ -297,6 +297,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.admindocs",
+    "django_admin_inline_paginator",
     "rangefilter",
     "rest_framework",
 ]

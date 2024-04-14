@@ -11,15 +11,16 @@ __all__: Sequence[str] = (
 )
 
 
-from django.contrib import admin
+from django.contrib.admin import StackedInline
 from django.utils.translation import gettext_lazy as _
+from django_admin_inline_paginator.admin import InlinePaginated, TabularInlinePaginated
 
 from ratemymodule.models import Course, Module, Post, Report, University, User
 
 from .forms import PostModelForm
 
 
-class UserMadePostsInline(admin.StackedInline[Post, User]):
+class UserMadePostsInline(InlinePaginated, StackedInline[Post, User]):  # type: ignore[no-any-unimported,misc]
     """Configuration class to describe how to display Posts inline under a User."""
 
     classes = ("collapse",)
@@ -38,9 +39,12 @@ class UserMadePostsInline(admin.StackedInline[Post, User]):
         ),
     )
     autocomplete_fields = ("module",)
+    per_page = 10
+    template = "admin/partials/stacked_paginated.html"
+    pagination_key = "user-made-posts-page"
 
 
-class UserMadeReportsInline(admin.TabularInline[Report, User]):
+class UserMadeReportsInline(TabularInlinePaginated[Report, User]):  # type: ignore[no-any-unimported,misc]
     """Configuration class to describe how to display Reports inline under a User."""
 
     classes = ("collapse",)
@@ -54,9 +58,11 @@ class UserMadeReportsInline(admin.TabularInline[Report, User]):
         "is_solved",
     )
     autocomplete_fields = ("post", "reporter")
+    per_page = 10
+    pagination_key = "user-made-reports-page"
 
 
-class UniversityCoursesInline(admin.TabularInline[Course, University]):
+class UniversityCoursesInline(TabularInlinePaginated[Course, University]):  # type: ignore[no-any-unimported,misc]
     """Configuration class to describe how to display Courses inline under a University."""
 
     classes = ("collapse",)
@@ -66,9 +72,11 @@ class UniversityCoursesInline(admin.TabularInline[Course, University]):
         "name",
         "student_type",
     )
+    per_page = 10
+    pagination_key = "university-courses-page"
 
 
-class ModulePostsInline(admin.TabularInline[Post, Module]):
+class ModulePostsInline(TabularInlinePaginated[Post, Module]):  # type: ignore[no-any-unimported,misc]
     """Configuration class to describe how to display Posts inline under a Module."""
 
     classes = ("collapse",)
@@ -86,12 +94,16 @@ class ModulePostsInline(admin.TabularInline[Post, Module]):
         ),
     )
     autocomplete_fields = ("user",)
+    per_page = 10
+    pagination_key = "module-posts-page"
 
 
-class PostReportsInline(admin.TabularInline[Report, Post]):
+class PostReportsInline(TabularInlinePaginated[Report, Post]):  # type: ignore[no-any-unimported,misc]
     """Configuration class to describe how to display Reports inline under a Post."""
 
     classes = ("collapse",)
     extra = 0
     model = Report
     autocomplete_fields = ("reporter",)
+    per_page = 10
+    pagination_key = "post-reports-page"

@@ -29,6 +29,7 @@ django = "~4.2"  # NOTE: Django is pinned below version 5.0 because the django-s
 django-allauth = "^0.61"
 django-environ = "^0.11"
 django-admin-rangefilter = "^0.12"
+django-admin-inline-paginator = "^0.4"
 djangorestframework = "^3.15"
 confusable-homoglyphs = "^3.3"
 tldextract = "^5.1"
@@ -86,6 +87,7 @@ module = [
     "allauth.socialaccount.models",
     "rangefilter.filters",
     "allauth.account.views",
+    "django_admin_inline_paginator.admin",
 ]
 ignore_missing_imports = true
 

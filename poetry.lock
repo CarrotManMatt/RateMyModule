@@ -443,6 +443,24 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-admin-inline-paginator"
+version = "0.4.0"
+description = "The \"Django Admin Inline Paginator\" is simple way to paginate your inline in django admin"
+optional = false
+python-versions = ">=3.3"
+files = [
+    {file = "django-admin-inline-paginator-0.4.0.tar.gz", hash = "sha256:e1558b468d347e965c4d25be7f546da6682ea03d95098ae37b90c926edd491b1"},
+    {file = "django_admin_inline_paginator-0.4.0-py3-none-any.whl", hash = "sha256:63b2e13dca6b0933f4b7a4d3262c7cb31db8cda19ad005bcbc1c29bba0e95a1a"},
+]
+
+[package.dependencies]
+django = "*"
+
+[package.extras]
+code-quality = ["bandit", "isort", "xenon"]
+dev = ["django", "django-mock-queries", "pylint", "pytest", "pytest-cov", "pytest-pylint", "pytest-watch", "tox"]
+
+[[package]]
 name = "django-admin-rangefilter"
 version = "0.12.4"
 description = "django-admin-rangefilter app, add the filter by a custom date range on the admin UI."
@@ -1729,4 +1747,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "5e884659c739089ccbbd8f3a8baf34c357eb021b2ea073768c6755e3344a58e7"
+content-hash = "1534e59e1dcd23d12efbdb41e860dc604b4f09ab8ecf0f5573c6a774a7bb066a"

@@ -153,7 +153,7 @@ class ExampleEmailValidator:
 
 @deconstructible
 class PreexistingEmailTLDValidator:
-    """Deprecated! DO NOT USE!"""  # "!" is not valid line ender # noqa: D400
+    """Deprecated! DO NOT USE!"""  # NOTE: "!" is not a valid line-ender # noqa: D400
 
     def __call__(self, _: object) -> None:
         """Execute this validator to decide whether the given value is valid."""

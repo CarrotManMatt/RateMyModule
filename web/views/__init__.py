@@ -333,7 +333,8 @@ class HomeView(TemplateView):
 
     def _get_advanced_analytics_form_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
         if "analytics_form" not in context_data:
-            action: str | None = self.request.GET.get("action")
+            # noinspection PyTypeChecker
+            action: str | None = self.request.GET.get("action", None)
 
             if action != "generate_graph":
                 context_data["analytics_form"] = AnalyticsForm()
@@ -357,8 +358,10 @@ class HomeView(TemplateView):
                     "aa_overall_rating", None,
                 )
                 # note: warning for next two lines, should be put in as int, if not int, die
-                start_year: int = int(self.request.GET.get("aa_start_year"))
-                end_year: int = int(self.request.GET.get("aa_end_year"))
+                # noinspection PyTypeChecker
+                start_year: int = int(self.request.GET["aa_start_year"])
+                # noinspection PyTypeChecker
+                end_year: int = int(self.request.GET["aa_end_year"])
                 # repopulate form
                 context_data["analytics_form"] = AnalyticsForm(
                     initial={
@@ -371,6 +374,7 @@ class HomeView(TemplateView):
                     },
                 )
                 # pass data to graph and make it
+                # noinspection PyTypeChecker
                 context_data["advanced_analytics_graph"] = mark_safe(  # noqa: S308
                     re.sub(
                         "#000002",  # NOTE: defines colour of border of legend box
@@ -507,6 +511,7 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
     model = Post
     http_method_names = ("get", "post")
 
+    # noinspection PyOverrides
     @override
     def get_form_kwargs(self) -> dict[str, object]:
         kwargs = super().get_form_kwargs()
@@ -521,6 +526,7 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
     # noinspection PyOverrides
     @override
     def form_valid(self, form: PostForm) -> HttpResponse:
+        # noinspection PyAttributeOutsideInit
         self.object = form.save(commit=False)
         if not self.request.user.is_authenticated:  # HACK: Ensure the user is real
             raise RuntimeError
@@ -567,7 +573,7 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
 
 
 class ToolTagAutocompleteView(View):
-    """A view for processing get requests for Tool tags."""
+    """A view for processing GET requests for Tool tags."""
 
     # noinspection PyOverrides
     @override
@@ -580,7 +586,7 @@ class ToolTagAutocompleteView(View):
 
 
 class TopicTagAutocompleteView(View):
-    """A view for processing get requests about topic tags."""
+    """A view for processing GET requests about topic tags."""
 
     # noinspection PyOverrides
     @override
@@ -593,7 +599,7 @@ class TopicTagAutocompleteView(View):
 
 
 class OtherTagAutocompleteView(View):
-    """A view for processing get requests for other tags."""
+    """A view for processing GET requests for other tags."""
 
     # noinspection PyOverrides
     @override
@@ -620,8 +626,8 @@ class LikeDislikePostView(View):
     # noinspection PyOverrides
     @override
     def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        post_id = request.POST.get("post_id")
-        action = request.POST.get("action")
+        post_id = request.POST["post_id"]
+        action = request.POST["action"]
 
         if action in ("like", "dislike") and post_id:
             try:
@@ -650,7 +656,7 @@ class LikeDislikePostView(View):
                             status=200,
                         )
 
-                    # Remove user from opposite set if present
+                    # Remove user from the opposite set if it is present
                     if action == "like":
                         post.disliked_user_set.remove(request.user)
                         post.liked_user_set.add(request.user)

@@ -161,19 +161,19 @@ def sb_format_reviews_string(array_of_in_ratings: list[int]) -> list[str]:
     return array_of_bar_labels
 
 
-def decide_in_or_out_of_bars(array_of_in_ratings: list[int], array_of_bar_labels: list[str]) -> (list[str], list[str]):  # noqa: E501
+def decide_in_or_out_of_bars(array_of_in_ratings: list[int], array_of_bar_labels: list[str]) -> tuple[list[str], list[str]]:  # noqa: E501
     # if bar less than 40% value of the largest bar, then put the text outside it
     forty_max = ceil(max(array_of_in_ratings) * 0.5)
-    inside_of_bar_texts = [p if p >= forty_max
-                           else "" for p in array_of_in_ratings
-                           ]
+    inside_of_bar_texts: list[str] = [
+        "x" if p >= forty_max else ""
+        for p
+        in array_of_in_ratings
+    ]
     for counter in range(5):
         if inside_of_bar_texts[counter] != "":
             inside_of_bar_texts[counter] = array_of_bar_labels[counter]
 
-    out_of_bar_texts = [p if p < forty_max
-                        else "" for p in array_of_in_ratings
-                        ]
+    out_of_bar_texts: list[str] = ["x" if p < forty_max else "" for p in array_of_in_ratings]
     for counter in range(5):
         if out_of_bar_texts[counter] != "":
             out_of_bar_texts[counter] = array_of_bar_labels[counter]
@@ -246,7 +246,7 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
     date_list, guide_bar, x_axis = aa_set_up_axis(start_year, end_year)
 
     guide_bar.pop(1)
-    guide_bar[len(guide_bar) - 1] = 1
+    guide_bar[-1] = 1  # type: ignore[call-overload] # HACK: Use incorrect indexing type
 
     label_color = "#aaaaaa"
     fig, ax = plt.subplots(sharex=True, sharey=True)
@@ -358,7 +358,7 @@ def validate_dates(start_year: int, end_year: int) -> str:
     return errors
 
 
-def aa_set_up_axis(start_year: int, end_year: int) -> (list[str], list[None], list[int]):
+def aa_set_up_axis(start_year: int, end_year: int) -> tuple[list[str], list[None], list[int]]:
     months = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ]
