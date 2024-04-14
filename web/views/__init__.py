@@ -340,8 +340,24 @@ class HomeView(TemplateView):
             if action != "generate_graph":
                 context_data["analytics_form"] = AnalyticsForm()
             else:
-                context_data["analytics_form"] = AnalyticsForm()
-
+                # first extract all data
+                _difficulty_rating = self.request.GET.get("aa_difficulty_rating")
+                _teaching_rating = self.request.GET.get("aa_teaching_quality")
+                _assessment_quality = self.request.GET.get("aa_assessment_quality")
+                _overall_rating = self.request.GET.get("aa_overall_rating")
+                _start_year = int(self.request.GET.get("aa_start_year"))
+                _end_year = int(self.request.GET.get("aa_end_year"))
+                # repopulate form
+                context_data["analytics_form"] = AnalyticsForm(
+                    initial={"aa_difficulty_rating": _difficulty_rating,
+                             "aa_teaching_quality": _teaching_rating,
+                             "aa_assessment_quality": _assessment_quality,
+                             "aa_overall_rating": _overall_rating,
+                             "aa_start_year": _start_year,
+                             "aa_end_year": _end_year,
+                             }
+                )
+                # pass data to graph and make it
                 context_data["advanced_analytics_graph"] = mark_safe(  # noqa: S308
                     re.sub("#000002", "var(--button-hover)",  # defines colour of border of legend box
                         re.sub("#000001", "var(--secondary-color)",  # defines color of legend box
@@ -350,16 +366,12 @@ class HomeView(TemplateView):
                                 module=Module.objects.get(
                                     code=unquote_plus(self.request.GET.get("module"))
                                 ),
-                                difficulty_rating=graph_utils.is_on(
-                                    self.request.GET.get("difficulty_rating")),
-                                teaching_rating=graph_utils.is_on(
-                                    self.request.GET.get("teaching_quality")),
-                                assessment_quality=graph_utils.is_on(
-                                    self.request.GET.get("assessment_quality")),
-                                overall_rating=graph_utils.is_on(
-                                    self.request.GET.get("overall_rating")),
-                                start_year=int(self.request.GET.get("start_year")),
-                                end_year=int(self.request.GET.get("end_year")),
+                                difficulty_rating=(_difficulty_rating == "on"),
+                                teaching_rating=(_teaching_rating == "on"),
+                                assessment_quality=(_assessment_quality == "on"),
+                                overall_rating=(_overall_rating == "on"),
+                                start_year=_start_year,
+                                end_year=_end_year,
                                 ),
                             ),
                         ),
@@ -454,7 +466,7 @@ class HomeView(TemplateView):
         login_url_params: QueryDict = QueryDict("", mutable=True)
         # noinspection PyArgumentList
         login_url_params.update(
-            self.request.GET.dict() | QueryDict(original_login_params).dict()
+            self.request.GET.dict() | QueryDict(original_login_params).dict(),
         )
         context_data["LOGIN_URL"] = (
             f"{original_login_path}{original_login_seperator}{login_url_params.urlencode()}"

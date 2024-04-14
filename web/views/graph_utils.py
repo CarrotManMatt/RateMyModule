@@ -1,4 +1,4 @@
-"""Contains a selection of graph generating functions."""
+"""Contains a selection of graph generating functions for RateMyModule."""
 import datetime
 from collections.abc import Sequence
 
@@ -164,6 +164,7 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
     image_format = "svg"
     out_string = StringIO()
     fig.savefig(out_string, format=image_format, transparent=True, bbox_inches="tight", dpi=80)
+    plt.close(fig)
     return out_string.getvalue()
 
 
@@ -343,6 +344,7 @@ def advanced_analytics_graph(module: Module, difficulty_rating: bool, assessment
     out_string = StringIO()
     fig.savefig(
         out_string, format=image_format, transparent=True, bbox_inches="tight", dpi=80)
+    plt.close(fig)  # delete the figure
     return out_string.getvalue()
 
 
@@ -389,9 +391,3 @@ def get_module_averages(start_year: int, end_year: int, module: Module, attribut
             else:
                 set_of_averages.append(0.55)
     return set_of_averages
-
-
-def is_on(text) -> bool:
-    if text == "on":
-        return True
-    return False

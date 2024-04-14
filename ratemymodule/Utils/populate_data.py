@@ -1,9 +1,10 @@
+"""contains a selection of functions to populate the database with random data"""
+
 import datetime
 import random
 
 import numpy as np
-
-from ratemymodule.models import Course, Post, User
+from models import Course, Post, User
 
 
 def populate_database() -> None:

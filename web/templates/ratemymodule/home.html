@@ -273,23 +273,23 @@
             <form method="get" action={% url 'ratemymodule:home' %}>
                 <table class="analytics-table">
                     <tr>
-                        <td>{{ analytics_form.overall_rating }}</td>
+                        <td>{{ analytics_form.aa_overall_rating }}</td>
                         <td class="analytics-form-text"> Overall Rating</td>
                         <td class="analytics-form-text">&emsp;&emsp;Start Year:</td>
-                        <td>{{ analytics_form.start_year }}</td>
+                        <td>{{ analytics_form.aa_start_year }}</td>
                     </tr>
                     <tr>
-                        <td>{{ analytics_form.difficulty_rating }} </td>
+                        <td>{{ analytics_form.aa_difficulty_rating }} </td>
                         <td class="analytics-form-text">Difficulty Rating</td>
                     </tr>
                     <tr>
-                        <td>{{ analytics_form.teaching_quality }}</td>
+                        <td>{{ analytics_form.aa_teaching_quality }}</td>
                         <td class="analytics-form-text">Teaching Quality</td>
                         <td class="analytics-form-text">&emsp;&emsp;End Year:</td>
-                        <td>{{ analytics_form.end_year }}</td>
+                        <td>{{ analytics_form.aa_end_year }}</td>
                     </tr>
                     <tr>
-                        <td>{{ analytics_form.assessment_quality }}</td>
+                        <td>{{ analytics_form.aa_assessment_quality }}</td>
                         <td class="analytics-form-text">Assessment Quality</td>
                     </tr>
                     <input type="hidden" name="module" value="{{ request.GET.module }}">
