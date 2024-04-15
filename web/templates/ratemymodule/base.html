@@ -25,22 +25,22 @@
 
     <link rel="apple-touch-icon"
           sizes="180x180"
-          href="{% static 'ratemymodule/favicon/apple-touch-icon.png' %}"/>
+          href="{% url 'ratemymodule:apple_favicon_redirect' %}"/>
     <link rel="icon"
           type="image/svg+xml"
-          href="{% static 'ratemymodule/favicon/favicon.svg' %}"/>
+          href="{% url 'ratemymodule:svg_favicon_redirect' %}"/>
     <link rel="icon"
           type="image/png"
           sizes="32x32"
-          href="{% static 'ratemymodule/favicon/favicon-32x32.png' %}"/>
+          href="{% url 'ratemymodule:favicon_32_redirect' %}"/>
     <link rel="icon"
           type="image/png"
           sizes="16x16"
-          href="{% static 'ratemymodule/favicon/favicon-16x16.png' %}"/>
+          href="{% url 'ratemymodule:favicon_16_redirect' %}"/>
     <link rel="manifest"
-          href="{% static 'ratemymodule/favicon/site.webmanifest' %}"/>
+          href="{% url 'ratemymodule:site_webmanifest_redirect' %}"/>
     <link rel="mask-icon"
-          href="{% static 'ratemymodule/favicon/safari-pinned-tab.svg' %}"
+          href="{% url 'ratemymodule:svg_safari_pinned_tab' %}"
           color="#b295e8"/>
     <meta name="msapplication-TileColor" content="#b295e8"/>
     <meta name="theme-color" content="#b295e8" data-react-helmet="true" />

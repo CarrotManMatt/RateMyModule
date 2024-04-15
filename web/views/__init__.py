@@ -626,8 +626,10 @@ class LikeDislikePostView(View):
     # noinspection PyOverrides
     @override
     def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        post_id = request.POST["post_id"]
-        action = request.POST["action"]
+        # noinspection PyTypeChecker
+        post_id: str = request.POST["post_id"]
+        # noinspection PyTypeChecker
+        action: str = request.POST["action"]
 
         if action in ("like", "dislike") and post_id:
             try:

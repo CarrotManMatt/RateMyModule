@@ -49,13 +49,9 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
         RedirectView.as_view(pattern_name="ratemymodule:home"),
         name="default",
     ),
+    django.urls.path(
+        r"accounts/",
+        django.urls.include("allauth.urls"),  # HACK: Temporarily include allauth URLs until they have all been implemented manually
+        name="debug-accounts",
+    )  # noqa: COM812
 ]
-
-if settings.DEBUG:
-    urlpatterns.append(
-        django.urls.path(
-            r"accounts/",
-            django.urls.include("allauth.urls"),
-            name="debug-accounts",
-        )  # noqa: COM812
-    )
