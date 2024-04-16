@@ -151,7 +151,65 @@
 {#        </div>#}
 {#    </div>#}
 
-{% endblock %}
+{#    <div id="tagSubmissionModal" class="modal">#}
+{#        <div class="modal-content">#}
+{#            <span class="close-button" onclick="document.getElementById('tagSubmissionModal').style.display='none'">&times;</span>#}
+{#            <form id="tagSubmissionForm">#}
+{#                <h2>Add a New <span id="tagTypeTitle">Tag</span></h2>#}
+{#                <p id="tagDescription">Here you can add a new tag for...</p>#}
+{#                <input type="text" id="tagNameInput" name="tagName" placeholder="Type Tag here..." required>#}
+{#                <div id="tagError" class="error-message" style="color: red; display: none;"></div>#}
+{#                <p>Note: User Defined tags are subject to moderation. These tags won't show on your post until they are verified by our admins.</p>#}
+{#                <button type="submit">Add Tag</button>#}
+{#            </form>#}
+{#        </div>#}
+{#    </div>#}
+
+    <div id="toolTagSubmissionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="document.getElementById('toolTagSubmissionModal').style.display='none'">&times;</span>
+            <form id="toolTagSubmissionForm">
+                <h2>Add a New Tool Tag</h2>
+                <p>These tags are used to specify tools, technologies, or software relevant to the module. For example, programming languages, software packages, or lab equipment.</p>
+                <input type="text" id="toolTagNameInput" name="tagName" placeholder="Type Tag here..." required>
+                <div id="toolTagError" class="error-message" style="color: red; display: none;"></div>
+                <p>Note: User Defined tags are subject to moderation. These tags won't show on your post until they are verified by our admins.</p>
+                <button type="submit">Add Tag</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="topicTagSubmissionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="document.getElementById('topicTagSubmissionModal').style.display='none'">&times;</span>
+            <form id="topicTagSubmissionForm">
+                <h2>Add a New Topic Tag</h2>
+                <p>These tags are used to specify the key topics or subjects covered in the module. For example, major themes, concepts, or areas of study.</p>
+                <input type="text" id="topicTagNameInput" name="tagName" placeholder="Type Tag here..." required>
+                <div id="topicTagError" class="error-message" style="color: red; display: none;"></div>
+                <p>Note: User Defined tags are subject to moderation. These tags won't show on your post until they are verified by our admins.</p>
+                <button type="submit">Add Tag</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="otherTagSubmissionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="document.getElementById('otherTagSubmissionModal').style.display='none'">&times;</span>
+            <form id="otherTagSubmissionForm">
+                <h2>Add a New Other Tag</h2>
+                <p>These tags are used for anything else that might be relevant but doesn't fit into tool or topic categories. For example, teaching methods, project types, or special requirements.</p>
+                <input type="text" id="otherTagNameInput" name="tagName" placeholder="Type Tag here..." required>
+                <div id="otherTagError" class="error-message" style="color: red; display: none;"></div>
+                <p>Note: User Defined tags are subject to moderation. These tags won't show on your post until they are verified by our admins.</p>
+                <button type="submit">Add Tag</button>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
 
 
 {% block scripts %}
@@ -168,26 +226,26 @@
         });
 
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var disclaimerModal = document.getElementById('disclaimerModal');
-            var closeButton = document.getElementsByClassName('disclaimer-close')[0];
-
-            closeButton.onclick = function () {
-                disclaimerModal.style.display = 'none';
-            }
-
-            window.onclick = function (event) {
-                if (event.target == disclaimerModal) {
-                    disclaimerModal.style.display = 'none';
-                }
-            }
-
-            setTimeout(function () {
-                disclaimerModal.style.display = 'none';
-            }, 5000);
-
-            disclaimerModal.style.display = 'block';
-        });
-    </script>
+{#    <script>#}
+{#        document.addEventListener('DOMContentLoaded', function () {#}
+{#            var disclaimerModal = document.getElementById('disclaimerModal');#}
+{#            var closeButton = document.getElementsByClassName('disclaimer-close')[0];#}
+{##}
+{#            closeButton.onclick = function () {#}
+{#                disclaimerModal.style.display = 'none';#}
+{#            }#}
+{##}
+{#            window.onclick = function (event) {#}
+{#                if (event.target == disclaimerModal) {#}
+{#                    disclaimerModal.style.display = 'none';#}
+{#                }#}
+{#            }#}
+{##}
+{#            setTimeout(function () {#}
+{#                disclaimerModal.style.display = 'none';#}
+{#            }, 5000);#}
+{##}
+{#            disclaimerModal.style.display = 'block';#}
+{#        });#}
+{#    </script>#}
 {% endblock scripts %}

@@ -167,19 +167,25 @@
                                 </div>
                                 {# Displaying all tags #}
                                 {% for tag in post.tool_tag_set.all %}
-                                    <div class="item-element can-hover">
-                                        {{ tag }}
-                                    </div>
+                                    {% if tag.is_verified %}
+                                        <div class="item-element can-hover">
+                                            {{ tag }}
+                                        </div>
+                                    {% endif %}
                                 {% endfor %}
                                 {% for tag in post.topic_tag_set.all %}
-                                    <div class="item-element can-hover">
-                                        {{ tag }}
-                                    </div>
+                                    {% if tag.is_verified %}
+                                        <div class="item-element can-hover">
+                                            {{ tag }}
+                                        </div>
+                                    {% endif %}
                                 {% endfor %}
                                 {% for tag in post.other_tag_set.all %}
-                                    <div class="item-element can-hover">
-                                        {{ tag }}
-                                    </div>
+                                    {% if tag.is_verified %}
+                                        <div class="item-element can-hover">
+                                            {{ tag }}
+                                        </div>
+                                    {% endif %}
                                 {% endfor %}
                                 {# Displaying when the post was made #}
                                 <div class="item-element">
@@ -227,19 +233,6 @@
 {% block right_sidebar_lower %}
     <div class="right-sidebar-lower-content">
         {# Content for lower part of the right sidebar #}
-        <style> {# TODO: put styling in css, where it currently doesnt work #}
-            .analytics-button {
-                display: inline-block;
-                text-decoration: none;
-                padding: 10px 10px;
-                background-color: var(--button-color);
-                color: white;
-                border-radius: 8px;
-                transition: background-color 0.3s;
-                text-align: center;
-                cursor: pointer;
-            }
-        </style>
         <button title="View Advanced Analytics Graph" class="analytics-button"
                 id="advanced-analytics" onclick="openAAModal()">
             Advanced Analytics

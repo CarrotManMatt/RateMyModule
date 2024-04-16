@@ -525,14 +525,7 @@ class SubmitPostView(EnsureUserHasCoursesMixin, LoginRequiredMixin, CreateView[P
     # noinspection PyOverrides
     @override
     def get_form_kwargs(self) -> dict[str, object]:
-        kwargs = super().get_form_kwargs()
-        if "data" in kwargs:
-            data = kwargs["data"].copy()
-            for field in ("tool_tags", "topic_tags", "other_tags"):
-                if data.get(field):
-                    data.setlist(field, data[field].split(","))
-            kwargs["data"] = data
-        return kwargs
+        return super().get_form_kwargs()
 
     # noinspection PyOverrides
     @override
@@ -544,7 +537,6 @@ class SubmitPostView(EnsureUserHasCoursesMixin, LoginRequiredMixin, CreateView[P
         self.object.user = self.request.user
         self.object.save()
 
-        # Associate tags with the post
         tag_fields = {
             "tool_tags": self.object.tool_tag_set,
             "topic_tags": self.object.topic_tag_set,
@@ -552,9 +544,23 @@ class SubmitPostView(EnsureUserHasCoursesMixin, LoginRequiredMixin, CreateView[P
         }
 
         for field, related_manager in tag_fields.items():
-            tag_ids = form.cleaned_data.get(field)
-            if tag_ids:
-                related_manager.set(tag_ids)  # type: ignore[attr-defined]
+            tag_ids = []
+            tag_names = form.cleaned_data.get(field, [])
+
+            for tag_name in tag_names:
+                if tag_name:
+                    if tag_name.startswith("custom-"):
+                        tag, created = related_manager.model.objects.get_or_create(  # type: ignore[attr-defined]
+                            name=tag_name[7:].strip(),
+                        )
+                        tag_ids.append(tag.id)
+                    else:
+                        try:
+                            tag_ids.append(int(tag_name))
+                        except ValueError:
+                            continue
+
+            related_manager.set(tag_ids)  # type: ignore[attr-defined]
 
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
@@ -581,6 +587,51 @@ class SubmitPostView(EnsureUserHasCoursesMixin, LoginRequiredMixin, CreateView[P
             self.form_class.ACADEMIC_YEAR_CHOICES
         )
         return context
+
+
+class TopicTagAutocompleteView(View):
+    """A view for processing GET requests about topic tags."""
+
+    # noinspection PyOverrides
+    @override
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+        # noinspection PyTypeChecker
+        term = request.GET.get("term", "")
+        tags = TopicTag.objects.filter(
+            name__icontains=term,
+            is_verified=True,
+        ).values("id", "name")
+        return JsonResponse(list(tags), safe=False)
+
+
+class ToolTagAutocompleteView(View):
+    """A view for processing GET requests for Tool tags."""
+
+    # noinspection PyOverrides
+    @override
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+        # noinspection PyTypeChecker
+        term = request.GET.get("term", "")
+        tags = ToolTag.objects.filter(
+            name__icontains=term,
+            is_verified=True,
+        ).values("id", "name")
+        return JsonResponse(list(tags), safe=False)
+
+
+class OtherTagAutocompleteView(View):
+    """A view for processing GET requests for other tags."""
+
+    # noinspection PyOverrides
+    @override
+    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+        # noinspection PyTypeChecker
+        term = request.GET.get("term", "")
+        tags = OtherTag.objects.filter(
+            name__icontains=term,
+            is_verified=True,
+        ).values("id", "name")
+        return JsonResponse(list(tags), safe=False)
 
 
 class ChangeEmailView(LoginRequiredMixin, AllAuthEmailView):  # type: ignore[misc,no-any-unimported]
@@ -659,45 +710,6 @@ class DeleteAccountView(LoginRequiredMixin, View):
         if user.is_authenticated:
             user.delete()
         return redirect("default")
-
-
-class ToolTagAutocompleteView(View):
-    """A view for processing GET requests for Tool tags."""
-
-    # noinspection PyOverrides
-    @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        if "term" in request.GET:
-            term = request.GET["term"]
-            tags = ToolTag.objects.filter(name__icontains=term).values("id", "name")
-            return JsonResponse(list(tags), safe=False)
-        return JsonResponse([], safe=False)
-
-
-class TopicTagAutocompleteView(View):
-    """A view for processing GET requests about topic tags."""
-
-    # noinspection PyOverrides
-    @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        if "term" in request.GET:
-            term = request.GET["term"]
-            tags = TopicTag.objects.filter(name__icontains=term).values("id", "name")
-            return JsonResponse(list(tags), safe=False)
-        return JsonResponse([], safe=False)
-
-
-class OtherTagAutocompleteView(View):
-    """A view for processing GET requests for other tags."""
-
-    # noinspection PyOverrides
-    @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        if "term" in request.GET:
-            term = request.GET["term"]
-            tags = OtherTag.objects.filter(name__icontains=term).values("id", "name")
-            return JsonResponse(list(tags), safe=False)
-        return JsonResponse([], safe=False)
 
 
 class LikeDislikePostView(View):

@@ -19,12 +19,12 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         var RatingArrows = document.querySelectorAll('.post-like-rating-arrow');
-        console.log("RatingArrows: " + RatingArrows.length);
+        // console.log("RatingArrows: " + RatingArrows.length);
 
         var likeArrows = document.querySelectorAll('.like-rating-up-arrow');
         var dislikeArrows = document.querySelectorAll('.like-rating-down-arrow');
-        console.log("likeArrows: " + likeArrows.length);
-        console.log("dislikeArrows: " + dislikeArrows.length);
+        // console.log("likeArrows: " + likeArrows.length);
+        // console.log("dislikeArrows: " + dislikeArrows.length);
 
         RatingArrows.forEach(function(arrow) {
             var index = -1;

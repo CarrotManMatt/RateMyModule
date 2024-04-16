@@ -4,6 +4,7 @@ from collections.abc import Sequence
 
 __all__: Sequence[str] = ("AnalyticsForm", "PostForm", "SignupForm", "ChangeCoursesForm")
 
+from collections.abc import Iterable
 from typing import Final, override
 
 from allauth.account.forms import SignupForm as AllAuthSignupForm
@@ -12,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from ratemymodule.models import Course, OtherTag, Post, ToolTag, TopicTag, User
+from ratemymodule.models import Course, Post, User
 
 
 class ChangeCoursesForm(ModelForm[User]):
@@ -72,36 +73,18 @@ class PostForm(ModelForm[Post]):
         required=False,
         label=_("Teaching Rating"),
     )
-    tool_tags = forms.ModelMultipleChoiceField(
-        queryset=ToolTag.objects.all(),
-        widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),
+    tool_tags = forms.CharField(
         required=False,
+        widget=forms.TextInput(attrs={"class": "autocomplete"}),
     )
-    topic_tags = forms.ModelMultipleChoiceField(
-        queryset=TopicTag.objects.all(),
-        widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),
+    topic_tags = forms.CharField(
         required=False,
+        widget=forms.TextInput(attrs={"class": "autocomplete"}),
     )
-    other_tags = forms.ModelMultipleChoiceField(
-        queryset=OtherTag.objects.all(),
-        widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),
+    other_tags = forms.CharField(
         required=False,
+        widget=forms.TextInput(attrs={"class": "autocomplete"}),
     )
-
-    @override
-    def clean(self) -> dict[str, object] | None:
-        cleaned_data = super().clean()
-        if not cleaned_data:
-            return cleaned_data
-        for field in (
-                "difficulty_rating", "assessment_rating", "teaching_rating"):
-            if not cleaned_data[field]:
-                cleaned_data.pop(field)
-
-        overall_rating = cleaned_data.get("overall_rating")
-        if not overall_rating:
-            self.add_error("overall_rating", _("This field is required."))
-        return cleaned_data
 
     class Meta:  # noqa: D106
         model = Post
@@ -117,6 +100,42 @@ class PostForm(ModelForm[Post]):
             "topic_tags",
             "other_tags",
         )
+
+    @override
+    def clean(self) -> dict[str, object] | None:
+        cleaned_data: dict[str, object] | None = super().clean()
+
+        if not cleaned_data:
+            return cleaned_data
+
+        # Check if the difficulty, assessment and teaching ratings are present
+        for field in ("difficulty_rating", "assessment_rating", "teaching_rating"):
+            if not cleaned_data.get(field):
+                cleaned_data.pop(field, None)
+
+        # Check if the overall rating is present
+        if "overall_rating" not in cleaned_data:
+            self.add_error("overall_rating", _("This field is required."))
+
+        # Clean the tags
+        for field in ("tool_tags", "topic_tags", "other_tags"):
+            tag_data: object | None = cleaned_data.get(field, None)
+            tag_items: Iterable[str] = (
+                tag_data.split(",")
+                if isinstance(tag_data, str)
+                else tag_data if isinstance(tag_data, Iterable) else ()
+            )
+            cleaned_tags = []
+            for item in tag_items:
+                stripped_item = item.strip()
+                if stripped_item.startswith("custom-"):
+                    tag_name = stripped_item[7:].strip()
+                    cleaned_tags.append(tag_name)
+                else:
+                    cleaned_tags.append(stripped_item)
+            cleaned_data[field] = cleaned_tags
+
+        return cleaned_data
 
 
 class SignupForm(AllAuthSignupForm):  # type: ignore[misc,no-any-unimported]

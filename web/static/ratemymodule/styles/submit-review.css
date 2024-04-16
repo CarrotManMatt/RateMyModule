@@ -353,42 +353,110 @@ button:hover {
     }
 }
 
-/* Modal Styles */
-.disclaimer-modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
+/*!* Modal Styles *!*/
+/*.disclaimer-modal {*/
+/*    display: none;*/
+/*    position: fixed;*/
+/*    z-index: 1;*/
+/*    left: 0;*/
+/*    top: 0;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    overflow: auto;*/
+/*    background-color: rgba(0, 0, 0, 0.4);*/
+/*}*/
+
+/*.disclaimer-modal-content {*/
+/*    background-color: var(--secondary-color);*/
+/*    margin: 15% auto;*/
+/*    padding: 20px;*/
+/*    border: 1px solid var(--secondary-color);*/
+/*    width: 80%;*/
+/*    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);*/
+/*    border-radius: 5px;*/
+/*    align-content: center;*/
+/*    color: var(--text-color);*/
+/*    text-align: center; !* Center the text *!*/
+/*}*/
+
+/*.disclaimer-close {*/
+/*    color: var(--text-color);*/
+/*    float: right;*/
+/*    font-size: 28px;*/
+/*    font-weight: bold;*/
+/*}*/
+
+/*.disclaimer-close:hover,*/
+/*.disclaimer-close:focus {*/
+/*    color: var(--text-color);*/
+/*    text-decoration: none;*/
+/*    cursor: pointer;*/
+/*}*/
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 2; /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
-.disclaimer-modal-content {
+.modal-content {
+    position: relative;
     background-color: var(--secondary-color);
-    margin: 15% auto;
+    margin: 10% auto; /* 10% from the top and centered */
     padding: 20px;
-    border: 1px solid var(--secondary-color);
-    width: 80%;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    align-content: center;
-    color: var(--text-color);
-    text-align: center; /* Center the text */
+    width: 50%; /* Could be more or less, depending on screen size */
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 10px; /* Optional */
 }
 
-.disclaimer-close {
+/* The Close Button */
+.close-button {
     color: var(--text-color);
     float: right;
     font-size: 28px;
     font-weight: bold;
 }
 
-.disclaimer-close:hover,
-.disclaimer-close:focus {
-    color: var(--text-color);
+.close-button:hover,
+.close-button:focus {
     text-decoration: none;
     cursor: pointer;
+    outline: none;
+}
+
+
+.modal-content h2 {
+    text-align: center; /* Center the title */
+    margin-bottom: 0.5em; /* Reduce the space below the title */
+    color: var(--button-color-light);
+}
+
+/* Style for input fields */
+.modal-content input[type="text"] {
+    padding: 12px; /* Increase padding */
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Source Sans Pro', sans-serif;
+    width: 100%; /* Adjust width as needed */
+    box-sizing: border-box;
+    margin: 10px auto; /* Center input horizontally with margin */
+}
+
+.modal-content input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #925EF4;
+}
+
+.custom-tag {
+    /* Custom styling for unverified tags */
+    background-color: #f45e75;
 }
