@@ -1,1 +1,17 @@
 /* CSS Style for User Settings Page */
+
+
+.user-settings-links a,
+.user-settings-links form button  {
+    color: #4e8cff; /* Adjust link color for visibility */
+    text-decoration: underline;
+    display: block;
+    margin: 20px;
+    background: none;
+    border: none;
+}
+
+.user-settings-links form button {
+    font-size: 17px;
+    padding-left: 0;
+}

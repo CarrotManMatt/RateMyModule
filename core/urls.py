@@ -53,5 +53,5 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
         r"accounts/",
         django.urls.include("allauth.urls"),  # HACK: Temporarily include allauth URLs until they have all been implemented manually
         name="debug-accounts",
-    )  # noqa: COM812
+    ),
 ]

@@ -5,7 +5,10 @@ from collections.abc import Sequence
 __all__: Sequence[str] = (
     "HomeView",
     "SubmitPostView",
-    "UserSettingsView",
+    "ChangeEmailView",
+    "ChangePasswordView",
+    "ChangeCoursesView",
+    "DeleteAccountView",
     "LogoutView",
     "LoginView",
     "SignupView",
@@ -16,16 +19,20 @@ __all__: Sequence[str] = (
 )
 
 import re
-from collections.abc import Container
+from collections.abc import Container, MutableSet
 from typing import TYPE_CHECKING, Final, override
 from urllib.parse import unquote_plus
 
 import django
 from allauth.account.forms import LoginForm
+from allauth.account.views import EmailView as AllAuthEmailView
 from allauth.account.views import LoginView as AllAuthLoginView
 from allauth.account.views import LogoutView as AllAuthLogoutView
+from allauth.account.views import PasswordChangeView as AllAuthPasswordChangeView
 from allauth.account.views import SignupView as AllAuthSignupView
+from django import forms, urls
 from django.conf import settings
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest
 from django.http import (
@@ -38,7 +45,8 @@ from django.http import (
 from django.shortcuts import redirect, render
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, TemplateView, View
+from django.views import View
+from django.views.generic import CreateView, FormView, TemplateView
 
 from ratemymodule.models import (
     Course,
@@ -48,12 +56,15 @@ from ratemymodule.models import (
     ToolTag,
     TopicTag,
     University,
+    User,
 )
-from web.forms import AnalyticsForm, PostForm, SignupForm
+from web.forms import AnalyticsForm, ChangeCoursesForm, PostForm, SignupForm
 
 from . import graph_generators
+from .utils import EnsureUserHasCoursesMixin
 
 if TYPE_CHECKING:
+    from django.contrib.auth.models import AnonymousUser
     from django.db.models import QuerySet
 
 
@@ -103,7 +114,7 @@ class SignupView(AllAuthSignupView):  # type: ignore[misc,no-any-unimported]
         return django.shortcuts.redirect(settings.SIGNUP_URL)
 
 
-class HomeView(TemplateView):
+class HomeView(EnsureUserHasCoursesMixin, TemplateView):
     """Main Dashboard view, for users to look at the most recent posts about uni modules."""
 
     template_name = "ratemymodule/home.html"
@@ -304,13 +315,13 @@ class HomeView(TemplateView):
 
         post_set: QuerySet[Post] = Post.filter_by_viewable(module, self.request).all()
 
-        # noinspection PyArgumentList
-        raw_search_string: str | None = self.request.GET.get("q")
+        # noinspection PyTypeChecker
+        raw_search_string: str | None = self.request.GET.get("q", None)
         if raw_search_string:
             post_set = post_set.filter(content__icontains=unquote_plus(raw_search_string))
 
-        # noinspection PyArgumentList
-        raw_rating: str | None = self.request.GET.get("rating")
+        # noinspection PyTypeChecker
+        raw_rating: str | None = self.request.GET.get("rating", None)
         if raw_rating:
             try:
                 rating: Post.Ratings = Post.Ratings(int(unquote_plus(raw_rating)))
@@ -319,8 +330,8 @@ class HomeView(TemplateView):
 
             post_set = post_set.filter(overall_rating=rating)
 
-        # noinspection PyArgumentList
-        raw_year: str | None = self.request.GET.get("year")
+        # noinspection PyTypeChecker
+        raw_year: str | None = self.request.GET.get("year", None)
         if raw_year:
             try:
                 year: int = int(unquote_plus(raw_year))
@@ -502,12 +513,12 @@ class HomeView(TemplateView):
         return context_data  # noqa: RET504
 
 
-class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
+class SubmitPostView(EnsureUserHasCoursesMixin, LoginRequiredMixin, CreateView[Post, PostForm]):  # noqa: E501
     """SubmitPostView for handling module review submissions."""
 
     template_name = "ratemymodule/submit-review.html"
     form_class = PostForm
-    success_url = "/"  # TODO: change to reverse url lookup
+    success_url = urls.reverse_lazy("default")
     model = Post
     http_method_names = ("get", "post")
 
@@ -572,6 +583,84 @@ class SubmitPostView(LoginRequiredMixin, CreateView[Post, PostForm]):
         return context
 
 
+class ChangeEmailView(LoginRequiredMixin, AllAuthEmailView):  # type: ignore[misc,no-any-unimported]
+    template_name = "ratemymodule/change-email.html"
+    http_method_names = ("get", "post")
+
+
+class ChangePasswordView(LoginRequiredMixin, AllAuthPasswordChangeView):  # type: ignore[misc,no-any-unimported]
+    template_name = "ratemymodule/change-password.html"
+    http_method_names = ("get", "post")
+
+
+class ChangeCoursesView(LoginRequiredMixin, FormView[ChangeCoursesForm]):
+    template_name = "ratemymodule/change-courses.html"
+    http_method_names = ("get", "post")
+    form_class = ChangeCoursesForm
+
+    @override
+    def get_initial(self) -> dict[str, object]:
+        initial: dict[str, object] = super().get_initial()
+        if self.request.user.is_authenticated:
+            initial.setdefault(
+                "enrolled_course_set",
+                self.request.user.enrolled_course_set.all(),
+            )
+        return initial
+
+    @override
+    def get_form(self, form_class: type[ChangeCoursesForm] | None = None) -> ChangeCoursesForm:
+        form: ChangeCoursesForm = super().get_form(form_class)
+        enrolled_course_set_field: forms.Field = form.fields["enrolled_course_set"]
+        CAN_SET_QUERYSET: Final[bool] = (
+            isinstance(enrolled_course_set_field, forms.ModelChoiceField)
+            and self.request.user.is_authenticated
+        )
+        if CAN_SET_QUERYSET:
+            university: University | None = self.request.user.university  # type: ignore[union-attr]
+            if university:
+                enrolled_course_set_field.queryset = university.course_set.all()  # type: ignore[attr-defined]
+        return form
+
+    @override
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+        if self.request.user.is_authenticated:
+            submitted_enrolled_course_set: MutableSet[Course | int] = set()
+
+            raw_course: str | Course | int
+            # noinspection PyArgumentList
+            for raw_course in self.request.POST.getlist("enrolled_course_set"):
+                if isinstance(raw_course, Course | int):
+                    submitted_enrolled_course_set.add(raw_course)
+                    continue
+
+                try:
+                    submitted_enrolled_course_set.add(int(raw_course))
+                except ValueError:
+                    pass
+                else:
+                    continue
+
+                submitted_enrolled_course_set.add(Course.objects.get(pk=raw_course))
+
+            self.request.user.enrolled_course_set.set(submitted_enrolled_course_set)
+
+        return redirect(self.request.path)
+
+
+class DeleteAccountView(LoginRequiredMixin, View):
+    http_method_names = ("post",)
+
+    # noinspection PyOverrides
+    @override  # type: ignore[misc]
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+        user: User | AnonymousUser = request.user
+        logout(request)
+        if user.is_authenticated:
+            user.delete()
+        return redirect("default")
+
+
 class ToolTagAutocompleteView(View):
     """A view for processing GET requests for Tool tags."""
 
@@ -609,13 +698,6 @@ class OtherTagAutocompleteView(View):
             tags = OtherTag.objects.filter(name__icontains=term).values("id", "name")
             return JsonResponse(list(tags), safe=False)
         return JsonResponse([], safe=False)
-
-
-class UserSettingsView(LoginRequiredMixin, TemplateView):
-    """Account management view, for users to edit their account settings."""
-
-    template_name = "ratemymodule/user-settings.html"
-    http_method_names = ("get",)
 
 
 class LikeDislikePostView(View):

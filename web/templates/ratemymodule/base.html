@@ -95,8 +95,11 @@
 
         <div class="user-profile-container">
             {% block user_profile %}
-                <a title="Create Post" href="{% url 'ratemymodule:submit-review' %}"
-                   class="create-post">Create Post</a>
+                {% if not request.user.is_authenticated or request.user.enrolled_course_set.exists and request.resolver_match.view_name != "ratemymodule:submit-review" %}
+                    <a title="Create Post" href="{% url 'ratemymodule:submit-review' %}"
+                       class="create-post">Create Post</a>
+                {% endif %}
+
                 {% if user.is_authenticated %}
                     <div class="user-dropdown">
                         <button class="user-dropbtn">
@@ -104,20 +107,25 @@
                             <img src="{% static 'ratemymodule/icons/down-arrow-dark.svg' %}"
                                  alt="Dropdown Icon" class="dropdown-icon"/>
                         </button>
+
                         <div class="user-dropdown-content">
-                            <a title="User Settings" href="{% url 'ratemymodule:user-settings' %}">
+                            <a title="User Settings" href="{% url 'ratemymodule:change-email' %}">
                                 User Settings
                             </a>
+
                             {% if user.is_staff %}
                                 <a title="Admin Site" href="{% url 'admin:index' %}">Admin Site</a>
                             {% endif %}
+
                             <a title="Browsable API" href="{% url 'api_rest:root' %}">Browsable API</a>
+
                             <form method="post" action="{% url 'ratemymodule:post-logout' %}">
                                 {% csrf_token %}
                                 <button title="Logout" type="submit">Logout</button>
                             </form>
                         </div>
                     </div>
+
                 {% else %}
                     <a href="{{ LOGIN_URL }}" class="login-button">Login/Register</a>
                 {% endif %}

@@ -1,0 +1,15 @@
+{% extends "ratemymodule/base-user-settings.html" %}
+
+{% load static %}
+
+{% block main_content %}
+    {# Main content for user settings #}
+    <h2>Change Enrolled Courses</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">
+            Submit Enrolled Courses
+        </button>
+    </form>
+{% endblock main_content %}

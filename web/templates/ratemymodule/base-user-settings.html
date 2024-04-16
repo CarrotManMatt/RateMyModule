@@ -1,0 +1,28 @@
+{% extends "ratemymodule/base-with-content.html" %}
+
+{% load static %}
+
+{% block title %}User Settings | {{ block.super }}{% endblock title %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet"
+          href="{% static 'ratemymodule/styles/user-settings.css' %}" />
+{% endblock styles %}
+
+{% block left_sidebar_upper %}
+    {# Include content for the left sidebar i.e. navigation links for user settings #}
+    <div class="user-settings-links">
+        <a href="{% url 'ratemymodule:change-email' %}">Change Email</a>
+        <a href="{% url 'ratemymodule:change-password' %}">Change Password</a>
+        <a href="{% url 'ratemymodule:change-courses' %}">Change Enrolled Courses</a>
+        <form
+                method="post"
+                action="{% url 'ratemymodule:delete-account' %}"
+                onsubmit="return confirm('Are you sure you want to delete your account?');"
+        >
+            {% csrf_token %}
+            <button type="submit">Delete Account</button>
+        </form>
+    </div>
+{% endblock left_sidebar_upper %}

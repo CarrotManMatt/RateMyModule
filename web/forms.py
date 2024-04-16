@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("AnalyticsForm", "PostForm", "SignupForm")
+__all__: Sequence[str] = ("AnalyticsForm", "PostForm", "SignupForm", "ChangeCoursesForm")
 
 from typing import Final, override
 
@@ -12,7 +12,19 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from ratemymodule.models import OtherTag, Post, ToolTag, TopicTag, User
+from ratemymodule.models import Course, OtherTag, Post, ToolTag, TopicTag, User
+
+
+class ChangeCoursesForm(ModelForm[User]):
+    enrolled_course_set = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.all(),
+        widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),
+        required=True,
+    )
+
+    class Meta:  # noqa: D106
+        model = User
+        fields = ("enrolled_course_set",)
 
 
 class PostForm(ModelForm[Post]):
@@ -92,7 +104,6 @@ class PostForm(ModelForm[Post]):
         return cleaned_data
 
     class Meta:  # noqa: D106
-
         model = Post
         fields = (
             "module",

@@ -12,6 +12,10 @@ from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
 from web.views import (
+    ChangeCoursesView,
+    ChangeEmailView,
+    ChangePasswordView,
+    DeleteAccountView,
     HomeView,
     LikeDislikePostView,
     LoginView,
@@ -21,7 +25,6 @@ from web.views import (
     SubmitPostView,
     ToolTagAutocompleteView,
     TopicTagAutocompleteView,
-    UserSettingsView,
 )
 
 app_name: Final[str] = "ratemymodule"
@@ -34,9 +37,24 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
         name="submit-review",
     ),
     django.urls.path(
-        r"settings/",
-        UserSettingsView.as_view(),
-        name="user-settings",
+        r"settings/change/email",
+        ChangeEmailView.as_view(),
+        name="change-email",
+    ),
+    django.urls.path(
+        r"settings/change/password",
+        ChangePasswordView.as_view(),
+        name="change-password",
+    ),
+    django.urls.path(
+        r"settings/change/courses",
+        ChangeCoursesView.as_view(),
+        name="change-courses",
+    ),
+    django.urls.path(
+        r"settings/delete-account",
+        DeleteAccountView.as_view(),
+        name="delete-account",
     ),
     django.urls.path(r"logout/", LogoutView.as_view(), name="post-logout"),
     django.urls.path(r"login/", LoginView.as_view(), name="post-login"),
