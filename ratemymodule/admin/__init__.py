@@ -202,7 +202,7 @@ class UserAdmin(DjangoUserAdmin):
         "enrolled_course_set__university__short_name",
         "enrolled_course_set__university__email_domain",
         "made_post_set__module__name",
-        "emailaddress_set__email",
+        "emailaddress__email",
     )
     search_help_text = _(
         "Search for a user's email address, group name, enrolled course name, "
