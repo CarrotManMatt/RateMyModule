@@ -16,6 +16,7 @@ __all__: Sequence[str] = (
     "ToolTagAutocompleteView",
     "TopicTagAutocompleteView",
     "OtherTagAutocompleteView",
+    "ReportSubmission",
 )
 
 import re
@@ -58,7 +59,7 @@ from ratemymodule.models import (
     University,
     User,
 )
-from web.forms import AnalyticsForm, ChangeCoursesForm, PostForm, SignupForm
+from web.forms import AnalyticsForm, ChangeCoursesForm, PostForm, ReportForm, SignupForm
 
 from . import graph_generators
 from .utils import EnsureUserHasCoursesMixin
@@ -788,3 +789,25 @@ class LikeDislikePostView(View):
             return JsonResponse(data)
 
         return JsonResponse({"error": "User Not Authenticated"})
+
+
+class ReportSubmission(View):
+    """ReportSubmission for handling report submissions."""
+
+    http_method_names = "post"
+
+    def post(self, request: HttpRequest) -> HttpResponseRedirect:
+        """Take in post request, Submit to form, Create in database."""
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            if request.user.is_authenticated:
+                report.reporter = request.user
+            else:
+                report.reporter = User.objects.get(pk=1)  #TODO: Charlie: Make it not use an arbitrary user
+            report.post = Post.objects.get(pk=request.POST.get("post_pk"))
+            report.reason = request.POST.get("reason")
+            report.save()
+            return HttpResponseRedirect("/")  # Redirect to the desired URL
+        # Handle invalid form submission
+        return HttpResponseRedirect("/")  # You can redirect to an error page

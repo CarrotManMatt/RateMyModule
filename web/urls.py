@@ -21,6 +21,7 @@ from web.views import (
     LoginView,
     LogoutView,
     OtherTagAutocompleteView,
+    ReportSubmission,
     SignupView,
     SubmitPostView,
     ToolTagAutocompleteView,
@@ -59,6 +60,7 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(r"logout/", LogoutView.as_view(), name="post-logout"),
     django.urls.path(r"login/", LoginView.as_view(), name="post-login"),
     django.urls.path(r"signup/", SignupView.as_view(), name="post-signup"),
+    django.urls.path(r"submit-report/", ReportSubmission.as_view(), name="submit_report"),
     django.urls.path(
         "autocomplete/tool_tags",
         ToolTagAutocompleteView.as_view(),

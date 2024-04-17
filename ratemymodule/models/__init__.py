@@ -905,7 +905,7 @@ class Report(CustomBaseModel):
 
     @override
     def clean(self) -> None:
-        if self.reporter == self.post.user:
+        if self.pk and self.reporter == self.post.user:
             raise ValidationError(
                 {"post": _("You cannot report your own posts.")},
                 code="invalid",

@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         RatingArrows.forEach(function(arrow) {
             var index = -1;
-            var postId = arrow.dataset.postId;
+            var postPK = arrow.dataset.postPK;
 
             // Find index of current arrow
             for (var i = 0; i < RatingArrows.length; i++) {
@@ -39,9 +39,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             // Toggling currently liked/disliked arrows on page load
-            if (likedPosts.indexOf(Number(postId)) !== -1){
+            if (likedPosts.indexOf(Number(postPK)) !== -1){
                 likeArrows[Math.floor(index / 2)].classList.add('post-like-rating-arrow-clicked');
-            } else if (dislikedPosts.indexOf(Number(postId)) !== -1) {
+            } else if (dislikedPosts.indexOf(Number(postPK)) !== -1) {
                 dislikeArrows[Math.floor(index/2)].classList.add('post-like-rating-arrow-clicked');
             }
 
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         dislikeArrows[likeDislikeIndex].classList.remove('post-like-rating-arrow-clicked');
                     }
                     likeArrows[likeDislikeIndex].classList.toggle('post-like-rating-arrow-clicked');
-                    ratePost(postId, "like");
+                    ratePost(postPK, "like");
 
                 } else if (arrow.classList.contains('like-rating-down-arrow')) {
                     // Handling Dislike Arrow Clicked
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         likeArrows[likeDislikeIndex].classList.remove('post-like-rating-arrow-clicked');
                     }
                     dislikeArrows[likeDislikeIndex].classList.toggle('post-like-rating-arrow-clicked');
-                    ratePost(postId, "dislike");
+                    ratePost(postPK, "dislike");
                 }
             });
         });
@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function ratePost(postId, action) {
+function ratePost(postPK, action) {
     var csrftoken = getCookie('csrftoken');
 
     fetch('/like-dislike-post/', {
@@ -85,7 +85,7 @@ function ratePost(postId, action) {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-CSRFToken': csrftoken
         },
-        body: 'post_id=' + postId + `&action=${action}`
+        body: 'post_pk=' + postPK + `&action=${action}`
     })
     .then(function(response) {
         return response.json();
