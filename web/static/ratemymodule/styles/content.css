@@ -38,11 +38,12 @@
     display: inline-block;
 }
 
-p {
+.legal-box p {
     word-wrap: break-word; /* This will break long words that would otherwise extend outside the container */
     white-space: normal; /* This ensures that the whitespace is handled normally */
     overflow-wrap: break-word; /* This is a standard way to specify line breaking */
     hyphens: auto;
+    color: var(--text-color);
 }
 
 .right-sidebar {

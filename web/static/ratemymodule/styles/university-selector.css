@@ -7,31 +7,50 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-form {
-    display: flex;
-    flex-direction: column;
+.title {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--button-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.university-form {
+    margin-top: 20px;
+}
+
+.university-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-family: 'Source Sans Pro', sans-serif;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.university-option {
+    font-size: 16px;
+    color: var(--text-color);
     font-family: 'Source Sans Pro', sans-serif;
 }
 
-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    border: none;
+.submit-button {
+    width: 100%;
+    padding: 10px;
     border-radius: 5px;
+    border: none;
     background-color: var(--button-color);
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-align: center;
-    width: auto;
-    height: auto;
-    line-height: 1;
     font-size: 14px;
     font-family: 'Source Sans Pro', sans-serif;
 }
 
-button:hover {
+.submit-button:hover {
     background-color: var(--button-hover);
 }

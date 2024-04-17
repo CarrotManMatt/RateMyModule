@@ -12,19 +12,19 @@
 
 {% block content %}
     <div class="container">
-        <h1>Select Your University</h1>
+        <h1 class="title">Select Your University</h1>
 
-        <form id="university-form" method="get">
+        <form id="university-form" method="get" class="university-form">
             <input type="hidden" name="action" value="select_university">
-            <label for="universitySelect" style="display: none;">Select a University:</label>
-            <select name="university" id="universitySelect" required>
+            <label for="universitySelect" style="display: none;" class="university-label">Select a University:</label>
+            <select name="university" id="universitySelect" required class="university-select">
                 <option value="" disabled selected>Select a University...
                 </option>
                 {% for university in university_choices %}
-                    <option value="{{ university.pk }}">{{ university.name }}</option>
+                    <option value="{{ university.pk }}" class="university-option">{{ university.name }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" aria-label="Submit">Submit</button>
+            <button type="submit" aria-label="Submit" class="submit-button">Submit</button>
         </form>
     </div>
 

@@ -3,8 +3,6 @@
     align-items: center;
     position: relative;
     margin: auto;
-    display: flex;
-    align-items: center;
     border: none;
     background-color: var(--background-color);
     border-radius: 8px;
@@ -47,6 +45,39 @@
 
 .left-sidebar {
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.university-link {
+    display: inline-block;
+    padding: 10px 10px;
+    background-color: var(--secondary-button-color);
+    color: var(--text-color);
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    align-self: center;
+}
+
+.university-link:hover, .university-link:focus {
+    background-color: rgba(0, 0, 0, 0.1);
+    outline: none;
+    text-decoration: none;
+    color: var(--text-color);
+    transform: translateY(-2px); /* Moves the button up by 2 pixels */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transition for background and movement */
+}
+
+.university-text {
+    margin: 0;
+    font-size: 14px;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .right-sidebar-upper-content {

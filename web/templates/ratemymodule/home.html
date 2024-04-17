@@ -28,9 +28,8 @@
 
 {% block left_sidebar_upper %}
     {% if not request.user.is_authenticated %}
-        <a style="display: flex; align-items: center; color: inherit;"
-           href="{{ select_university_url }}">
-            <p style="color: #7e8285;">Choose a different university</p>
+        <a class="university-link" href="{{ select_university_url }}">
+            <p class="university-text">Choose a different university</p>
         </a>
     {% endif %}
     {% include "ratemymodule/fragments/main-dropdown.html" %}
