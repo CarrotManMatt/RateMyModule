@@ -13,12 +13,12 @@
 {% block left_sidebar_upper %}
     {# Include content for the left sidebar i.e. navigation links for user settings #}
     <div class="user-settings-links">
-        <a href="{% url 'ratemymodule:change-email' %}">Change Email</a>
-        <a href="{% url 'ratemymodule:change-password' %}">Change Password</a>
-        <a href="{% url 'ratemymodule:change-courses' %}">Change Enrolled Courses</a>
+        <a href="{% url 'ratemymodule:change_email' %}">Change Email</a>
+        <a href="{% url 'ratemymodule:change_password' %}">Change Password</a>
+        <a href="{% url 'ratemymodule:change_courses' %}">Change Enrolled Courses</a>
         <form
                 method="post"
-                action="{% url 'ratemymodule:delete-account' %}"
+                action="{% url 'ratemymodule:delete_account' %}"
                 onsubmit="return confirm('Are you sure you want to delete your account?');"
         >
             {% csrf_token %}

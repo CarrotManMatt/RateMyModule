@@ -13,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from ratemymodule.models import OtherTag, Post, Report, ToolTag, TopicTag, User, Course
+from ratemymodule.models import Course, Post, Report, User
 
 
 class ChangeCoursesForm(ModelForm[User]):
@@ -138,7 +138,7 @@ class PostForm(ModelForm[Post]):
         return cleaned_data
 
 
-class ReportForm(forms.ModelForm):
+class ReportForm(forms.ModelForm[Report]):
     reason = forms.ChoiceField(
         choices=Report.Reasons.choices,
         widget=forms.RadioSelect(),
@@ -150,12 +150,6 @@ class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ("reason", "post_pk")
-
-    def clean(self) -> dict[str, object]:
-        cleaned_data = super().clean()
-        cleaned_data["post_pk"] = cleaned_data.get("post_pk")
-        cleaned_data["reason"] = cleaned_data.get("reason")
-        return cleaned_data
 
 
 class SignupForm(AllAuthSignupForm):  # type: ignore[misc,no-any-unimported]

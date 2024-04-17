@@ -96,7 +96,7 @@
         <div class="user-profile-container">
             {% block user_profile %}
                 {% if not request.user.is_authenticated or request.user.enrolled_course_set.exists and request.resolver_match.view_name != "ratemymodule:submit-review" %}
-                    <a title="Create Post" href="{% url 'ratemymodule:submit-review' %}"
+                    <a title="Create Post" href="{% url 'ratemymodule:submit_review' %}"
                        class="create-post">Create Post</a>
                 {% endif %}
 
@@ -109,7 +109,7 @@
                         </button>
 
                         <div class="user-dropdown-content">
-                            <a title="User Settings" href="{% url 'ratemymodule:change-email' %}">
+                            <a title="User Settings" href="{% url 'ratemymodule:change_email' %}">
                                 User Settings
                             </a>
 
@@ -119,7 +119,7 @@
 
                             <a title="Browsable API" href="{% url 'api_rest:root' %}">Browsable API</a>
 
-                            <form method="post" action="{% url 'ratemymodule:post-logout' %}">
+                            <form method="post" action="{% url 'ratemymodule:post_logout' %}">
                                 {% csrf_token %}
                                 <button title="Logout" type="submit">Logout</button>
                             </form>

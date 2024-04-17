@@ -21,9 +21,9 @@ from web.views import (
     LoginView,
     LogoutView,
     OtherTagAutocompleteView,
-    ReportSubmission,
     SignupView,
     SubmitPostView,
+    SubmitReportView,
     ToolTagAutocompleteView,
     TopicTagAutocompleteView,
 )
@@ -35,32 +35,36 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"submit-review/",
         SubmitPostView.as_view(),
-        name="submit-review",
+        name="submit_review",
     ),
     django.urls.path(
         r"settings/change/email",
         ChangeEmailView.as_view(),
-        name="change-email",
+        name="change_email",
     ),
     django.urls.path(
         r"settings/change/password",
         ChangePasswordView.as_view(),
-        name="change-password",
+        name="change_password",
     ),
     django.urls.path(
         r"settings/change/courses",
         ChangeCoursesView.as_view(),
-        name="change-courses",
+        name="change_courses",
     ),
     django.urls.path(
         r"settings/delete-account",
         DeleteAccountView.as_view(),
-        name="delete-account",
+        name="delete_account",
     ),
-    django.urls.path(r"logout/", LogoutView.as_view(), name="post-logout"),
-    django.urls.path(r"login/", LoginView.as_view(), name="post-login"),
-    django.urls.path(r"signup/", SignupView.as_view(), name="post-signup"),
-    django.urls.path(r"submit-report/", ReportSubmission.as_view(), name="submit_report"),
+    django.urls.path(r"logout/", LogoutView.as_view(), name="post_logout"),
+    django.urls.path(r"login/", LoginView.as_view(), name="post_login"),
+    django.urls.path(r"signup/", SignupView.as_view(), name="post_signup"),
+    django.urls.path(
+        r"submit-report/",
+        SubmitReportView.as_view(),
+        name="submit_report",
+    ),
     django.urls.path(
         "autocomplete/tool_tags",
         ToolTagAutocompleteView.as_view(),
@@ -79,7 +83,7 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"like-dislike-post/",
         LikeDislikePostView.as_view(),
-        name="like-dislike-post",
+        name="like_dislike_post",
     ),
 ]
 

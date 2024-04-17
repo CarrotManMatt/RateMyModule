@@ -18,6 +18,6 @@ class EnsureUserHasCoursesMixin(View):
             and not self.request.user.enrolled_course_set.exists()
         )
         if USER_NEEDS_TO_SELECT_COURSE:
-            return redirect("ratemymodule:change-courses")
+            return redirect("ratemymodule:change_courses")
 
         return super().dispatch(request, *args, **kwargs)

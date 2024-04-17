@@ -16,7 +16,7 @@ __all__: Sequence[str] = (
     "ToolTagAutocompleteView",
     "TopicTagAutocompleteView",
     "OtherTagAutocompleteView",
-    "ReportSubmission",
+    "SubmitReportView",
 )
 
 import re
@@ -791,12 +791,14 @@ class LikeDislikePostView(View):
         return JsonResponse({"error": "User Not Authenticated"})
 
 
-class ReportSubmission(View):
+class SubmitReportView(View):
     """ReportSubmission for handling report submissions."""
 
-    http_method_names = "post"
+    http_method_names = ("post",)
 
-    def post(self, request: HttpRequest) -> HttpResponseRedirect:
+    # noinspection PyOverrides
+    @override  # type: ignore[misc]
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         """Take in post request, Submit to form, Create in database."""
         form = ReportForm(request.POST)
         if form.is_valid():
@@ -805,8 +807,8 @@ class ReportSubmission(View):
                 report.reporter = request.user
             else:
                 report.reporter = User.objects.get(pk=1)  #TODO: Charlie: Make it not use an arbitrary user
-            report.post = Post.objects.get(pk=request.POST.get("post_pk"))
-            report.reason = request.POST.get("reason")
+            report.post = Post.objects.get(pk=request.POST["post_pk"])
+            report.reason = request.POST["reason"]
             report.save()
             return HttpResponseRedirect("/")  # Redirect to the desired URL
         # Handle invalid form submission

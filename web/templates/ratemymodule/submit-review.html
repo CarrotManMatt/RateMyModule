@@ -12,7 +12,7 @@
     <div class="container">
         <h1>Submit Your Module Review</h1>
         <form id="review-form" method="post"
-              action="{% url 'ratemymodule:submit-review' %}">
+              action="{% url 'ratemymodule:submit_review' %}">
             {% csrf_token %}
             <div class="module-selection-container">
                 <label for="moduleSelect">Module:</label>
