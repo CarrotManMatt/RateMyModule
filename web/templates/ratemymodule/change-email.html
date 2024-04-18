@@ -3,46 +3,47 @@
 {% load static %}
 
 {% block main_content %}
-    {# Main content for user settings #}
     <h2>Change Email Address</h2>
-    <form method="post">
+    <form method="post" class="settings-form">
         {% csrf_token %}
 
         {% if current_emailaddress %}
+            <label for="change_email_field">Current email:</label>
             <input id="change_email_field" disabled type="email" value="{{ current_emailaddress.email }}" />
-            <label for="change_email_field">Current email</label>
         {% endif %}
 
         {% if new_emailaddress %}
-            <input name="change_email_field" value="{{ new_emailaddress.email }}" disabled type="email" />
             <label for="change_email_field">
                 {% if not current_emailaddress %}
                     Current email:
                 {% else %}
-                    Changing to":
+                    Changing to:
                 {% endif %}
             </label>
+            <input name="change_email_field" value="{{ new_emailaddress.email }}" disabled type="email" />
         {% endif %}
 
-        <ul>
-            {% for field, errors in form.errors.items %}
-                {% if field == "__all__" %}
-                    {% for error in errors %}
-                        <li>{{ error|striptags }}</li>
-                    {% endfor %}
-                {% else %}
-                    <li>{{ field|striptags|title }}:
-                        <ul>{% for error in errors %}
-                            <li>{{ error|striptags }}</li>{% endfor %}</ul>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
+        <div class="error-list">
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% if field == "__all__" %}
+                        {% for error in errors %}
+                            <li>{{ error|striptags }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li>{{ field|striptags|title }}:
+                            <ul>{% for error in errors %}
+                                <li>{{ error|striptags }}</li>{% endfor %}</ul>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
 
-        <input id="new_email_field" name="email" value="{{ form.email.value }}" type="email" />
         <label for="new_email_field">Change to:</label>
+        <input id="new_email_field" name="email" value="{{ form.email.value }}" type="email" />
 
-        <button name="action_add" type="submit">
+        <button name="action_add" type="submit" class="settings-button">
             Change Email
         </button>
     </form>

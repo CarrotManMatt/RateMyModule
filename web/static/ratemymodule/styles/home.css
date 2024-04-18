@@ -70,8 +70,8 @@
     outline: none;
     text-decoration: none;
     color: var(--text-color);
-    transform: translateY(-2px); /* Moves the button up by 2 pixels */
-    transition: background-color 0.3s, transform 0.3s; /* Smooth transition for background and movement */
+    transform: translateY(-2px);
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .university-text {
@@ -124,7 +124,7 @@
 
 .filter-button:hover {
     cursor: pointer;
-    background-color: var(--button-hover); /* lighter version of button colour */
+    background-color: var(--button-hover);
 }
 
 .rating-item {
@@ -209,7 +209,7 @@
 }
 
 .post-item {
-    position: relative; /* Added to ensure modal button is positioned relative to this container */
+    position: relative;
     width: 100%;
     background-color: var(--secondary-color);
     border-radius: 12px;
@@ -222,14 +222,14 @@
 
 .header {
     display: flex;
-    justify-content: space-between; /* This will push the module-year and button to the ends */
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px; /* Space between header and the content below */
+    margin-bottom: 10px;
 }
 
 .title {
     font-weight: bold;
-    font-size: 1.125rem; /* 18px if the base size is 16px */
+    font-size: 1.125rem;
     color: var(--text-color);
 }
 
@@ -243,10 +243,10 @@
     background-color: var(--button-color);
     padding: 5px 10px;
     border-radius: 8px;
-    white-space: nowrap; /* Prevents breaking into multiple lines */
+    white-space: nowrap;
     margin-right: 30px;
     font-weight: bold;
-    font-size: 1.125rem; /* 18px if the base size is 16px */
+    font-size: 1.125rem;
     color: white;
 }
 
@@ -259,7 +259,7 @@
 .items {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Uniform space between item elements */
+    gap: 10px;
 }
 
 .item-element {
@@ -279,8 +279,7 @@
 .contents {
     font-size: 14px;
     font-family: 'Source Sans Pro', sans-serif;
-    color: var(--secondary-text-color);
-    margin-top: 10px; /* Space between items and content */
+    margin-top: 10px;
 }
 
 .post-like-rating-arrow {
@@ -307,9 +306,8 @@
 
 .open-modal-button {
     position: absolute;
-    top: 15px; /* Adjust according to your layout */
+    top: 15px;
     right: 15px;
-    /* Other styles remain unchanged */
 }
 
 @media (max-width: 768px) {
@@ -319,11 +317,11 @@
     }
 
     .module-year, .open-modal-button {
-        margin-top: 10px; /* Extra space in smaller screens */
+        margin-top: 10px;
     }
 
     .items {
-        justify-content: center; /* Center the tags in mobile view */
+        justify-content: center;
     }
 }
 
@@ -339,14 +337,13 @@
     height: 20px;
     border-radius: 50%;
     cursor: pointer;
-    display: flex; /* Use flexbox for centering */
-    align-items: center; /* Center content vertically */
-    justify-content: center; /* Center content horizontally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
     vertical-align: middle;
 }
 
-/* Adjust the following styles as needed for the flag and SVG container */
 .svg-container {
     width: 12px;
     height: 12px;
@@ -357,9 +354,9 @@
 }
 
 .flag-container {
-    display: flex; /* Center content horizontally */
-    align-items: center; /* Center content vertically */
-    justify-content: center; /* Center content horizontally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .right-sidebar-lower-content {
@@ -434,7 +431,7 @@
 
 .analytics-submit-button:hover {
     cursor: pointer;
-    background-color: var(--button-hover); /* lighter version of button colour */
+    background-color: var(--button-hover);
 }
 .analytics-button-text{
     border: none;
@@ -451,7 +448,6 @@
     text-align: left;
 }
 
-/* Enhance responsiveness for smaller screens */
 @media (max-width: 768px) {
     .right-sidebar-lower-content {
         padding: 10px;
@@ -459,18 +455,17 @@
     }
 
     .graphs > div {
-        flex-direction: column; /* Stack label and graph vertically on smaller screens */
-        align-items: flex-start; /* Align items to the start for a tight layout */
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
 .disclaimer-content {
     margin-top: 10px;
     padding: 0 15px 0 15px;
-    color: #7e8285;
     text-align: right;
     border-radius: 8px;
-    font-size: 0.8rem; /* Example font size */
+    font-size: 0.8rem;
     word-wrap: normal;
     overflow-wrap: normal;
     hyphens: none;

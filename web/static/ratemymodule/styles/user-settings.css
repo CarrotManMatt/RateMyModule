@@ -1,17 +1,97 @@
-/* CSS Style for User Settings Page */
-
-
-.user-settings-links a,
-.user-settings-links form button  {
-    color: #4e8cff; /* Adjust link color for visibility */
-    text-decoration: underline;
-    display: block;
-    margin: 20px;
-    background: none;
-    border: none;
+.left-sidebar {
+    padding: 20px;
 }
 
-.user-settings-links form button {
-    font-size: 17px;
-    padding-left: 0;
+.user-settings-links {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.settings-button {
+    display: block;
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: var(--button-color);
+    color: white;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 14px;
+    border: none;
+    box-sizing: border-box;
+}
+
+.settings-button:hover {
+    background-color: var(--button-hover);
+}
+
+.danger-button {
+    background-color: #dc3545;
+    width: 100%;
+}
+
+.danger-button:hover {
+    background-color: #9a2530;
+}
+
+.main-content {
+    padding: 0 40px;
+}
+
+.main-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 500px;
+}
+
+.main-content h2 {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: var(--title-colour);
+    font-size: 1.8em;
+}
+
+.main-content input[type="email"],
+.main-content input[type="password"] {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--secondary-color);
+    width: 100%;
+    color: var(--text-color);
+    box-sizing: border-box;
+}
+
+.main-content button {
+    padding: 10px 20px;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    color: white;
+    background-color: var(--button-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.main-content button:hover {
+    background-color: var(--button-hover);
+}
+
+.autocomplete {
+    width: 100%;
+    margin-top: 10px;
+    padding: 0.375rem;
+    border-radius: 7px;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 14px;
 }

@@ -25,23 +25,23 @@
     color: #7e8285;
     text-align: center;
     border-radius: 8px;
-    font-size: 0.875rem; /* Example font size */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adds some depth */
+    font-size: 0.875rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     word-wrap: normal;
     overflow-wrap: normal;
     hyphens: none;
 }
 
 .legal-box a {
-    color: #4e8cff; /* Adjust link color for visibility */
+    color: var(--link-colour);
     text-decoration: underline;
     display: inline-block;
 }
 
 .legal-box p {
-    word-wrap: break-word; /* This will break long words that would otherwise extend outside the container */
-    white-space: normal; /* This ensures that the whitespace is handled normally */
-    overflow-wrap: break-word; /* This is a standard way to specify line breaking */
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
     hyphens: auto;
     color: var(--text-color);
 }
@@ -63,10 +63,6 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/*.right-sidebar-upper {*/
-/*    margin-bottom: 10px; !* Space between the two right sidebar boxes *!*/
-/*}*/
-
 .right-sidebar-lower {
     object-fit: contain;
     overflow-x: hidden;
@@ -80,7 +76,6 @@
     margin: 0 auto;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .left-container, .right-sidebar {
         flex-basis: auto;

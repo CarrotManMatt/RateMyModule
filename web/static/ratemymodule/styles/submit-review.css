@@ -8,7 +8,7 @@
 }
 
 h1 {
-    color: var(--button-color-light);
+    color: var(--title-colour);
     text-align: center;
 }
 
@@ -90,7 +90,7 @@ textarea:focus {
 
 .rating {
     display: flex;
-    flex-direction: row-reverse; /* Reverse the flex container */
+    flex-direction: row-reverse;
     justify-content: flex-end;
     gap: 4px;
     margin-left: 10px;
@@ -109,22 +109,21 @@ textarea:focus {
 .rating label {
     cursor: pointer;
     font-size: 35px;
-    color: #925EF4; /* Default star color */
+    color: #925EF4;
 }
 
 
 .rating label:before {
-    content: "☆"; /* Empty star */
+    content: "☆";
 }
 
 .rating label:hover:before,
 .rating label:hover ~ label:before,
 .rating input[type="radio"]:checked ~ label:before {
-    content: "★"; /* Filled star character */
-    color: #925EF4; /* Color of filled stars */
+    content: "★";
+    color: #925EF4;
 }
 
-/* Specifically fill the selected star */
 .rating input[type="radio"]:checked + label:before {
     content: "★";
     color: #925EF4;
@@ -143,18 +142,18 @@ textarea:focus {
 
 .sliders-container .rating-container {
     display: flex;
-    flex-direction: column; /* Stacks items vertically */
-    align-items: center; /* Horizontally centers the items */
-    flex-basis: calc(33.333% - 10px); /* Gives each item a third of the container width minus margin */
-    margin: 5px; /* Adds a small margin to each side */
+    flex-direction: column;
+    align-items: center;
+    flex-basis: calc(33.333% - 10px);
+    margin: 5px;
 }
 
 .sliders-container .rating-container .rating {
-    justify-content: center; /* Ensures stars are centered */
+    justify-content: center;
 }
 
 .small-rating .rating label {
-    font-size: 30px; /* Adjust to desired smaller star size */
+    font-size: 30px;
 }
 
 .sliders-container label {
@@ -207,8 +206,8 @@ input[type="range"]:active::-moz-range-thumb {
 
 .tags-container {
     display: flex;
-    justify-content: space-evenly; /* Matches sliders-container */
-    align-items: center; /* Centers items vertically */
+    justify-content: space-evenly;
+    align-items: center;
     gap: 10px;
     margin-bottom: 20px;
     flex-wrap: wrap;
@@ -218,12 +217,12 @@ input[type="range"]:active::-moz-range-thumb {
     flex-basis: calc(33.333% - 10px);
     display: flex;
     flex-direction: column;
-    align-items: center; /* Aligns the text and input box to the center */
+    align-items: center;
     position: relative;
 }
 
 .tag-input-container label {
-    text-align: center; /* Center-align the label text */
+    text-align: center;
     margin-bottom: 5px;
 }
 
@@ -235,7 +234,7 @@ input[type="range"]:active::-moz-range-thumb {
     color: var(--text-color);
     font-family: 'Source Sans Pro', sans-serif;
     width: 100%;
-    box-sizing: border-box; /* Adds padding and border into the width */
+    box-sizing: border-box;
 }
 
 .tag-input-container input[type="text"]:focus {
@@ -261,7 +260,7 @@ input[type="range"]:active::-moz-range-thumb {
     padding: 10px;
     border-bottom: 1px solid var(--secondary-color);
     cursor: pointer;
-    font-family: 'Source Sans Pro', sans-serif; /* Match the font family */
+    font-family: 'Source Sans Pro', sans-serif;
     color: var(--text-color);
 }
 
@@ -273,12 +272,11 @@ input[type="range"]:active::-moz-range-thumb {
     background-color: var(--dropdown-hover);
 }
 
-/* Selected Tags Styling */
 .selected-tags-container {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    margin-top: 4px; /* Space between input box and selected tags */
+    margin-top: 4px;
 }
 
 .selected-tag {
@@ -317,106 +315,49 @@ button:hover {
     background-color: var(--button-hover);
 }
 
-/* Responsive Design Adjustments */
-@media (max-width: 768px) {
-    .tags-container,
-    .tag-input-container {
-        flex-direction: column;
-        align-items: flex-start;
-        flex-basis: 100%;
-    }
-
-    .sliders-container,
-    .tags-container {
-        justify-content: start;
-    }
-}
-
-
 .form-errors-container {
-    background-color: #ffcccc; /* Light red background */
-    color: #cc0000; /* Darker red text for contrast */
+    background-color: #ffcccc;
+    color: #cc0000;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #cc0000;
-    margin: 20px auto; /* Center the container */
-    width: 90%; /* Adjust as necessary */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
-    text-align: center; /* Center the text */
+    margin: 20px auto;
+    width: 90%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
     font-size: 14px;
     font-family: 'Source Sans Pro', sans-serif;
 }
 
 @media (max-width: 768px) {
     .form-errors-container {
-        width: 50%; /* More width on smaller screens */
+        width: 50%;
     }
 }
 
-/*!* Modal Styles *!*/
-/*.disclaimer-modal {*/
-/*    display: none;*/
-/*    position: fixed;*/
-/*    z-index: 1;*/
-/*    left: 0;*/
-/*    top: 0;*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*    overflow: auto;*/
-/*    background-color: rgba(0, 0, 0, 0.4);*/
-/*}*/
-
-/*.disclaimer-modal-content {*/
-/*    background-color: var(--secondary-color);*/
-/*    margin: 15% auto;*/
-/*    padding: 20px;*/
-/*    border: 1px solid var(--secondary-color);*/
-/*    width: 80%;*/
-/*    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);*/
-/*    border-radius: 5px;*/
-/*    align-content: center;*/
-/*    color: var(--text-color);*/
-/*    text-align: center; !* Center the text *!*/
-/*}*/
-
-/*.disclaimer-close {*/
-/*    color: var(--text-color);*/
-/*    float: right;*/
-/*    font-size: 28px;*/
-/*    font-weight: bold;*/
-/*}*/
-
-/*.disclaimer-close:hover,*/
-/*.disclaimer-close:focus {*/
-/*    color: var(--text-color);*/
-/*    text-decoration: none;*/
-/*    cursor: pointer;*/
-/*}*/
-
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 2; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 2;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
     position: relative;
     background-color: var(--secondary-color);
-    margin: 10% auto; /* 10% from the top and centered */
+    margin: 10% auto;
     padding: 20px;
-    width: 50%; /* Could be more or less, depending on screen size */
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    border-radius: 10px; /* Optional */
+    width: 50%;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
 }
 
-/* The Close Button */
 .close-button {
     color: var(--text-color);
     float: right;
@@ -431,24 +372,22 @@ button:hover {
     outline: none;
 }
 
-
 .modal-content h2 {
-    text-align: center; /* Center the title */
-    margin-bottom: 0.5em; /* Reduce the space below the title */
+    text-align: center;
+    margin-bottom: 0.5em;
     color: var(--button-color-light);
 }
 
-/* Style for input fields */
 .modal-content input[type="text"] {
-    padding: 12px; /* Increase padding */
+    padding: 12px;
     border: 1px solid var(--secondary-color);
     border-radius: 5px;
     background-color: var(--background-color);
     color: var(--text-color);
     font-family: 'Source Sans Pro', sans-serif;
-    width: 100%; /* Adjust width as needed */
+    width: 100%;
     box-sizing: border-box;
-    margin: 10px auto; /* Center input horizontally with margin */
+    margin: 10px auto;
 }
 
 .modal-content input[type="text"]:focus {
@@ -457,6 +396,5 @@ button:hover {
 }
 
 .custom-tag {
-    /* Custom styling for unverified tags */
     background-color: #f45e75;
 }

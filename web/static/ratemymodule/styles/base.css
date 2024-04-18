@@ -22,7 +22,11 @@
     --secondary-button-color-dark: #333C45;
     --secondary-button-color-light: #DBDFE5;
     --secondary-text-color-dark: #cbcbcb;
-    --secondary-text-color-light: #747474
+    --secondary-text-color-light: #747474;
+    --title-colour-darkmode: #9f5cff;
+    --title-colour-lightmode: #7f4fd9;
+    --link-colour-darkmode: #93BAFD;
+    --link-colour-lightmode: #2B56A7;
 }
 
 @media (prefers-color-scheme: light) {
@@ -35,9 +39,10 @@
         --dropdown: var(--dropdown-light);
         --dropdown-content: var(--dropdown-content-light);
         --dropdown-hover: var(--dropdown-hover-light);
-        /* Ryan's colours */
         --secondary-button-color: var(--secondary-button-color-light);
         --secondary-text-color: var(--secondary-text-color-light);
+        --title-colour: var(--title-colour-lightmode);
+        --link-colour: var(--link-colour-lightmode);
     }
 }
 
@@ -51,9 +56,10 @@
         --dropdown: var(--dropdown-dark);
         --dropdown-content: var(--dropdown-content-dark);
         --dropdown-hover: var(--dropdown-hover-dark);
-        /* Ryan's colours */
         --secondary-button-color: var(--secondary-button-color-dark);
         --secondary-text-color: var(--secondary-text-color-dark);
+        --title-colour: var(--title-colour-darkmode);
+        --link-colour: var(--link-colour-darkmode);
     }
 }
 
@@ -68,6 +74,8 @@
     --dropdown-hover: var(--dropdown-hover-light);
     --secondary-button-color: var(--secondary-button-color-light);
     --secondary-text-color: var(--secondary-text-color-light);
+    --title-colour: var(--title-colour-lightmode);
+    --link-colour: var(--link-colour-lightmode);
 }
 
 [data-theme="dark"] {
@@ -81,6 +89,8 @@
     --dropdown-hover: var(--dropdown-hover-dark);
     --secondary-button-color: var(--secondary-button-color-dark);
     --secondary-text-color: var(--secondary-text-color-dark);
+    --title-colour: var(--title-colour-darkmode);
+    --link-colour: var(--link-colour-darkmode);
 }
 
 body {
@@ -95,7 +105,6 @@ body.loaded {
     opacity: 1;
 }
 
-/* Optional: Improve loading overlay appearance, e.g., adding a spinner */
 #loading-overlay {
     display: flex;
     justify-content: center;
@@ -126,13 +135,13 @@ body.loaded {
 .name {
     padding-right: 0;
     margin-right: 1px;
+    color: var(--title-colour);
 }
 
 .logo-container .name {
     font-size: 1.8em;
     font-weight: 700;
     line-height: 1.4615384615;
-    color: var(--button-color);
     white-space: nowrap;
     flex-shrink: 0;
     flex-grow: 0;
@@ -143,6 +152,17 @@ body.loaded {
     margin-top: 0;
     color: var(--text-color);
     padding-right: 10px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: auto;
+    border: none;
+    background-color: var(--background-color);
+    border-radius: 8px;
+    width: 500px;
 }
 
 .name, .create-post, .user-container span {
@@ -229,7 +249,7 @@ body.loaded {
 }
 
 .user-dropdown-content a,
-.user-dropdown-content form button { /* This will target both anchor tags and buttons within .user-dropdown-content */
+.user-dropdown-content form button {
     color: var(--text-color);
     padding: 12px 16px;
     font-family: 'Source Sans Pro', sans-serif;
@@ -239,7 +259,7 @@ body.loaded {
     border: none;
     width: 100%;
     text-align: left;
-    box-sizing: border-box; /* Added to ensure padding is included in the width */
+    box-sizing: border-box;
 }
 
 .user-dropdown-content form button {
@@ -259,23 +279,22 @@ body.loaded {
     fill: var(--button-color-dark);
 }
 
-/* Styles when dark mode is active */
 [data-theme="dark"] .theme-svg {
     fill: #f0f0f0;
 }
 
 .toggle-container {
     display: flex;
-    justify-content: center; /* Center the SVG in the container */
+    justify-content: center;
     align-items: center;
-    cursor: pointer; /* Indicates that the SVG is clickable */
+    cursor: pointer;
     margin-left: 10px;
 }
 
 .toggle-container svg {
-    width: 20px; /* Adjust width as necessary */
-    height: 20px; /* Adjust height as necessary */
-    transition: fill 0.3s; /* Smooth transition for color change */
+    width: 20px;
+    height: 20px;
+    transition: fill 0.3s;
 }
 
 .user-dropdown-content a:hover, .user-dropdown-content form button:hover {
@@ -287,7 +306,7 @@ footer {
     bottom: 0;
     left: 0;
     width: 100%;
-    color: #7e8285;
+    color: var(--text-color);
     padding: 10px;
     margin-bottom: -15px;
     z-index: 1000;

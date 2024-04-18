@@ -11,18 +11,17 @@
 {% endblock styles %}
 
 {% block left_sidebar_upper %}
-    {# Include content for the left sidebar i.e. navigation links for user settings #}
     <div class="user-settings-links">
-        <a href="{% url 'ratemymodule:change_email' %}">Change Email</a>
-        <a href="{% url 'ratemymodule:change_password' %}">Change Password</a>
-        <a href="{% url 'ratemymodule:change_courses' %}">Change Enrolled Courses</a>
+        <a href="{% url 'ratemymodule:change_email' %}" class="settings-button">Change Email</a>
+        <a href="{% url 'ratemymodule:change_password' %}" class="settings-button">Change Password</a>
+        <a href="{% url 'ratemymodule:change_courses' %}" class="settings-button">Change Enrolled Courses</a>
         <form
                 method="post"
                 action="{% url 'ratemymodule:delete_account' %}"
                 onsubmit="return confirm('Are you sure you want to delete your account?');"
         >
             {% csrf_token %}
-            <button type="submit">Delete Account</button>
+            <button type="submit" class="settings-button danger-button">Delete Account</button>
         </form>
     </div>
 {% endblock left_sidebar_upper %}

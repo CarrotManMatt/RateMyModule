@@ -10,7 +10,7 @@
 .title {
     font-size: 30px;
     font-weight: bold;
-    color: var(--button-color);
+    color: var(--title-colour);
     margin-bottom: 20px;
     text-align: center;
 }

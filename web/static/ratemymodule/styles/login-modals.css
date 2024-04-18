@@ -1,23 +1,23 @@
 .modal-login {
-    display: none; /* Hide the modal by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-login .modal-content-login {
-    background: var(--background-color); /* Background color */
+    background: var(--background-color);
     padding: 20px;
     border-radius: 8px;
     color: var(--text-color);
-    margin: 15% auto; /* 15% from the top and centered */
-    width: auto; /* Adjust width as per content size */
-    max-width: 400px; /* Maximum width */
+    margin: 15% auto;
+    width: auto;
+    max-width: 400px;
     font-size: 14px;
 }
 
@@ -42,27 +42,27 @@
 .button-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center align the buttons */
+    align-items: center;
     width: 100%;
 }
 
 .button-wrapper button,
 .button-wrapper form {
-    width: auto; /* Adjust width as per content size */
+    width: auto;
     margin-top: 10px;
 }
 
 .modal-login .btn-google-login,
 .modal-login .btn-microsoft-login,
 .modal-login .btn-other-login {
-    border-radius: 20px; /* Rounded corners */
+    border-radius: 20px;
     border: none;
     font-size: 15px;
     padding: 12px 20px;
     font-weight: 500;
-    min-width: 250px; /* Minimum width to accommodate content */
+    min-width: 250px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    background: white; /* Default background */
+    background: white;
     color: #515151;
     transition: background-color 0.3s;
     display: flex;
@@ -107,7 +107,7 @@
 .modal-login .login-footer {
     font-size: 12px;
     margin-top: 20px;
-    color: #666;
+    color: var(--text-color);
     text-align: center;
 }
 
@@ -122,15 +122,13 @@
     color: var(--secondary-text-color);
     font-weight: 100;
     text-align: center;
-    padding: 10px 0; /* Add padding to top and bottom for space */
+    padding: 10px 0;
 }
 
-/* Sign Up Styles */
-
 .modal-content-signup {
-    background: var(--background-color); /* Or any dark color to match your theme */
+    background: var(--background-color);
     padding: 20px;
-    border-radius: 10px; /* Slightly less rounded than before */
+    border-radius: 10px;
     color: #fff;
     margin: 10% auto;
     width: 90%;
@@ -142,28 +140,27 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 10px; /* Space before the 'or' divider */
+    margin-bottom: 10px;
 }
 
 .signup-form .form-group {
-    width: 100%; /* ensure the form group takes the full width of its parent */
+    width: 100%;
 }
 
-/* Style individual form inputs */
 .signup-form input[type="email"],
 .signup-form input[type="password"],
 .signup-form input[type="text"],
 .signup-form select {
-    width: calc(100% - 40px); /* Full width to fit the parent container */
-    padding: 10px 20px; /* Comfortable padding inside the input fields */
-    margin-bottom: 10px; /* Space between each field */
-    border: none; /* No border */
-    border-radius: 5px; /* Slightly rounded */
+    width: calc(100% - 40px);
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
     font-size: 15px;
-    background-color: var(--secondary-color); /* Slightly lighter than the modal background for contrast */
+    background-color: var(--secondary-color);
     color: var(--text-color);
     font-family: 'Source Sans Pro', sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for a 3D effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .signup-form input::placeholder {
@@ -174,73 +171,67 @@
 .signup-form input[type="password"]:focus,
 .signup-form input[type="text"]:focus {
     box-shadow: 0 0 0 2px #925EF4;
-    outline: none; /* Removes the default focus outline */
+    outline: none;
 }
 
-/* Style for the submit button to make it stand out */
 .btn-signup {
     padding: 12px 20px;
-    border-radius: 20px; /* More rounded */
-    background-color: var(--button-color); /* Brighter color for the button */
+    border-radius: 20px;
+    background-color: var(--button-color);
     color: #fff;
     font-size: 15px;
     border: none;
     font-family: 'Source Sans Pro', sans-serif;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for a 3D effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-    width: fit-content; /* Fits to content */
-    margin: 0 auto; /* Center button */
+    width: fit-content;
+    margin: 0 auto;
     border: transparent;
 }
 
 .btn-signup:hover {
-    background-color: var(--button-hover); /* Slightly lighter on hover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
-    transform: translateY(-2px); /* Lifts button up slightly on hover */
+    background-color: var(--button-hover);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
 }
-
-/* Other SignUp Options */
 
 .options-wrapper {
     display: flex;
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center children horizontally */
-    justify-content: center; /* Center children vertically if there's extra space */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     margin-top: 20px;
-    text-align: center; /* Center-align the text for all child elements */
+    text-align: center;
     gap: 10px;
 }
-
 
 .btn-link-account {
     color: var(--text-color-dark);
     padding: 10px 15px;
     border: none;
-    border-radius: 20px; /* Match the rounded corners */
+    border-radius: 20px;
     font-family: 'Source Sans Pro', sans-serif;
-    font-size: 15px; /* Match the font size */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Consistent with other buttons */
+    font-size: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease-in-out;
     cursor: pointer;
 }
 
-
 .btn-link-account:hover {
-    background: #7aa9f7; /* Hover state color */
+    background: #7aa9f7;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px); /* Lifts button up slightly on hover */
+    transform: translateY(-2px);
 }
 
 .btn-google-microsoft {
-    background: #4285F4; /* Google's brand color */
+    background: #4285F4;
     align-self: center;
 }
 
-/* Style for the alternative option text and button */
 .signup-alt-option {
     text-align: center;
     font-family: 'Source Sans Pro', sans-serif;
-    color: var(--text-color); /* Use your text color */
+    color: var(--text-color);
     margin-top: 10px;
     font-size: 15px;
 }
@@ -248,8 +239,8 @@
 .btn-sign-in-link {
     background: none;
     border: none;
-    color: #4285F4; /* A color that stands out, like Google blue */
-    padding-left: 5px; /* Space between text and button */
+    color: #4285F4;
+    padding-left: 5px;
     cursor: pointer;
     text-decoration: underline;
     font-family: 'Source Sans Pro', sans-serif;
@@ -260,7 +251,6 @@
 .btn-sign-in-link:hover {
     color: #94baf8;
 }
-
 
 .signup-or-divider {
     display: flex;
@@ -279,11 +269,9 @@
 .or-text {
     margin: 0 10px;
     color: var(--text-color);
-    background-color: var(--background-color); /* to hide the line behind the text */
+    background-color: var(--background-color);
     padding: 0 5px;
 }
-
-/* Manual Login Styles */
 
 .modal-content-manual-login {
     box-sizing: border-box;
@@ -293,26 +281,26 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-bottom: 10px; /* Space before the 'or' divider */
+    margin-bottom: 10px;
 }
 
 .manual-login-form .form-group {
-    width: 100%; /* ensure the form group takes the full width of its parent */
+    width: 100%;
 }
 
 .manual-login-form input[type="email"],
 .manual-login-form input[type="password"],
 .manual-login-form input[type="text"],
 .manual-login-form select {
-    width: calc(100% - 40px); /* Full width to fit the parent container */
-    padding: 10px 20px; /* Comfortable padding inside the input fields */
-    border: none; /* No border */
-    border-radius: 5px; /* Slightly rounded */
+    width: calc(100% - 40px);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
     font-size: 15px;
-    background-color: var(--secondary-color); /* Slightly lighter than the modal background for contrast */
+    background-color: var(--secondary-color);
     color: var(--text-color);
     font-family: 'Source Sans Pro', sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for a 3D effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .manual-login-form input::placeholder {
@@ -325,60 +313,57 @@
 }
 
 a[href="/accounts/password/reset/"] {
-    color: #9f9f9f; /* Choose a color that fits your design */
-    text-decoration: underline; /* Style as a typical hyperlink */
-    display: block; /* To allow margin for spacing */
-    margin-bottom: 5px; /* Spacing below the link */
+    color: var(--text-color);
+    text-decoration: underline;
+    display: block;
+    margin-bottom: 5px;
     margin-top: 5px;
-    text-align: right; /* Align to the right */
-    font-size: 14px; /* Smaller font size */
+    text-align: right;
+    font-size: 14px;
 }
 
-/* password reset hover */
 a[href="/accounts/password/reset/"]:hover {
-    color: #7f7f7f; /* Slightly darker on hover */
+    color: #7f7f7f;
 }
 
 #manualLoginModal .form-group label[for="id_login_remember"] {
-    color: #9f9f9f !important; /* The !important flag can force this style to take precedence */
-    font-size: 14px; /* Adjust the font size as necessary */
-    /* Add any other styles you need here */
+    color: #9f9f9f !important;
+    font-size: 14px;
 }
 
-/* Additional styles to align the 'Remember Me' with the 'Login' button */
 .manual-login-form .form-group:last-child {
-    display: flex; /* Use flexbox for layout */
-    align-items: center; /* Align items vertically */
-    justify-content: space-between; /* Spacing between checkbox and button */
-    flex-wrap: wrap; /* Wrap items to next line if needed */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .manual-login-form input[type="email"]:focus,
 .manual-login-form input[type="password"]:focus,
 .manual-login-form input[type="text"]:focus {
     box-shadow: 0 0 0 2px #925EF4;
-    outline: none; /* Removes the default focus outline */
+    outline: none;
 }
 
 .btn-manual-login {
     padding: 12px 40px;
-    border-radius: 20px; /* More rounded */
-    background-color: var(--button-color); /* Brighter color for the button */
+    border-radius: 20px;
+    background-color: var(--button-color);
     color: #fff;
     font-size: 15px;
     border: none;
     font-family: 'Source Sans Pro', sans-serif;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for a 3D effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-    width: fit-content; /* Fits to content */
-    margin: 0 auto; /* Center button */
+    width: fit-content;
+    margin: 0 auto;
     border: transparent;
 }
 
 .btn-manual-login:hover {
-    background-color: var(--button-hover); /* Slightly lighter on hover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
-    transform: translateY(-2px); /* Lifts button up slightly on hover */
+    background-color: var(--button-hover);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
 }
 
 .manual-login-footer {

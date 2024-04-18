@@ -14,10 +14,10 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--secondary-color);
-    padding: 1.2vw; /* Use relative units for padding */
+    padding: 1.2vw;
     text-align: center;
-    border-radius: 1vw; /* Use relative units for border-radius */
-    width: 40vw; /* Use relative units for width */
+    border-radius: 1vw;
+    width: 40vw;
     font-size: 1vw;
     align-content: center;
 }
@@ -27,7 +27,7 @@
     color: var(--text-color);
     top: 1vw;
     right: 1vw;
-    font-size: 1.5vw; /* Use relative units for font size */
+    font-size: 1.5vw;
     cursor: pointer;
     background-color: transparent;
     background-repeat: no-repeat;
@@ -36,35 +36,35 @@
 }
 
 .options {
-    margin-top: 1vw; /* Use relative units for margin */
+    margin-top: 1vw;
 }
 
 .options h2 {
-    font-size: 2vw; /* Use relative units for font size */
+    font-size: 2vw;
 }
 
 .options button {
     display: block;
     width: 100%;
-    padding: 1vw; /* Use relative units for padding */
-    margin-bottom: 1vw; /* Use relative units for margin */
+    padding: 1vw;
+    margin-bottom: 1vw;
     background-color: var(--button-color-dark);
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 0.5vw; /* Use relative units for border-radius */
-    font-size: 1.2vw; /* Use relative units for font size */
+    border-radius: 0.5vw;
+    font-size: 1.2vw;
 }
 
 .cancel-button, .confirm-button {
-    margin-top: 1vw; /* Use relative units for margin */
-    padding: 1vw; /* Use relative units for padding */
+    margin-top: 1vw;
+    padding: 1vw;
     background-color: var(--button-color-dark);
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 0.5vw; /* Use relative units for border-radius */
-    font-size: 1.2vw; /* Use relative units for font size */
+    border-radius: 0.5vw;
+    font-size: 1.2vw;
 }
 
 .confirmation-modal {
@@ -72,18 +72,6 @@
 }
 
 .confirmation-modal-content {
-    padding: 2vw; /* Use relative units for padding */
-    font-size: 1.5vw; /* Use relative units for font size */
+    padding: 2vw;
+    font-size: 1.5vw;
 }
-
-/*.open-modal-button {*/
-/*  background-color: var(--button-color-dark);*/
-/*  color: white;*/
-/*  border: none;*/
-/*  padding: 2vw; !* Use relative units for padding *!*/
-/*  width: 5vw; !* Use relative units for width *!*/
-/*  height: 5vw; !* Use relative units for height *!*/
-/*  border-radius: 50%;*/
-/*  cursor: pointer;*/
-/*  font-size: 2vw; !* Use relative units for font size *!*/
-/*}*/
