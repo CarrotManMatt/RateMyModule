@@ -204,13 +204,13 @@
     flex-direction: column;
     gap: 10px;
     box-sizing: border-box;
-    max-height: 900px;
     min-height: fit-content;
 }
 
 .post-item {
     position: relative;
     width: 100%;
+    min-height: fit-content;
     background-color: var(--secondary-color);
     border-radius: 12px;
     padding: 15px;
