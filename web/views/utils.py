@@ -1,3 +1,5 @@
+"""A set of utility functions for RateMyModule."""
+
 from collections.abc import Sequence
 
 __all__: Sequence[str] = ("EnsureUserHasCoursesMixin",)

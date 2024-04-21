@@ -17,6 +17,8 @@ from ratemymodule.models import Course, Post, Report, User
 
 
 class ChangeCoursesForm(ModelForm[User]):
+    """The form for getting the data to change courses for a user."""
+
     enrolled_course_set = forms.ModelMultipleChoiceField(
         queryset=Course.objects.all(),
         widget=forms.SelectMultiple(attrs={"class": "autocomplete"}),

@@ -636,16 +636,22 @@ class OtherTagAutocompleteView(View):
 
 
 class ChangeEmailView(LoginRequiredMixin, AllAuthEmailView):  # type: ignore[misc,no-any-unimported]
+    """The view for showing and processing a user's change of email address."""
+
     template_name = "ratemymodule/change-email.html"
     http_method_names = ("get", "post")
 
 
 class ChangePasswordView(LoginRequiredMixin, AllAuthPasswordChangeView):  # type: ignore[misc,no-any-unimported]
+    """The view for showing and processing a user's change of password."""
+
     template_name = "ratemymodule/change-password.html"
     http_method_names = ("get", "post")
 
 
 class ChangeCoursesView(LoginRequiredMixin, FormView[ChangeCoursesForm]):
+    """The view for showing and processing a user's change of courses."""
+
     template_name = "ratemymodule/change-courses.html"
     http_method_names = ("get", "post")
     form_class = ChangeCoursesForm
@@ -701,6 +707,8 @@ class ChangeCoursesView(LoginRequiredMixin, FormView[ChangeCoursesForm]):
 
 
 class DeleteAccountView(LoginRequiredMixin, View):
+    """The view for processing user post requests to delete their account."""
+
     http_method_names = ("post",)
 
     # noinspection PyOverrides

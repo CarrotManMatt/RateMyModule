@@ -1,5 +1,4 @@
 """Contains a selection of graph generating functions for RateMyModule."""
-
 from collections.abc import Sequence
 
 __all__: Sequence[str] = (
@@ -120,6 +119,7 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
     )
 
     if flag_nodata:
+        out_of_bar_texts = ["", "", "", "", ""]
         out_of_bar_texts[3] = "No posts = (\n be the first to \nRateThisModule!"
 
     ax.bar_label(rects, out_of_bar_texts, padding=5, color=label_color,
@@ -128,11 +128,13 @@ def rating_bar_graph(array_of_in_ratings: list[int], title: str, _bar_color: str
     # has white text on purple always
     if flag_nodata:
         ax.bar_label(
-            rects, inside_of_bar_texts, padding=-50, color=label_color, fontweight="light",
+            rects, inside_of_bar_texts, padding=-50, color=label_color,
+            fontweight="light",
         )
     else:
         ax.bar_label(
-            rects, inside_of_bar_texts, padding=-75, color="#f0f0f0", fontweight="light",
+            rects, inside_of_bar_texts, padding=-75, color="#f0f0f0",
+            fontweight="light",
             )
 
     # recolour axis to taste
@@ -157,23 +159,31 @@ def sb_format_reviews_string(array_of_in_ratings: list[int]) -> list[str]:
         elif array_of_in_ratings[counter] == 0:
             array_of_bar_labels[counter] = "(0 Reviews)"
         else:
-            array_of_bar_labels[counter] = f"({array_of_in_ratings[counter]} Reviews)"
+            array_of_bar_labels[counter] = (f"({number_to_text(array_of_in_ratings[counter])}"
+                                            f" Reviews)"
+                                            )
     return array_of_bar_labels
 
 
 def decide_in_or_out_of_bars(array_of_in_ratings: list[int], array_of_bar_labels: list[str]) -> tuple[list[str], list[str]]:  # noqa: E501
     # if bar less than 40% value of the largest bar, then put the text outside it
     forty_max = ceil(max(array_of_in_ratings) * 0.5)
-    inside_of_bar_texts: list[str] = [
-        "x" if p >= forty_max else ""
+    inside_of_bar_texts = [
+        p if p >= forty_max
+        else ""
         for p
         in array_of_in_ratings
-    ]
+        ]
     for counter in range(5):
         if inside_of_bar_texts[counter] != "":
             inside_of_bar_texts[counter] = array_of_bar_labels[counter]
 
-    out_of_bar_texts: list[str] = ["x" if p < forty_max else "" for p in array_of_in_ratings]
+    out_of_bar_texts = [
+        p if p < forty_max
+        else ""
+        for p
+        in array_of_in_ratings
+        ]
     for counter in range(5):
         if out_of_bar_texts[counter] != "":
             out_of_bar_texts[counter] = array_of_bar_labels[counter]
@@ -403,7 +413,8 @@ def get_module_averages(start_year: int, end_year: int, module: Module, attribut
 
                 this_months_reviews = [
                     getattr(post, attribute) for post in module.post_set.all()
-                    if start_band <= post.date_time_created <= end_band
+                    if start_band <= post.date_time_created <= end_band and
+                    getattr(post, attribute) is not None
                 ]
 
                 if this_months_reviews:
@@ -420,7 +431,8 @@ def get_module_averages(start_year: int, end_year: int, module: Module, attribut
 
             this_months_reviews = [
                 getattr(post, attribute) for post in module.post_set.all()
-                if start_band <= post.date_time_created <= end_band
+                if start_band <= post.date_time_created <= end_band and
+                getattr(post, attribute) is not None
             ]
 
             if this_months_reviews:
@@ -428,3 +440,16 @@ def get_module_averages(start_year: int, end_year: int, module: Module, attribut
             else:
                 set_of_averages.append(0.55)
     return set_of_averages
+
+
+def number_to_text(number: int) -> str:
+    MODIFIERS = [
+        ("B", 1000000000),
+        ("M", 1000000),
+        ("K", 1000),
+    ]
+    for item in MODIFIERS:
+        if item[1] <= number:
+            text = str(round(number/item[1], 3))[:3]
+            return f"{text.rstrip("0").rstrip(".")}{item[0]}"
+    return str(number)
