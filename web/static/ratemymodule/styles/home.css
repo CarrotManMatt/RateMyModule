@@ -461,6 +461,9 @@
 }
 
 .disclaimer-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     margin-top: 10px;
     padding: 0 15px 0 15px;
     text-align: right;
@@ -469,4 +472,9 @@
     word-wrap: normal;
     overflow-wrap: normal;
     hyphens: none;
+}
+
+.disclaimer-text {
+    margin-left: 8px;
+    color: #888;
 }
