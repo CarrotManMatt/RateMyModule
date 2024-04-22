@@ -92,7 +92,7 @@
         </div>
 
         <div title="Search for a post" class="search-container">{% block search_bar %}{% endblock search_bar %}</div>
-
+        <div class="right-aligned-section">
         <div class="user-profile-container">
             {% block user_profile %}
                 {% if not request.user.is_authenticated or request.user.enrolled_course_set.exists and request.resolver_match.view_name != "ratemymodule:submit-review" %}
@@ -143,6 +143,7 @@
                     </clipPath>
                 </defs>
             </svg>
+        </div>
         </div>
     </div>
 </header>

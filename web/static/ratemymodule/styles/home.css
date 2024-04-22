@@ -323,6 +323,17 @@
     .items {
         justify-content: center;
     }
+
+    .search-container {
+        width: auto;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
 }
 
 .open-modal-button {
@@ -454,9 +465,13 @@
         gap: 5px;
     }
 
-    .graphs > div {
-        flex-direction: column;
-        align-items: flex-start;
+    .graphs {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 0;
     }
 }
 

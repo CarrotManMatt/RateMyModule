@@ -4,7 +4,8 @@
 
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'ratemymodule/styles/content.css' %}"/>
+    <link rel="stylesheet"
+          href="{% static 'ratemymodule/styles/content.css' %}"/>
 {% endblock styles %}
 
 {% block content %}
@@ -45,7 +46,3 @@
         </aside>
     </div>
 {% endblock content %}
-
-{# TODO-Lilah: At the bottom of the sidebar, add a disclaimer section. This should be styled similarly to the Instagram disclaimer bubble, can also include GDPR here #}
-{# TODO-Lilah: Implement a sticky behavior for the sidebar where it becomes fixed once the user scrolls past its bottom edge, but still allowing the main content to scroll independently. #}
-{# TODO-Lilah: Create a 'Scroll to Top' button that floats over the main content. This button should have a high z-index to ensure it lays over other elements, such as graphs. It should be discreet but easily accessible. #}

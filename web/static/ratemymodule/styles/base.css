@@ -93,6 +93,7 @@
     --link-colour: var(--link-colour-darkmode);
 }
 
+
 body {
     font-family: 'Spline Sans', sans-serif;
     background-color: var(--background-color);
@@ -115,10 +116,10 @@ body.loaded {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    margin: -8px -8px 10px -8px;
+    padding: 0.625rem;
+    margin: -0.5rem -0.5rem 0.625rem -0.5rem;
     border: none;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1);
     background-color: var(--secondary-color);
     font-family: 'Source Sans Pro', sans-serif;
 }
@@ -134,7 +135,7 @@ body.loaded {
 
 .name {
     padding-right: 0;
-    margin-right: 1px;
+    margin-right: 0.0625rem;
     color: var(--title-colour);
 }
 
@@ -148,10 +149,9 @@ body.loaded {
 }
 
 #uni-name {
-    margin-left: 0;
-    margin-top: 0;
     color: var(--text-color);
-    padding-right: 10px;
+    padding-right: 0.625rem;
+    padding-left: 0.2rem;
 }
 
 .search-container {
@@ -166,23 +166,22 @@ body.loaded {
 }
 
 .name, .create-post, .user-container span {
-    margin-left: 10px;
+    margin-left: 0.625rem;
 }
 
 .user-profile-container {
-    flex-shrink: 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.625rem;
 }
 
 .create-post, .login-button {
     display: inline-block;
     text-decoration: none;
-    padding: 10px 10px;
+    padding: 0.625rem 0.625rem;
     background-color: var(--button-color);
     color: white;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     transition: background-color 0.3s;
     text-align: center;
     cursor: pointer;
@@ -199,18 +198,12 @@ body.loaded {
     margin-left: auto;
 }
 
-.user-icon {
-    height: 40px;
-    width: 40px;
-    margin-right: 10px;
-}
-
 .short-username {
     color: var(--text-color);
     font-weight: lighter;
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 1.2em;
-    margin-right: 10px;
+    margin-right: 0.625rem;
 }
 
 .user-dropdown {
@@ -224,7 +217,7 @@ body.loaded {
 
 .user-dropbtn {
     background-color: transparent;
-    padding: 10px;
+    padding: 0.625rem;
     border: none;
     cursor: pointer;
     width: 100%;
@@ -243,15 +236,14 @@ body.loaded {
     position: absolute;
     right: 0;
     background-color: var(--secondary-color);
-    min-width: 200px;
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    min-width: 12.5rem;
+    box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
-.user-dropdown-content a,
-.user-dropdown-content form button {
+.user-dropdown-content a, .user-dropdown-content form button {
     color: var(--text-color);
-    padding: 12px 16px;
+    padding: 0.75rem 1rem;
     font-family: 'Source Sans Pro', sans-serif;
     text-decoration: none;
     display: block;
@@ -260,15 +252,7 @@ body.loaded {
     width: 100%;
     text-align: left;
     box-sizing: border-box;
-}
-
-.user-dropdown-content form button {
-    font-size: 16.5px;
-}
-
-.user-dropdown-content form {
-    margin: 0;
-    padding: 0;
+    font-size: 1.031rem;
 }
 
 .user-dropdown:hover .user-dropdown-content {
@@ -288,12 +272,12 @@ body.loaded {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 0.625rem;
 }
 
 .toggle-container svg {
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
     transition: fill 0.3s;
 }
 
@@ -301,15 +285,70 @@ body.loaded {
     background-color: var(--dropdown-hover);
 }
 
+.right-aligned-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    .banner {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-container {
+        margin-bottom: 1rem;
+    }
+
+    .user-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .create-post, .login-button, .short-username, .toggle-container {
+        margin-bottom: 0.5rem;
+    }
+
+    .toggle-container {
+        order: 2;
+        margin-left: 0.625rem;
+    }
+
+    .right-aligned-section {
+        padding-top: 1rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        align-content: center;
+        justify-content: flex-end;
+        margin-bottom: 0;
+    }
+
+    .user-dropdown-content {
+        right: auto;
+        left: 0;
+    }
+}
+
 footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
     color: var(--text-color);
     padding: 10px;
-    margin-bottom: -15px;
-    z-index: 1000;
-    font-size: 14px;
+    margin: 1rem -0.5rem -0.5rem -0.5rem;
+    font-size: 0.875rem;
     font-family: 'Source Sans Pro', sans-serif;
+    background: var(--secondary-color);
+    text-align: center;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }

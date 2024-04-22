@@ -333,6 +333,10 @@ button:hover {
     .form-errors-container {
         width: 50%;
     }
+
+    .sliders-container {
+        flex-direction: column;
+    }
 }
 
 .modal {

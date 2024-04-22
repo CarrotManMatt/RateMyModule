@@ -77,13 +77,30 @@
 }
 
 @media (max-width: 768px) {
-    .left-container, .right-sidebar {
-        flex-basis: auto;
-        order: -1;
+    .wrapper {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .main-content, .left-container, .right-sidebar {
-        flex: none;
+    .left-container, .right-sidebar, .main-content {
         width: 100%;
+        flex: none;
+    }
+
+    .left-container {
+        order: 1;
+    }
+
+    .main-content {
+        order: 2;
+        margin-top: 20px;
+    }
+
+    .right-sidebar {
+        order: 3;
+    }
+
+    .left-container, .right-sidebar {
+        margin-top: 10px;
     }
 }

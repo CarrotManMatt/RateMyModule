@@ -62,3 +62,12 @@
 .dropdown:hover .dropbtn {
     background-color: var(--button-hover);
 }
+
+.dropbtn:focus {
+    outline: 2px solid var(--button-hover);
+    outline-offset: 2px;
+}
+
+.dropbtn:focus:not(:focus-visible) {
+    outline: none;
+}
