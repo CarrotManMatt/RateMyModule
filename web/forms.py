@@ -2,7 +2,13 @@
 
 from collections.abc import Sequence
 
-__all__: Sequence[str] = ("AnalyticsForm", "PostForm", "SignupForm", "ChangeCoursesForm")
+__all__: Sequence[str] = (
+    "AnalyticsForm",
+    "PostForm",
+    "SignupForm",
+    "ChangeCoursesForm",
+    "ReportForm"
+)
 
 from collections.abc import Iterable
 from typing import Final, override

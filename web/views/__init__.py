@@ -12,7 +12,6 @@ __all__: Sequence[str] = (
     "LogoutView",
     "LoginView",
     "SignupView",
-    "LikeDislikePostView",
     "ToolTagAutocompleteView",
     "TopicTagAutocompleteView",
     "OtherTagAutocompleteView",
@@ -341,7 +340,7 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
 
             post_set = post_set.filter(academic_year_start=year)
 
-        return {**context_data, "post_list": post_set}
+        return {**context_data, "post_list": post_set.order_by("-date_time_created")}
 
     def _get_advanced_analytics_form_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
         if "analytics_form" not in context_data:
@@ -682,26 +681,28 @@ class ChangeCoursesView(LoginRequiredMixin, FormView[ChangeCoursesForm]):
 
     @override
     def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
-        if self.request.user.is_authenticated:
-            submitted_enrolled_course_set: MutableSet[Course | int] = set()
+        if not self.request.user.is_authenticated:
+            raise RuntimeError
 
-            raw_course: str | Course | int
-            # noinspection PyArgumentList
-            for raw_course in self.request.POST.getlist("enrolled_course_set"):
-                if isinstance(raw_course, Course | int):
-                    submitted_enrolled_course_set.add(raw_course)
-                    continue
+        submitted_enrolled_course_set: MutableSet[Course | int] = set()
 
-                try:
-                    submitted_enrolled_course_set.add(int(raw_course))
-                except ValueError:
-                    pass
-                else:
-                    continue
+        raw_course: str | Course | int
+        # noinspection PyArgumentList
+        for raw_course in self.request.POST.getlist("enrolled_course_set"):
+            if isinstance(raw_course, Course | int):
+                submitted_enrolled_course_set.add(raw_course)
+                continue
 
-                submitted_enrolled_course_set.add(Course.objects.get(pk=raw_course))
+            try:
+                submitted_enrolled_course_set.add(int(raw_course))
+            except ValueError:
+                pass
+            else:
+                continue
 
-            self.request.user.enrolled_course_set.set(submitted_enrolled_course_set)
+            submitted_enrolled_course_set.add(Course.objects.get(pk=raw_course))
+
+        self.request.user.enrolled_course_set.set(submitted_enrolled_course_set)
 
         return redirect(self.request.path)
 
@@ -721,84 +722,6 @@ class DeleteAccountView(LoginRequiredMixin, View):
         return redirect("default")
 
 
-class LikeDislikePostView(View):
-    """View to handle like/dislike of posts."""
-
-    http_method_names = ("post", "get")
-
-    # noinspection PyOverrides
-    @override
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        # noinspection PyTypeChecker
-        post_id: str = request.POST["post_id"]
-        # noinspection PyTypeChecker
-        action: str = request.POST["action"]
-
-        if action in ("like", "dislike") and post_id:
-            try:
-                post = Post.objects.get(pk=post_id)
-                if request.user.is_authenticated:
-                    # Check if the user has already liked or disliked the post
-                    POST_ALREADY_LIKED: Final[bool] = (
-                        post.liked_user_set.filter(pk=request.user.pk).exists()
-                        and action == "like"
-                    )
-                    if POST_ALREADY_LIKED:
-                        # User already liked the post, no action needed
-                        return JsonResponse(
-                            {"message": "User already liked the post"},
-                            status=200,
-                        )
-
-                    POST_ALREADY_DISLIKED: Final[bool] = (
-                        post.disliked_user_set.filter(pk=request.user.pk).exists()
-                        and action == "dislike"
-                    )
-                    if POST_ALREADY_DISLIKED:
-                        # User already disliked the post, no action needed
-                        return JsonResponse(
-                            {"message": "User already disliked the post"},
-                            status=200,
-                        )
-
-                    # Remove user from the opposite set if it is present
-                    if action == "like":
-                        post.disliked_user_set.remove(request.user)
-                        post.liked_user_set.add(request.user)
-                    elif action == "dislike":
-                        post.liked_user_set.remove(request.user)
-                        post.disliked_user_set.add(request.user)
-
-                    post.save()
-                    return JsonResponse(
-                        {"message": "Action performed successfully"},
-                        status=200,
-                    )
-
-                return JsonResponse({"error": "User Not Authenticated"}, status=400)
-
-            except Post.DoesNotExist:
-                return JsonResponse({"error": "Post does not exist"}, status=404)
-
-        return JsonResponse({"error": "Invalid Post ID or Action provided"}, status=400)
-
-    # noinspection PyOverrides
-    @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
-        user = request.user
-        if user.is_authenticated:
-            liked_post_ids = list(user.liked_post_set.values_list("pk", flat=True))
-            disliked_post_ids = list(user.disliked_post_set.values_list("pk", flat=True))
-
-            data = {
-                "liked_posts": liked_post_ids,
-                "disliked_posts": disliked_post_ids,
-            }
-            return JsonResponse(data)
-
-        return JsonResponse({"error": "User Not Authenticated"})
-
-
 class SubmitReportView(View):
     """ReportSubmission for handling report submissions."""
 
@@ -814,7 +737,7 @@ class SubmitReportView(View):
             if request.user.is_authenticated:
                 report.reporter = request.user
             else:
-                report.reporter = User.objects.get(pk=1)  #TODO: Charlie: Make it not use an arbitrary user
+                report.reporter = User.objects.get(pk=1)  # TODO: Charlie: Make it not use an arbitrary user
             report.post = Post.objects.get(pk=request.POST["post_pk"])
             report.reason = request.POST["reason"]
             report.save()

@@ -7,7 +7,7 @@ __all__: Sequence[str] = ("urlpatterns", "app_name")
 from collections.abc import MutableSequence
 from typing import Final
 
-import django
+import django.urls
 from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
@@ -17,7 +17,6 @@ from web.views import (
     ChangePasswordView,
     DeleteAccountView,
     HomeView,
-    LikeDislikePostView,
     LoginView,
     LogoutView,
     OtherTagAutocompleteView,
@@ -79,11 +78,6 @@ view_urlpatterns: MutableSequence[URLResolver | URLPattern] = [
         "autocomplete/other_tags",
         OtherTagAutocompleteView.as_view(),
         name="autocomplete_other_tags",
-    ),
-    django.urls.path(
-        r"like-dislike-post/",
-        LikeDislikePostView.as_view(),
-        name="like_dislike_post",
     ),
 ]
 

@@ -101,7 +101,7 @@
                             </div>
                             <button title="Report Post" class="open-modal-button"
                                     onclick="openModal({{ post.pk }})">
-                                <div class="svg-container">
+                                <span class="svg-container">
                                     <svg class="flag-container"
                                          xmlns="http://www.w3.org/2000/svg"
                                          xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -113,7 +113,7 @@
                                             <path class="flag" d="M73.377,36.054l10.646-17.9c0.46-0.773,0.469-1.732,0.024-2.515c-0.444-0.781-1.273-1.264-2.173-1.264H59.292v-5.5  c0-1.381-1.119-2.5-2.5-2.5H18.125c-1.381,0-2.5,1.119-2.5,2.5v82.25c0,1.381,1.119,2.5,2.5,2.5s2.5-1.119,2.5-2.5v-39.75h20.083  v5.5c0,1.381,1.119,2.5,2.5,2.5h38.667c0.882,0,1.699-0.465,2.149-1.224c0.45-0.758,0.468-1.698,0.046-2.473L73.377,36.054z   M20.625,11.375h33.667v35H20.625V11.375z M45.708,54.375v-3h11.084c1.381,0,2.5-1.119,2.5-2.5v-29.5h18.188l-9.128,15.347  c-0.451,0.759-0.469,1.699-0.047,2.475l9.361,17.179H45.708z"
                                                   fill="white"/>
                                     </svg>
-                                </div>
+                                </span>
                             </button>
                         </div>
 
@@ -121,25 +121,10 @@
                             {# Post Item Bar Content #}
                             <div class="items">
                                 {# Calculating which type of star to display #}
-                                <div class="item-element">
-                                    <svg id="abcd" width="18" height="18" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <title>Like Post</title>
-                                        <path class="post-like-rating-arrow like-rating-up-arrow"
-                                              data-post-pk="{{ post.pk }}"
-                                              d="M5.24999 11.6666V6.99995H3.15816C3.04281 6.99993 2.93005 6.9657 2.83414 6.9016C2.73824 6.8375 2.66349 6.74641 2.61935 6.63983C2.57521 6.53326 2.56366 6.41599 2.58615 6.30285C2.60865 6.18971 2.66419 6.08578 2.74574 6.0042L6.58758 2.16237C6.69697 2.05301 6.84531 1.99158 6.99999 1.99158C7.15467 1.99158 7.30302 2.05301 7.41241 2.16237L11.2542 6.0042C11.3358 6.08578 11.3913 6.18971 11.4138 6.30285C11.4363 6.41599 11.4248 6.53326 11.3806 6.63983C11.3365 6.74641 11.2618 6.8375 11.1658 6.9016C11.0699 6.9657 10.9572 6.99993 10.8418 6.99995H8.74999V11.6666C8.74999 11.8213 8.68854 11.9697 8.57914 12.0791C8.46974 12.1885 8.32137 12.25 8.16666 12.25H5.83333C5.67862 12.25 5.53024 12.1885 5.42085 12.0791C5.31145 11.9697 5.24999 11.8213 5.24999 11.6666Z"
-                                              stroke="#747474" stroke-width="1.25"
-                                              stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                    <div class="post-like-rating-counter">{{ post.overall_likes_count }}</div>
-                                    <svg width="18" height="18" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <title>Dislike Post</title>
-                                        <path class="post-like-rating-arrow like-rating-down-arrow"
-                                              data-post-pk="{{ post.pk }}"
-                                              d="M5.24999 2.33338V7.00005H3.15816C3.04281 7.00007 2.93005 7.0343 2.83414 7.0984C2.73824 7.16249 2.66349 7.25359 2.61935 7.36017C2.57521 7.46674 2.56366 7.58401 2.58615 7.69715C2.60865 7.81029 2.66419 7.91422 2.74574 7.9958L6.58758 11.8376C6.69697 11.947 6.84531 12.0084 6.99999 12.0084C7.15467 12.0084 7.30302 11.947 7.41241 11.8376L11.2542 7.9958C11.3358 7.91422 11.3913 7.81029 11.4138 7.69715C11.4363 7.58401 11.4248 7.46674 11.3806 7.36017C11.3365 7.25359 11.2617 7.16249 11.1658 7.0984C11.0699 7.0343 10.9572 7.00007 10.8418 7.00005H8.74999V2.33338C8.74999 2.17867 8.68854 2.0303 8.57914 1.9209C8.46974 1.8115 8.32137 1.75005 8.16666 1.75005H5.83333C5.67862 1.75005 5.53024 1.8115 5.42085 1.9209C5.31145 2.0303 5.24999 2.17867 5.24999 2.33338Z"
-                                              stroke="#747474" stroke-width="1.25"
-                                              stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
+                                <div class="like-dislike-container" id="like-dislike-container-{{ post.pk }}">
+                                    {% include "ratemymodule/fragments/like-dislike-buttons.html" %}
                                 </div>
+
                                 <div class="item-element">
                                     {% for i in "x"|rjust:"5" %}
                                         {% if post.overall_rating >= forloop.counter %}
@@ -249,7 +234,8 @@
 
 {% block modals %}
     {{ block.super }}
-{#  advanced analytics graph modal#}
+
+    {# advanced analytics graph modal #}
     <div class="modal" id="analytics-modal" >
         <div class="modal-content">
             <span class="close" onclick="closeAAModal()" tabindex="0" role="button" id="aa-close">
@@ -281,38 +267,38 @@
                         <td>{{ analytics_form.aa_assessment_quality }}</td>
                         <td class="analytics-form-text">Assessment Quality</td>
                     </tr>
-                    <input type="hidden" name="module" value="{{ request.GET.module }}">
-                    <input type="hidden" name="action" value="generate_graph">
                 </table>
-               <button class="analytics-button">
-                   <input class="analytics-button-text" type="submit" value="Submit">
-               </button>
+                <input type="hidden" name="module" value="{{ request.GET.module }}">
+                <input type="hidden" name="action" value="generate_graph">
+                <button class="analytics-button">
+                    <input class="analytics-button-text" type="submit" value="Submit">
+                </button>
             </form>
 
         </div>
     </div>
-{{ block.super }}
-<div class="modal" id="report-modal">
-  <div class="modal-content">
-    <button class="close" onclick="closeModal()">&times;</button>
-    <h2>Select an Option</h2>
-    <div class="options">
-        <form id="reportForm" method="post" action="{% url 'ratemymodule:submit_report' %}">
-            {% csrf_token %}
-            <input type="hidden" id="selectedOptionInput" name="reason">
-            <input type="hidden" name="post_pk" id="postPkInput">
-        </form>
-      <button onclick="selectOption('Hate Speech of Language', 'HAT')">Hate Speech or Language</button>
-      <button onclick="selectOption('Identifying Information', 'IDE')">Identifying Information</button>
-      <button onclick="selectOption('Assignment Answers', 'ANS')">Assignment Answers</button>
-      <button onclick="selectOption('Spam', 'SPM')">Spam</button>
-      <button onclick="selectOption('Bullying or Harassment', 'BUL')">Bullying or Harassment</button>
-      <button onclick="selectOption('False Information', 'FLS')">False Information</button>
-      <button onclick="selectOption('Sexual Content', 'SEX')">Sexual Content</button>
+
+    <div class="modal" id="report-modal">
+      <div class="modal-content">
+        <button class="close" onclick="closeModal()">&times;</button>
+        <h2>Select an Option</h2>
+        <div class="options">
+            <form id="reportForm" method="post" action="{% url 'ratemymodule:submit_report' %}">
+                {% csrf_token %}
+                <input type="hidden" id="selectedOptionInput" name="reason">
+                <input type="hidden" name="post_pk" id="postPkInput">
+            </form>
+          <button onclick="selectOption('Hate Speech of Language', 'HAT')">Hate Speech or Language</button>
+          <button onclick="selectOption('Identifying Information', 'IDE')">Identifying Information</button>
+          <button onclick="selectOption('Assignment Answers', 'ANS')">Assignment Answers</button>
+          <button onclick="selectOption('Spam', 'SPM')">Spam</button>
+          <button onclick="selectOption('Bullying or Harassment', 'BUL')">Bullying or Harassment</button>
+          <button onclick="selectOption('False Information', 'FLS')">False Information</button>
+          <button onclick="selectOption('Sexual Content', 'SEX')">Sexual Content</button>
+        </div>
+        <button class="cancel-button" onclick="closeModal()">Cancel</button>
+      </div>
     </div>
-    <button class="cancel-button" onclick="closeModal()">Cancel</button>
-  </div>
-</div>
 
     <div class="modal confirmation-modal" id="confirmation-modal">
         <div class="modal-content confirmation-modal-content">
@@ -333,7 +319,7 @@
 {% endblock modals %}
 
 {% block scripts %}
-{{ block.super }}
+    {{ block.super }}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
               document.getElementById("confirmation-modal").style.display = "none";
@@ -345,13 +331,21 @@
         {# when trying to put letters in AA year boxes, removes them #}
         document.addEventListener("DOMContentLoaded", function() {
             const startYearInput = document.getElementById("id_start_year");
-            startYearInput.addEventListener("input", function() {
-                this.value = this.value.replace(/\D/g, "");
-            });
+            if (!startYearInput) {
+                alert("Tom's JavaScript Broke: No element with ID 'id_start_year'");
+            } else {
+                startYearInput.addEventListener("input", function() {
+                    this.value = this.value.replace(/\D/g, "");
+                });
+            }
             const endYearInput = document.getElementById("id_end_year");
-            endYearInput.addEventListener("input", function() {
-                this.value = this.value.replace(/\D/g, "");
-            });
+            if (!endYearInput) {
+                alert("Tom's JavaScript Broke: No element with ID 'id_end_year'");
+            } else {
+                endYearInput.addEventListener("input", function() {
+                    this.value = this.value.replace(/\D/g, "");
+                });
+            }
         });
 
         document.getElementById("aa-close").addEventListener("keydown", function(event){
