@@ -232,9 +232,13 @@ class AnalyticsForm(forms.Form):
         label="From year?",
         widget=forms.TextInput(),
     )
-    aa_start_year.widget.attrs.update({"class": "year-input-box", "type": "text"})
+    aa_start_year.widget.attrs.update({
+        "class": "year-input-box", "type": "text", "id": "id_start_year"
+    })
     aa_end_year = forms.IntegerField(
         label="To year?",
         widget=forms.TextInput(),
     )
-    aa_end_year.widget.attrs.update({"class": "year-input-box", "type": "text"})
+    aa_end_year.widget.attrs.update({
+        "class": "year-input-box", "type": "text", "id": "id_end_year"
+    })
