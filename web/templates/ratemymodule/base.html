@@ -71,9 +71,9 @@
         <div title="RateMyModule | {{ selected_university }}" class="logo-container">
             <a href="{% url 'default' %}"
                style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                <svg role="img" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo">
-                    <rect x="0.5" y="0.5" width="39" height="39" rx="7.5" fill="var(--button-color)" stroke="var(--button-color)" />
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M32.1071 10H22.2857L21.6607 10.2532L20.5 11.3333L19.3393 10.2532L18.7143 10H8.89286L8 10.8439V27.7215L8.89286 28.5654H18.3393L19.875 30H21.125L22.6607 28.5654H32.1071L33 27.7215V10.8439L32.1071 10ZM19.6071 27.4177L19.2857 27.1308L18.7143 26.8776H9.78571V11.6878H18.3393L19.6607 12.9367L19.6071 27.4177ZM31.2143 26.8776H22.2857L21.6607 27.1308L21.4107 27.3502V12.8692L22.6607 11.6878H31.2143V26.8776ZM16.9286 15.0633H11.5714V16.7511H16.9286V15.0633ZM16.9286 21.8143H11.5714V23.5021H16.9286V21.8143ZM11.5714 18.4388H16.9286V20.1266H11.5714V18.4388ZM29.4286 15.0633H24.0714V16.7511H29.4286V15.0633ZM24.0714 18.4388H29.4286V20.1266H24.0714V18.4388ZM24.0714 21.8143H29.4286V23.5021H24.0714V21.8143Z" fill="white" />
+                <svg role="img" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo" aria-label="RateMyModule Logo">
+                    <rect x="0.5" y="0.5" width="39" height="39" rx="7.5" fill="var(--button-color)" stroke="var(--button-color)"></rect>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M32.1071 10H22.2857L21.6607 10.2532L20.5 11.3333L19.3393 10.2532L18.7143 10H8.89286L8 10.8439V27.7215L8.89286 28.5654H18.3393L19.875 30H21.125L22.6607 28.5654H32.1071L33 27.7215V10.8439L32.1071 10ZM19.6071 27.4177L19.2857 27.1308L18.7143 26.8776H9.78571V11.6878H18.3393L19.6607 12.9367L19.6071 27.4177ZM31.2143 26.8776H22.2857L21.6607 27.1308L21.4107 27.3502V12.8692L22.6607 11.6878H31.2143V26.8776ZM16.9286 15.0633H11.5714V16.7511H16.9286V15.0633ZM16.9286 21.8143H11.5714V23.5021H16.9286V21.8143ZM11.5714 18.4388H16.9286V20.1266H11.5714V18.4388ZM29.4286 15.0633H24.0714V16.7511H29.4286V15.0633ZM24.0714 18.4388H29.4286V20.1266H24.0714V18.4388ZM24.0714 21.8143H29.4286V23.5021H24.0714V21.8143Z" fill="white" style=""></path>
                 </svg>
                 <span class="name">{{ request.site.name }}</span>
                 {% if request.user.is_authenticated %}
@@ -130,7 +130,7 @@
                 {% endif %}
             {% endblock user_profile %}
         </div>
-        <div class="toggle-container">
+        <div class="toggle-container" tabindex="0">
             <svg class="theme-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <title>Toggle Theme</title>
                 <g clip-path="url(#a)">
@@ -222,6 +222,7 @@
             const themeToggleSvg = document.querySelector('.toggle-container');
             if (themeToggleSvg) {
                 themeToggleSvg.addEventListener('click', toggleTheme);
+                themeToggleSvg.addEventListener('keydown', handleToggleKeyPress);
             }
 
             // Hide the loading overlay if it exists
@@ -231,6 +232,12 @@
             }
             document.body.classList.add('loaded');
         });
+
+        function handleToggleKeyPress(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                toggleTheme();
+            }
+        }
     </script>
 {% endblock scripts %}
 </body>

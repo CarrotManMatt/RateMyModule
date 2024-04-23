@@ -1,6 +1,7 @@
 .wrapper {
     display: flex;
     flex-direction: row;
+    padding-bottom: 60px;
 }
 
 .left-container {
@@ -25,7 +26,6 @@
     color: #7e8285;
     text-align: center;
     border-radius: 8px;
-    font-size: 0.875rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     word-wrap: normal;
     overflow-wrap: normal;
@@ -44,6 +44,8 @@
     overflow-wrap: break-word;
     hyphens: auto;
     color: var(--text-color);
+    font-size: 0.875rem;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .right-sidebar {

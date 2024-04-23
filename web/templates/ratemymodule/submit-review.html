@@ -42,7 +42,8 @@
                         <input type="radio" id="star{{ value }}"
                                name="{{ form.overall_rating.html_name }}"
                                value="{{ value }}"
-                               aria-label="Overall Rating {{ value }}">
+                               aria-label="Overall Rating {{ value }}"
+                               tabindex="0">
                         <label for="star{{ value }}"></label>
                     {% endfor %}
                 </div>
@@ -57,7 +58,8 @@
                         {% for value, star in form.difficulty_rating.field.choices reversed %}
                             <input type="radio" id="difficulty_star{{ value }}"
                                    name="{{ form.difficulty_rating.html_name }}"
-                                   value="{{ value }}" tabindex="0"
+                                   value="{{ value }}"
+                                   tabindex="0"
                                    aria-label="Difficulty Rating {{ value }}">
                             <label for="difficulty_star{{ value }}"></label>
                         {% endfor %}
@@ -71,7 +73,8 @@
                         {% for value, star in form.teaching_rating.field.choices reversed %}
                             <input type="radio" id="teaching_star{{ value }}"
                                    name="{{ form.teaching_rating.html_name }}"
-                                   value="{{ value }}" tabindex="0"
+                                   value="{{ value }}"
+                                   tabindex="0"
                                    aria-label="Teaching Quality Rating {{ value }}">
                             <label for="teaching_star{{ value }}"></label>
                         {% endfor %}
@@ -86,7 +89,8 @@
                         {% for value, star in form.assessment_rating.field.choices reversed %}
                             <input type="radio" id="assessment_star{{ value }}"
                                    name="{{ form.assessment_rating.html_name }}"
-                                   value="{{ value }}" tabindex="0"
+                                   value="{{ value }}"
+                                   tabindex="0"
                                    aria-label="Assessment Quality Rating {{ value }}">
                             <label for="assessment_star{{ value }}"></label>
                         {% endfor %}
@@ -129,11 +133,9 @@
     {% if form.non_field_errors or form.errors %}
         <div class="form-errors-container" aria-live="assertive">
             <strong>Please correct the following errors:</strong>
-            <!-- Display non-field errors -->
             {% for error in form.non_field_errors %}
                 <p>{{ error }}</p>
             {% endfor %}
-            <!-- Display field-specific errors -->
             {% for field in form %}
                 {% for error in field.errors %}
                     <p><strong>{{ field.label }}:</strong> {{ error }}</p>
@@ -141,29 +143,6 @@
             {% endfor %}
         </div>
     {% endif %}
-
-{#    <div id="disclaimerModal" class="disclaimer-modal"#}
-{#         aria-labelledby="disclaimerTitle" aria-modal="true" role="dialog">#}
-{#        <div class="disclaimer-modal-content">#}
-{#            <span class="disclaimer-close" aria-label="Close disclaimer">&times;</span>#}
-{#            <p id="disclaimerTitle">We currently only accept submissions in <b>English</b>#}
-{#                and hope to expand to other languages soon.</p>#}
-{#        </div>#}
-{#    </div>#}
-
-{#    <div id="tagSubmissionModal" class="modal">#}
-{#        <div class="modal-content">#}
-{#            <span class="close-button" onclick="document.getElementById('tagSubmissionModal').style.display='none'">&times;</span>#}
-{#            <form id="tagSubmissionForm">#}
-{#                <h2>Add a New <span id="tagTypeTitle">Tag</span></h2>#}
-{#                <p id="tagDescription">Here you can add a new tag for...</p>#}
-{#                <input type="text" id="tagNameInput" name="tagName" placeholder="Type Tag here..." required>#}
-{#                <div id="tagError" class="error-message" style="color: red; display: none;"></div>#}
-{#                <p>Note: User Defined tags are subject to moderation. These tags won't show on your post until they are verified by our admins.</p>#}
-{#                <button type="submit">Add Tag</button>#}
-{#            </form>#}
-{#        </div>#}
-{#    </div>#}
 
     <div id="toolTagSubmissionModal" class="modal">
         <div class="modal-content">
@@ -206,10 +185,7 @@
             </form>
         </div>
     </div>
-
-
 {% endblock content %}
-
 
 
 {% block scripts %}
@@ -226,26 +202,4 @@
         });
 
     </script>
-{#    <script>#}
-{#        document.addEventListener('DOMContentLoaded', function () {#}
-{#            var disclaimerModal = document.getElementById('disclaimerModal');#}
-{#            var closeButton = document.getElementsByClassName('disclaimer-close')[0];#}
-{##}
-{#            closeButton.onclick = function () {#}
-{#                disclaimerModal.style.display = 'none';#}
-{#            }#}
-{##}
-{#            window.onclick = function (event) {#}
-{#                if (event.target == disclaimerModal) {#}
-{#                    disclaimerModal.style.display = 'none';#}
-{#                }#}
-{#            }#}
-{##}
-{#            setTimeout(function () {#}
-{#                disclaimerModal.style.display = 'none';#}
-{#            }, 5000);#}
-{##}
-{#            disclaimerModal.style.display = 'block';#}
-{#        });#}
-{#    </script>#}
 {% endblock scripts %}

@@ -31,6 +31,7 @@
     background-color: var(--secondary-color);
     font-size: 14px;
     font-family: 'Source Sans Pro', sans-serif;
+    border-radius: 8px;
 }
 
 .dropdown-content a.selected {
@@ -47,6 +48,7 @@
     padding: 12px 20px;
     text-decoration: none;
     display: block;
+    border-radius: 8px;
 }
 
 .dropdown-content a:hover {

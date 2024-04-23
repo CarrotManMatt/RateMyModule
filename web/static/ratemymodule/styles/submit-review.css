@@ -124,9 +124,16 @@ textarea:focus {
     color: #925EF4;
 }
 
-.rating input[type="radio"]:checked + label:before {
-    content: "★";
-    color: #925EF4;
+.rating input[type="radio"] + label:before {
+    outline: none;
+}
+
+.rating input[type="radio"]:focus + label:before {
+    outline: 2px solid #925EF4;
+}
+
+.rating input[type="radio"]:focus:not(:focus-visible) + label:before {
+    outline: none;
 }
 
 .sliders-container {

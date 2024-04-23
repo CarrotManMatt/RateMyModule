@@ -342,6 +342,9 @@ body.loaded {
 }
 
 footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
     color: var(--text-color);
     padding: 10px;
     margin: 1rem -0.5rem -0.5rem -0.5rem;
@@ -351,4 +354,5 @@ footer {
     text-align: center;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    z-index: 1000;
 }
