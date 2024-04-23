@@ -285,14 +285,14 @@
 .like-dislike-container {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 5px 10px;
     border-radius: 8px;
     background-color: var(--secondary-button-color);
     gap: 3px;
 }
 
-.like-dislike-container .post-like-rating-arrow {
+.like-dislike-container .post-like-rating-arrow, .post-like-rating-arrow-clicked {
     background: transparent;
     border: none;
     padding: 0;
@@ -306,7 +306,6 @@
 .like-dislike-container .post-like-rating-arrow svg path {
     stroke: var(--text-color);
     fill: none;
-    display: block;
 }
 
 .like-dislike-container .post-like-rating-arrow:hover svg path,
@@ -320,15 +319,19 @@
     fill: #C7A9FF;
 }
 
+.like-dislike-container .post-like-rating-arrow-clicked:active {
+    transform: scale(0.95);
+    background: transparent;
+}
+
 .like-dislike-container .post-like-rating-counter {
-    margin: 0 3px;
+    margin: 0;
     color: var(--text-color);
     font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 
 .open-modal-button {
     position: absolute;
