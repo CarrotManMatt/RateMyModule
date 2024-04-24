@@ -332,7 +332,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             const startYearInput = document.getElementById("id_start_year");
             if (!startYearInput) {
-                alert("Tom's JavaScript Broke: No element with ID 'id_start_year'");
+                console.error("Tom's JavaScript Broke: No element with ID 'id_start_year'");
             } else {
                 startYearInput.addEventListener("input", function() {
                     this.value = this.value.replace(/\D/g, "");
@@ -340,7 +340,7 @@
             }
             const endYearInput = document.getElementById("id_end_year");
             if (!endYearInput) {
-                alert("Tom's JavaScript Broke: No element with ID 'id_end_year'");
+                console.error("Tom's JavaScript Broke: No element with ID 'id_end_year'");
             } else {
                 endYearInput.addEventListener("input", function() {
                     this.value = this.value.replace(/\D/g, "");

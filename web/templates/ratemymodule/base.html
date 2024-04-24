@@ -93,7 +93,7 @@
         <div class="user-profile-container">
             {% block user_profile %}
                 {% if not request.user.is_authenticated or request.user.enrolled_course_set.exists and request.resolver_match.view_name != "ratemymodule:submit-review" %}
-                    <a title="Create Post" href="{% url 'ratemymodule:submit_review' %}"
+                    <a title="Create Post" href="{% if not request.user.is_authenticated and LOGIN_URL %}{{ LOGIN_URL }}{% else %}{% url 'ratemymodule:submit_review' %}{% endif %}"
                        class="create-post">Create Post</a>
                 {% endif %}
 
@@ -124,7 +124,7 @@
                     </div>
 
                 {% else %}
-                    <a href="{{ LOGIN_URL }}" class="login-button">Login/Register</a>
+                    <a href="{% if LOGIN_URL %}{{ LOGIN_URL }}{% else %}/?action=login{% endif %}" class="login-button">Login/Register</a>
                 {% endif %}
             {% endblock user_profile %}
         </div>
