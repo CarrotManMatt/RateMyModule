@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rate-my-module"
-version = "0.3.2"
+version = "0.3.3"
 license = "GPL-3.0-or-later"
 description = "Enhanced student feedback for university modules; a dynamic and user-friendly platform for honest reviews."
 authors = [
@@ -26,7 +26,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.12"
 django = "~4.2"  # NOTE: Django is pinned below version 5.0 because the django-stubs package is not yet compatable with Django 5.0 (see https://github.com/typeddjango/django-stubs/issues/1493 for the tracked issue)
-django-allauth = "^0.61"
+django-allauth = "~0.61"  # TODO: select only the required social account providers (See https://allauth.org/news/2024/04/django-allauth-0.62.0-release)
 django-environ = "^0.11"
 django-admin-rangefilter = "^0.12"
 django-admin-inline-paginator = "^0.4"
@@ -34,9 +34,9 @@ djangorestframework = "^3.15"
 confusable-homoglyphs = "^3.3"
 tldextract = "^5.1"
 classproperties = {git = "https://github.com/hottwaj/classproperties.git"}
-setuptools = "^69.2"
+setuptools = "^69.5"
 django-stubs-ext = "~4.2"
-regex = "^2023.12"
+regex = "^2023.12"  # NOTE: regex module cannot be updated because djlint relies upon an older version
 matplotlib = "^3.8"
 docutils = "^0.21"
 
@@ -46,14 +46,14 @@ mypy = "~1.7"
 django-stubs = {extras = ["compatible-mypy"], version = "~4.2"}
 djangorestframework-stubs = {extras = ["compatible-mypy"], version = "^3.14"}
 types-regex = "^2023.12"
-ruff = "^0.3"
+ruff = "^0.4"
 djlint = "^1.34"
 
 [tool.poetry.group.deploy]
 optional = true
 
 [tool.poetry.group.deploy.dependencies]
-gunicorn = "^21.2"
+gunicorn = "^22.0"
 
 
 [tool.mypy]
