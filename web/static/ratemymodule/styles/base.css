@@ -259,6 +259,10 @@ body.loaded {
     display: block;
 }
 
+[data-theme="auto"] .theme-svg {
+    fill: #f0f0f0;
+}
+
 [data-theme="light"] .theme-svg {
     fill: var(--button-color-dark);
 }
