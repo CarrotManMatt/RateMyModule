@@ -35,6 +35,7 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest
+from django.db.models import Q
 from django.http import (
     HttpRequest,
     HttpResponse,
@@ -309,7 +310,8 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
     def _get_post_list_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
         try:
             # noinspection PyTypeChecker
-            module: Module = Module.objects.get(code=unquote_plus(self.request.GET["module"]))
+            module_code = unquote_plus(self.request.GET["module"])
+            module = Module.objects.get(code=module_code)
         except Module.DoesNotExist:
             return {**context_data, "error": _("Error: Module Not Found")}
 
@@ -327,7 +329,6 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                 rating: Post.Ratings = Post.Ratings(int(unquote_plus(raw_rating)))
             except ValueError:
                 return {**context_data, "error": _("Error: Incorrect rating value")}
-
             post_set = post_set.filter(overall_rating=rating)
 
         # noinspection PyTypeChecker
@@ -339,6 +340,20 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                 return {**context_data, "error": _("Error: Incorrect rating value")}
 
             post_set = post_set.filter(academic_year_start=year)
+
+        # noinspection PyTypeChecker
+        raw_tags: list[str] | None = self.request.GET.getlist("tags", None)
+        if raw_tags:
+            tags = [tag.strip() for raw_tag in raw_tags for tag in raw_tag.split(',')]
+            tag_filter = (
+                    Q(tool_tag_set__name__in=tags, module=module) |
+                    Q(topic_tag_set__name__in=tags, module=module) |
+                    Q(other_tag_set__name__in=tags, module=module)
+            )
+            # Apply tag filter to post_set
+            post_set = post_set.filter(tag_filter)
+
+        post_set = post_set.distinct()
 
         return {**context_data, "post_list": post_set.order_by("-date_time_created")}
 

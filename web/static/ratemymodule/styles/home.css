@@ -199,6 +199,68 @@
     background-color: var(--button-hover);
 }
 
+.filter-drop-down-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    padding-bottom: 3px;
+}
+
+.filter-drop-down-content.active {
+    display: block;
+}
+
+.filter-drop-down-element {
+    color: var(--text-color);
+    text-decoration: none;
+    display: block;
+    margin-left: 6px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    width: fit-content;
+    border-radius: 8px;
+    align-items: center;
+    padding: 5px 10px; /* Adjusted padding for a better touch target */
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1.1em; /* Slightly larger font size for visibility */
+}
+
+.filter-drop-down-element:hover {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.filter-drop-down-element.clicked {
+    background-color: var(--button-color);
+    color: white;
+}
+
+.filter-tag-container {
+    position: relative;
+    display: inline-block;
+}
+
+.filter-tag-search-input {
+    height: fit-content;
+    border: 2px solid var(--button-color);
+    border-radius: 8px;
+    padding: 5px 5px;
+    color: var(--secondary-text-color);
+    background-color: var(--background-color);
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.filter-tag-search-input:focus {
+    outline: none;
+}
+
 .post-container {
     display: flex;
     flex-direction: column;
@@ -454,6 +516,7 @@
     margin-left: auto;
     margin-right: auto;
 }
+
 .analytics-submit-button {
     display: block;
     flex-flow: row nowrap;
@@ -473,18 +536,19 @@
     cursor: pointer;
     background-color: var(--button-hover);
 }
-.analytics-button-text{
+
+.analytics-button-text {
     border: none;
     text-decoration: none;
-    background-color:transparent;
-    color:var(--text-color-dark);
+    background-color: transparent;
+    color: var(--text-color-dark);
     font-family: 'Source Sans Pro', sans-serif;
     font-weight: bold;
     font-size: 15px;
 }
 
 
-.analytics-form-text{
+.analytics-form-text {
     text-align: left;
 }
 

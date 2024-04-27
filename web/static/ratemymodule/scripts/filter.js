@@ -1,13 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
+    const buttonColor = getComputedStyle(document.documentElement).getPropertyValue('--button-color');
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
+
     const stars = document.querySelectorAll('.filter-rating-star');
-    const unselectedColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
 
     stars.forEach(function(star, index) {
         star.addEventListener('click', function() {
             stars.forEach(function(s, i) {
                 if (i <= index) {
                     s.setAttribute('data-selected', 'true');
-                    s.style.stroke = '#7F4FD9';
+                    s.style.stroke = buttonColor;
                     s.style.fill = '#C7A9FF';
                     s.style.fillOpacity = '100%';
                 } else {
@@ -33,11 +35,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Construct the filter parameters based on the selected criteria
         if (ratingStarsNumber > 0) {
-            currentURL.searchParams.set("rating", ratingStarsNumber.toString())
+            currentURL.searchParams.set("rating", ratingStarsNumber.toString());
         }
         if (filterYear !== '' && !isNaN(filterYear) && Number.isInteger(parseFloat(filterYear))) {
-            currentURL.searchParams.set("year", filterYear)
+            currentURL.searchParams.set("year", filterYear);
         }
+
+        const selectedTags = [];
+        // Get the text content of elements with the "clicked" class
+        const clickedElements = document.querySelectorAll('.filter-drop-down-element.clicked');
+        clickedElements.forEach(function(element) {
+            selectedTags.push(element.textContent.trim());
+        });
+
+        // Add selected tags to the URL
+        if (selectedTags.length > 0) {
+            currentURL.searchParams.set("tags", selectedTags.join(','));
+        }
+
         currentURL.searchParams.delete("action");
 
         // Redirect to the modified URL
@@ -45,4 +60,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     filterButton.addEventListener('click', performFilter);
+
+    // Function to handle click event on filter-drop-down-element
+    function handleTagSelection(event) {
+        const target = event.target;
+        target.classList.toggle('clicked');
+    }
+
+    // Add event listener to each filter-drop-down-element
+    const filterDropDownElements = document.querySelectorAll('.filter-drop-down-element');
+    filterDropDownElements.forEach(function(element) {
+        element.addEventListener('click', handleTagSelection);
+    });
 });
