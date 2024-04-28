@@ -401,6 +401,7 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
 
     def _get_post_list_context_data(self, selected_module: Module) -> dict[str, object]:
         post_set: QuerySet[Post] = Post.filter_by_viewable(selected_module, self.request).all()
+        print(post_set)
 
         # noinspection PyTypeChecker
         raw_search_string: str | None = self.request.GET.get("q", None)
@@ -430,9 +431,9 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
         # noinspection PyTypeChecker
         raw_tags: list[str] | None = self.request.GET.getlist("tags", None)
         if raw_tags:
-            post_set = post_set & Post.filter_by_tags(
+            post_set = Post.filter_by_tags(
                 tag_names=(tag.strip() for raw_tag in raw_tags for tag in raw_tag.split(",")),
-            ).all()
+            ).all() & post_set
 
         post_set = post_set.distinct()
 

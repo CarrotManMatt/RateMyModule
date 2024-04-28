@@ -68,21 +68,21 @@
                 {# Displaying all tags #}
                 {% for tag in post.tool_tag_set.all %}
                     {% if tag.is_verified %}
-                        <div class="item-element can-hover">
+                        <div class="item-element">
                             {{ tag }}
                         </div>
                     {% endif %}
                 {% endfor %}
                 {% for tag in post.topic_tag_set.all %}
                     {% if tag.is_verified %}
-                        <div class="item-element can-hover">
+                        <div class="item-element">
                             {{ tag }}
                         </div>
                     {% endif %}
                 {% endfor %}
                 {% for tag in post.other_tag_set.all %}
                     {% if tag.is_verified %}
-                        <div class="item-element can-hover">
+                        <div class="item-element">
                             {{ tag }}
                         </div>
                     {% endif %}

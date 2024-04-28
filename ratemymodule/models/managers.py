@@ -138,7 +138,7 @@ class PostFilteredByTagManager(Manager["Post"]):
             models.Q(tool_tag_set__name__in=self._tag_names)
             | models.Q(topic_tag_set__name__in=self._tag_names)
             | models.Q(other_tag_set__name__in=self._tag_names)  # noqa: COM812
-        ).distinct()
+        )
 
 
 class ModuleOrRequestVisiblePostsManager(Manager["Post"]):
