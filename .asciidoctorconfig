@@ -95,7 +95,7 @@
 :url-project-repo: {url-uob-cs-gitlab}/team-projects-2023-24/team55
 :url-project-main-branch: {url-project-repo}/-/commits/main
 :url-wiki-version-control-system: {_url-wikipedia}/Version_control
-:url-wiki-line-seperators: {_url-wikipedia}/Newline#Representation
+:url-wiki-line-separators: {_url-wikipedia}/Newline#Representation
 :url-wiki-microsoft-windows: {_url-wikipedia}/Microsoft_Windows
 :url-wiki-linux: {_url-wikipedia}/Linux
 :url-wiki-linux-distribution: {_url-wikipedia}/Linux_distribution

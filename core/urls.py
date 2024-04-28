@@ -13,7 +13,7 @@ from django.http import JsonResponse
 from django.urls import URLPattern, URLResolver
 from django.views.generic import RedirectView
 
-from core.views import AdminDocsRedirectView
+from core.views import AdminDocsRedirectView, AdminLoginRedirectView
 
 urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
@@ -29,7 +29,7 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
                 ],
             },
         ),
-        name="microsoft-oauth-domain-verification",
+        name="microsoft_oauth_domain_verification",
     ),
     django.urls.path(
         r"admin/doc/",
@@ -39,6 +39,11 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"admin/docs/<path:subpath>",
         AdminDocsRedirectView.as_view(),
+    ),
+    django.urls.path(
+        r"admin/login/",
+        AdminLoginRedirectView.as_view(),
+        name="admin_login_redirect",
     ),
     django.urls.path(r"admin/", admin.site.urls),
     django.urls.path(r"api/htmx/", django.urls.include("api_htmx.urls")),
@@ -52,6 +57,6 @@ urlpatterns: MutableSequence[URLResolver | URLPattern] = [
     django.urls.path(
         r"accounts/",
         django.urls.include("allauth.urls"),  # HACK: Temporarily include allauth URLs until they have all been implemented manually
-        name="debug-accounts",
+        name="hack_accounts",
     ),
 ]

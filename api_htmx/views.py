@@ -25,7 +25,7 @@ class LikePostView(LoginRequiredMixin, DetailView[Post]):
 
     # noinspection PyOverrides
     @override
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
         self.object: Post = self.get_object()
 
         if not self.request.user.is_authenticated:
@@ -49,7 +49,7 @@ class DislikePostView(LoginRequiredMixin, DetailView[Post]):
 
     # noinspection PyOverrides
     @override
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
         self.object: Post = self.get_object()
 
         if not self.request.user.is_authenticated:
@@ -73,7 +73,7 @@ class UnlikePostView(LoginRequiredMixin, DetailView[Post]):
 
     # noinspection PyOverrides
     @override
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
         self.object: Post = self.get_object()
 
         if not self.request.user.is_authenticated:

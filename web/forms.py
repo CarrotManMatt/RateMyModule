@@ -7,7 +7,7 @@ __all__: Sequence[str] = (
     "PostForm",
     "SignupForm",
     "ChangeCoursesForm",
-    "ReportForm"
+    "ReportForm",
 )
 
 from collections.abc import Iterable
@@ -155,7 +155,7 @@ class ReportForm(forms.ModelForm[Report]):
     )
     post_pk = forms.IntegerField()
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Report
         fields = ("reason", "post_pk")
 
@@ -233,12 +233,16 @@ class AnalyticsForm(forms.Form):
         widget=forms.TextInput(),
     )
     aa_start_year.widget.attrs.update({
-        "class": "year-input-box", "type": "text", "id": "id_start_year"
+        "class": "year-input-box",
+        "type": "text",
+        "id": "id_start_year",
     })
     aa_end_year = forms.IntegerField(
         label="To year?",
         widget=forms.TextInput(),
     )
     aa_end_year.widget.attrs.update({
-        "class": "year-input-box", "type": "text", "id": "id_end_year"
+        "class": "year-input-box",
+        "type": "text",
+        "id": "id_end_year",
     })

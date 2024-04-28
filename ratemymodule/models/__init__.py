@@ -794,7 +794,7 @@ class Post(CustomBaseModel):
 
         if not first_course:
             if self.user.is_staff:
-                return "an administrator"
+                return "an Administrator"
 
             raise Course.DoesNotExist
 
@@ -812,13 +812,13 @@ class Post(CustomBaseModel):
             return str(self.pk)
 
     @classmethod
-    def filter_by_tags(cls, names: Iterable[str]) -> Manager["Post"]:
+    def filter_by_tags(cls, tag_names: Iterable[str]) -> Manager["Post"]:
         """
         Retrieve all posts by a list of tag names.
 
         Searches for tag names within the ToolTag, TopicTag & OtherTag models.
         """
-        return PostFilteredByTagManager(tag_names=names, post_model=cls)
+        return PostFilteredByTagManager(tag_names=tag_names, post_model=cls)
 
     @classmethod
     def filter_by_viewable(cls, module: Module | None = None, request: HttpRequest | None = None) -> Manager["Post"]:  # noqa: E501

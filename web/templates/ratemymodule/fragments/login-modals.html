@@ -38,7 +38,7 @@
                 Other Account Types
             </button>
         </div>
-        <div class="login-disclaimer">Use the 'Other Account Types' option if
+        <div class="login-disclaimer">Use the &ldquo;Other Account Types&rdquo; option if
             your university account is not managed by Google or Microsoft
         </div>
     </div>
@@ -72,7 +72,7 @@
                 </ul>
             </div>
         {% endif %}
-        <form method="post" action="{% url 'ratemymodule:post_signup' %}"
+        <form method="post" action="{% url 'ratemymodule:signup' %}"
               class="signup-form">
             {% csrf_token %}
             {% for field in signup_form %}
@@ -87,6 +87,9 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            {% if request.GET.next %}
+                <input type="hidden" name="signup-next" value="{{ request.GET.next }}">
+            {% endif %}
             <button type="submit" class="btn-signup login-button">Create My
                 Account
             </button>
@@ -140,7 +143,7 @@
         {% endif %}
 
         <!-- Your login template -->
-        <form method="post" action="{% url 'ratemymodule:post_login' %}"
+        <form method="post" action="{% url 'ratemymodule:login' %}"
               class="manual-login-form">
             {% csrf_token %}
             {% for field in login_form %}
@@ -155,6 +158,9 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            {% if request.GET.next %}
+                <input type="hidden" name="login-next" value="{{ request.GET.next }}">
+            {% endif %}
             <button type="submit" class="btn-manual-login login-button">Login
             </button>
         </form>

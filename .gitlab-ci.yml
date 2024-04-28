@@ -8,7 +8,6 @@ django-test:
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-        - if: $CI_COMMIT_TAG
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
     tags:
@@ -34,7 +33,6 @@ mypy-test:
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-        - if: $CI_COMMIT_TAG
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
     allow_failure: true
@@ -62,7 +60,6 @@ ruff-test:
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-        - if: $CI_COMMIT_TAG
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
     allow_failure: true
@@ -90,7 +87,6 @@ djlint-test:
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-        - if: $CI_COMMIT_TAG
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
     allow_failure: true
@@ -117,7 +113,6 @@ asciidoctor-test:
     stage: check
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-        - if: $CI_COMMIT_TAG
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
     tags:
@@ -135,7 +130,6 @@ pre-commit-test:
     stage: check
     rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-        - if: $CI_COMMIT_TAG
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
     tags:
@@ -164,7 +158,7 @@ check-updated-tag:
     image: python:3
     stage: check
     rules:
-        - if: $CI_COMMIT_TAG
+        - if: $CI_COMMIT_TAG =~ /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
 
     tags:
         - python
@@ -214,7 +208,7 @@ build-stable-docker-image:
         - docker
 
     rules:
-        - if: $CI_COMMIT_TAG
+        - if: $CI_COMMIT_TAG =~ /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
 
     when: manual
 

@@ -46,7 +46,9 @@
     <meta name="theme-color" content="#b295e8" data-react-helmet="true" />
 
     <link rel="stylesheet" href="{% static 'ratemymodule/styles/base.css' %}"/>
-    <link rel="stylesheet" href="{% static 'ratemymodule/styles/login-modals.css' %}"/>
+    {% if not request.user.is_authenticated %}
+        <link rel="stylesheet" href="{% static 'ratemymodule/styles/login-modals.css' %}"/>
+    {% endif %}
     {% block styles %}
     {% endblock styles %}
 
@@ -115,7 +117,7 @@
 
                             <a title="Browsable API" href="{% url 'api_rest:root' %}">Browsable API</a>
 
-                            <form method="post" action="{% url 'ratemymodule:post_logout' %}">
+                            <form method="post" action="{% url 'ratemymodule:logout' %}">
                                 {% csrf_token %}
                                 <button title="Logout" type="submit">Logout</button>
                             </form>
@@ -151,7 +153,9 @@
 </main>
 
 {% block modals %}
-    {% include "ratemymodule/fragments/login-modals.html" %}
+    {% if not request.user.is_authenticated %}
+        {% include "ratemymodule/fragments/login-modals.html" %}
+    {% endif %}
 {% endblock modals %}
 
 <footer>
@@ -165,6 +169,7 @@
 <script src="{% static 'api_htmx/htmx.min.js' %}" defer></script>
 
 {% block scripts %}
+    {% if not request.user.is_authenticated %}
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById("loginModal").style.display = "{% if request.GET.action == "login" %}block{% else %}none{% endif %}";
@@ -193,15 +198,19 @@
               document.getElementById("manualLoginModal").style.display = "block";
             }
         </script>
-        <script>
-            function toggleTheme() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                setDropdownIconTheme(newTheme);
-                // You might want to call any function here that updates the SVG fill based on the theme
-            }
+    {% endif %}
+{% endblock scripts %}
+
+{% block theme_scripts %}
+    <script>
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            setDropdownIconTheme(newTheme);
+            // You might want to call any function here that updates the SVG fill based on the theme
+        }
 
         function setDropdownIconTheme(theme) {
             const dropdownIcons = document.querySelectorAll('.dropdown-icon');
@@ -236,6 +245,6 @@
             }
         }
     </script>
-{% endblock scripts %}
+{% endblock theme_scripts %}
 </body>
 </html>

@@ -1,4 +1,5 @@
 """Contains a selection of graph generating functions for RateMyModule."""
+
 from collections.abc import Sequence
 
 __all__: Sequence[str] = (
@@ -168,7 +169,7 @@ def sb_format_reviews_string(array_of_in_ratings: list[int]) -> list[str]:
 def decide_in_or_out_of_bars(array_of_in_ratings: list[int], array_of_bar_labels: list[str]) -> tuple[list[str], list[str]]:  # noqa: E501
     # if bar less than 40% value of the largest bar, then put the text outside it
     forty_max = ceil(max(array_of_in_ratings) * 0.5)
-    inside_of_bar_texts = [
+    inside_of_bar_texts: list[str | int] = [
         p if p >= forty_max
         else ""
         for p
@@ -178,7 +179,7 @@ def decide_in_or_out_of_bars(array_of_in_ratings: list[int], array_of_bar_labels
         if inside_of_bar_texts[counter] != "":
             inside_of_bar_texts[counter] = array_of_bar_labels[counter]
 
-    out_of_bar_texts = [
+    out_of_bar_texts: list[str | int] = [
         p if p < forty_max
         else ""
         for p

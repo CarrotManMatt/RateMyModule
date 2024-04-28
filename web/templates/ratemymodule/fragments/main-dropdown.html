@@ -2,7 +2,7 @@
 
 {% for course in course_list %}
     <div title="Course: {{ course.name }}" class="dropdown
-            {% for module in course.module_set.all %}{% if request.GET.module == module.code %}active{% endif %}{% endfor %}">
+            {% for module in course.module_set.all %}{% if request.session.selected_module_pk == module.pk %}active{% endif %}{% endfor %}">
         <button class="dropbtn">
             {{ course.name }}
             <span class="arrow">&#9660;</span>
@@ -11,7 +11,9 @@
             {% for module in course.module_set.all %}
                 <a title="Module: {{ module.name }}"
                    href="{{ module|get_module_search_url:request }}"
-                   class="{% if request.GET.module == module.code %}selected{% endif %}">{{ module.name }}</a>
+                   class="{% if request.session.selected_module_pk == module.pk %}selected{% endif %}">
+                    {{ module.name }}
+                </a>
             {% endfor %}
         </div>
     </div>

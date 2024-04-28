@@ -18,12 +18,14 @@ __all__: Sequence[str] = (
     "SubmitReportView",
 )
 
+import contextlib
 import re
 from collections.abc import Container, MutableSet
 from typing import TYPE_CHECKING, Final, override
 from urllib.parse import unquote_plus
 
 import django
+import django.shortcuts
 from allauth.account.forms import LoginForm
 from allauth.account.views import EmailView as AllAuthEmailView
 from allauth.account.views import LoginView as AllAuthLoginView
@@ -31,19 +33,15 @@ from allauth.account.views import LogoutView as AllAuthLogoutView
 from allauth.account.views import PasswordChangeView as AllAuthPasswordChangeView
 from allauth.account.views import SignupView as AllAuthSignupView
 from django import forms, urls
-from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest
-from django.db.models import Q
 from django.http import (
-    HttpRequest,
     HttpResponse,
     HttpResponseRedirect,
     JsonResponse,
     QueryDict,
 )
-from django.shortcuts import redirect, render
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -61,8 +59,8 @@ from ratemymodule.models import (
 )
 from web.forms import AnalyticsForm, ChangeCoursesForm, PostForm, ReportForm, SignupForm
 
-from . import graph_generators
-from .utils import EnsureUserHasCoursesMixin
+from . import graph_generators, utils
+from .utils import EnsureUserHasCoursesMixin, NextURLRemovedFromGETParams
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AnonymousUser
@@ -72,15 +70,19 @@ if TYPE_CHECKING:
 class LogoutView(AllAuthLogoutView):  # type: ignore[misc,no-any-unimported]
     """The view for logging out the user."""
 
-    http_method_name = ("post",)
+    http_method_names = ("post",)
 
 
 class LoginView(AllAuthLoginView):  # type: ignore[misc,no-any-unimported]
     """The view for processing login requests."""
 
-    http_method_names = ("post",)
+    http_method_names = ("get", "post")
     redirect_authenticated_user = True
     prefix = "login"
+
+    @override
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+        return django.shortcuts.redirect(utils.get_login_url_from_request(self.request))
 
     @override
     def form_invalid(self, form: LoginForm) -> HttpResponseRedirect:  # type: ignore[misc,no-any-unimported]
@@ -92,15 +94,35 @@ class LoginView(AllAuthLoginView):  # type: ignore[misc,no-any-unimported]
             "errors": form.errors,
         }
 
-        return django.shortcuts.redirect(settings.LOGIN_URL)
+        extra_get_params: QueryDict = QueryDict("", mutable=True)
+        # noinspection PyTypeChecker
+        next_url: str | None = self.request.POST.get("login-next", None)
+        if next_url:
+            extra_get_params["next"] = next_url
+        extra_get_params.update(self.request.GET)
+
+        return django.shortcuts.redirect(
+            utils.get_login_url_with_extra_params(extra_get_params),
+        )
+
+    @override
+    def get_success_url(self) -> str:  # type: ignore[misc]
+        # noinspection PyTypeChecker
+        next_url: str | None = self.request.POST.get("login-next", None)
+
+        return next_url if next_url else super().get_success_url()  # type: ignore[no-any-return]
 
 
 class SignupView(AllAuthSignupView):  # type: ignore[misc,no-any-unimported]
     """A view for signing up a new user."""
 
-    http_method_names = ("post",)
+    http_method_names = ("get", "post")
     redirect_authenticated_user = True
     prefix = "signup"
+
+    @override
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+        return django.shortcuts.redirect(utils.get_signup_url_from_request(self.request))
 
     @override
     def form_invalid(self, form: SignupForm) -> HttpResponseRedirect:  # type: ignore[misc]
@@ -112,7 +134,23 @@ class SignupView(AllAuthSignupView):  # type: ignore[misc,no-any-unimported]
             "errors": form.errors,
         }
 
-        return django.shortcuts.redirect(settings.SIGNUP_URL)
+        extra_get_params: QueryDict = QueryDict("", mutable=True)
+        # noinspection PyTypeChecker
+        next_url: str | None = self.request.POST.get("signup-next", None)
+        if next_url:
+            extra_get_params["next"] = next_url
+        extra_get_params.update(self.request.GET)
+
+        return django.shortcuts.redirect(
+            utils.get_signup_url_with_extra_params(extra_get_params),
+        )
+
+    @override
+    def get_success_url(self) -> str:  # type: ignore[misc]
+        # noinspection PyTypeChecker
+        next_url: str | None = self.request.POST.get("signup-next", None)
+
+        return next_url if next_url else super().get_success_url()  # type: ignore[no-any-return]
 
 
 class HomeView(EnsureUserHasCoursesMixin, TemplateView):
@@ -121,24 +159,56 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
     template_name = "ratemymodule/home.html"
     http_method_names = ("get",)
 
+    @classmethod
+    def _remove_next_url_from_get_params(cls, get_params: QueryDict) -> NextURLRemovedFromGETParams:  # noqa: E501
+        raw_next_url: list[str] | None = get_params.pop("next", None)  # type: ignore[assignment]
+        return NextURLRemovedFromGETParams(
+            next_url=raw_next_url[0] if raw_next_url and raw_next_url[0] else None,
+            returned_get_params=get_params,
+        )
+
     @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:
         # noinspection PyArgumentList
         returned_get_params: QueryDict = self.request.GET.copy()
 
-        # noinspection PyTypeChecker
-        action: str | None = self.request.GET.get("action", None)
+        MODULE_CODE: Final[str | None] = returned_get_params.get("module", None)
+        if MODULE_CODE:
+            with contextlib.suppress(Module.DoesNotExist):
+                self.request.session["selected_module_pk"] = Module.objects.get(
+                    code=unquote_plus(MODULE_CODE),
+                ).pk
+
+            returned_get_params.pop("module", None)
+
+        _next_url_removed_from_get_params: NextURLRemovedFromGETParams = self._remove_next_url_from_get_params(  # noqa: E501
+            returned_get_params,
+        )
+        NEXT_URL: Final[str | None] = _next_url_removed_from_get_params.next_url
+        returned_get_params = _next_url_removed_from_get_params.returned_get_params
+
+        action: str | None = returned_get_params.get("action", None)
 
         if action is not None:
             new_action: str = action.strip().replace("-", "_").strip()
 
             if not new_action:
                 returned_get_params.pop("action", None)
-                return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+                return django.shortcuts.redirect(
+                    to=utils.get_reload_with_get_params_url(
+                        self.request,
+                        returned_get_params,
+                    ),
+                )
 
             if new_action != action:
                 returned_get_params["action"] = new_action
-                return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+                return django.shortcuts.redirect(
+                    to=utils.get_reload_with_get_params_url(
+                        self.request,
+                        returned_get_params,
+                    ),
+                )
 
             ALLOWED_ACTIONS: Final[Container[str]] = (
                 "signup",
@@ -149,22 +219,48 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                 "dislike",
             )
             if action not in ALLOWED_ACTIONS:
-                raise BadRequest
+                BAD_REQUEST_MESSAGE: Final[str] = f"{action!r} is not a valid action."
+                raise BadRequest(BAD_REQUEST_MESSAGE)
+
+        if action in ("login", "signup") and self.request.user.is_authenticated:
+            if NEXT_URL:
+                return django.shortcuts.redirect(NEXT_URL)
+
+            login_signup_next_action: list[str] | None = returned_get_params.pop(  # type: ignore[assignment]
+                "next_action",
+                None,
+            )
+            LOGIN_SIGNUP_NEXT_ACTION_EXISTS: Final[bool] = bool(
+                login_signup_next_action
+                and login_signup_next_action[0]
+                and login_signup_next_action[0] != "login"
+                and login_signup_next_action[0] != "signup"  # noqa: COM812
+            )
+            if LOGIN_SIGNUP_NEXT_ACTION_EXISTS:
+                returned_get_params["action"] = login_signup_next_action[0]  # type: ignore[index]
+            else:
+                returned_get_params.pop("action", None)
+
+            return django.shortcuts.redirect(
+                to=utils.get_reload_with_get_params_url(self.request, returned_get_params),
+            )
 
         if action == "signup":
             returned_get_params["action"] = "login"
-            return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+            return django.shortcuts.redirect(
+                to=utils.get_reload_with_get_params_url(self.request, returned_get_params),
+            )
 
         if action == "select_university":
-            if not request.user.is_authenticated:
+            if not self.request.user.is_authenticated:
                 # noinspection PyTypeChecker
                 raw_university_pk: str | None = self.request.GET.get(
                     "university",
                     None  # noqa: COM812
                 )
                 if not raw_university_pk:
-                    return render(
-                        request,
+                    return django.shortcuts.render(
+                        self.request,
                         "ratemymodule/university-selector.html",
                         {"university_choices": University.objects.all()},
                     )
@@ -175,76 +271,72 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                     )
                 except University.DoesNotExist:
                     returned_get_params.pop("university", None)
-                    return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+                    return django.shortcuts.redirect(
+                        to=utils.get_reload_with_get_params_url(
+                            self.request,
+                            returned_get_params,
+                        ),
+                    )
 
                 self.request.session["selected_university_pk"] = selected_university.pk
 
-            returned_get_params.pop("action", None)
+            if NEXT_URL:
+                return django.shortcuts.redirect(to=NEXT_URL)
+
+            select_university_next_action: list[str] | None = returned_get_params.pop(  # type: ignore[assignment]
+                "next_action",
+                None,
+            )
+            if select_university_next_action and select_university_next_action[0]:
+                returned_get_params["action"] = select_university_next_action[0]
+            else:
+                returned_get_params.pop("action", None)
+
             returned_get_params.pop("university", None)
 
-        # noinspection PyTypeChecker
-        module_code: str | None = self.request.GET.get("module", None)
-        if not module_code:
-            # noinspection PyUnusedLocal
-            university: University | None = None
-
-            if self.request.user.is_authenticated:
-                university = self.request.user.university
-
-                if not university:
-                    raise Course.DoesNotExist
-
-            else:
-                try:
-                    university = University.objects.get(
-                        pk=self.request.session.get("selected_university_pk", None),
-                    )
-                except University.DoesNotExist:
-                    returned_get_params["action"] = "select_university"
-                    returned_get_params.pop("university", None)
-                    return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
-
-            if not university:
-                raise RuntimeError
-
-            if not university.module_set.exists():
-                raise Module.DoesNotExist
-
-            returned_get_params["module"] = university.module_set.all()[0].code
-
-            return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
+            return django.shortcuts.redirect(
+                to=utils.get_reload_with_get_params_url(self.request, returned_get_params),
+            )
 
         NO_SELECTED_UNIVERSITY: bool = (
             not self.request.user.is_authenticated
             and not self.request.session.get("selected_university_pk", None)
         )
         if NO_SELECTED_UNIVERSITY:
+            if NEXT_URL:
+                returned_get_params["next"] = NEXT_URL
+            elif action:
+                returned_get_params["next_action"] = action
+
             returned_get_params["action"] = "select_university"
             returned_get_params.pop("university", None)
-            return redirect(f"{self.request.path}?{returned_get_params.urlencode()}")
 
-        return super().get(request, *args, **kwargs)
+            return django.shortcuts.redirect(
+                to=utils.get_reload_with_get_params_url(self.request, returned_get_params),
+            )
+
+        if NEXT_URL and self.request.user.is_authenticated:
+            return django.shortcuts.redirect(to=NEXT_URL)
+
+        if MODULE_CODE:
+            return django.shortcuts.redirect(
+                to=utils.get_reload_with_get_params_url(self.request, returned_get_params),
+            )
+
+        return super().get(*args, **kwargs)  # type: ignore[arg-type]
 
     # noinspection PyMethodMayBeStatic
-    def _get_graphs_context_data(self, context_data: dict[str, object]) -> dict[str, object]:
+    def _get_graphs_context_data(self, selected_module: Module) -> dict[str, object]:
         if not Post.objects.exists():
             return {
-                **context_data,
                 "overall_rating_bar_graph": "",
                 "difficulty_bar_graph": "",
                 "teaching_graph": "",
                 "assessment_graph": "",
             }
 
-        try:
-            # noinspection PyTypeChecker
-            module: Module = Module.objects.get(code=unquote_plus(self.request.GET["module"]))
-        except Module.DoesNotExist:
-            return {**context_data, "error": _("Error: Module Not Found")}
-
         # noinspection SpellCheckingInspection
         return {
-            **context_data,
             "overall_rating_bar_graph": mark_safe(  # noqa: S308
                 re.sub(
                     "#aaaaaa",
@@ -253,7 +345,7 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                         "#ffffff",
                         "var(--button-color)",
                         graph_generators.overall_rating_bar_graph(
-                            module,
+                            selected_module,
                             "ffffff",
                             "aaaaaa",
                         ),
@@ -268,7 +360,7 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                         "#ffffff",
                         "var(--button-color)",
                         graph_generators.difficulty_rating_bar_graph(
-                            module,
+                            selected_module,
                             "ffffff",
                             "aaaaaa",
                         ),
@@ -283,7 +375,7 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                         "#ffffff",
                         "var(--button-color)",
                         graph_generators.teaching_quality_bar_graph(
-                            module,
+                            selected_module,
                             "ffffff",
                             "aaaaaa",
                         ),
@@ -298,7 +390,7 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
                         "#ffffff",
                         "var(--button-color)",
                         graph_generators.assessment_quality_bar_graph(
-                            module,
+                            selected_module,
                             "ffffff",
                             "aaaaaa",
                         ),
@@ -307,15 +399,8 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
             ),
         }
 
-    def _get_post_list_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
-        try:
-            # noinspection PyTypeChecker
-            module_code = unquote_plus(self.request.GET["module"])
-            module = Module.objects.get(code=module_code)
-        except Module.DoesNotExist:
-            return {**context_data, "error": _("Error: Module Not Found")}
-
-        post_set: QuerySet[Post] = Post.filter_by_viewable(module, self.request).all()
+    def _get_post_list_context_data(self, selected_module: Module) -> dict[str, object]:
+        post_set: QuerySet[Post] = Post.filter_by_viewable(selected_module, self.request).all()
 
         # noinspection PyTypeChecker
         raw_search_string: str | None = self.request.GET.get("q", None)
@@ -328,7 +413,8 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
             try:
                 rating: Post.Ratings = Post.Ratings(int(unquote_plus(raw_rating)))
             except ValueError:
-                return {**context_data, "error": _("Error: Incorrect rating value")}
+                return {"error": _("Error: Incorrect rating value")}
+
             post_set = post_set.filter(overall_rating=rating)
 
         # noinspection PyTypeChecker
@@ -337,195 +423,191 @@ class HomeView(EnsureUserHasCoursesMixin, TemplateView):
             try:
                 year: int = int(unquote_plus(raw_year))
             except ValueError:
-                return {**context_data, "error": _("Error: Incorrect rating value")}
+                return {"error": _("Error: Incorrect rating value")}
 
             post_set = post_set.filter(academic_year_start=year)
 
         # noinspection PyTypeChecker
         raw_tags: list[str] | None = self.request.GET.getlist("tags", None)
         if raw_tags:
-            tags = [tag.strip() for raw_tag in raw_tags for tag in raw_tag.split(',')]
-            tag_filter = (
-                    Q(tool_tag_set__name__in=tags, module=module) |
-                    Q(topic_tag_set__name__in=tags, module=module) |
-                    Q(other_tag_set__name__in=tags, module=module)
-            )
-            # Apply tag filter to post_set
-            post_set = post_set.filter(tag_filter)
+            post_set = post_set & Post.filter_by_tags(
+                tag_names=(tag.strip() for raw_tag in raw_tags for tag in raw_tag.split(",")),
+            ).all()
 
         post_set = post_set.distinct()
 
-        return {**context_data, "post_list": post_set.order_by("-date_time_created")}
+        return {
+            "post_list": post_set.order_by("-date_time_created"),
+            "can_filter_by_tags": (
+                ToolTag.objects.exists()
+                or TopicTag.objects.exists()
+                or OtherTag.objects.exists()
+            ),
+        }
 
-    def _get_advanced_analytics_form_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
-        if "analytics_form" not in context_data:
+    def _get_advanced_analytics_form_context_data(self, selected_module: Module, *, analytics_form_already_in_context_data: bool) -> dict[str, object]:  # noqa: E501
+        if analytics_form_already_in_context_data:
+            return {}
+
+        # noinspection PyTypeChecker
+        action: str | None = self.request.GET.get("action", None)
+
+        if action != "generate_graph":
+            return {"analytics_form": AnalyticsForm()}
+
+        # first extract all data
+
+        # noinspection PyTypeChecker
+        difficulty_rating: str | None = self.request.GET.get(
+            "aa_difficulty_rating", None,
+        )
+        # noinspection PyTypeChecker
+        teaching_rating: str | None = self.request.GET.get(
+            "aa_teaching_quality", None,
+        )
+        # noinspection PyTypeChecker
+        assessment_quality: str | None = self.request.GET.get(
+            "aa_assessment_quality", None,
+        )
+        # noinspection PyTypeChecker
+        overall_rating: str | None = self.request.GET.get(
+            "aa_overall_rating", None,
+        )
+
+        # noinspection PyTypeChecker
+        start_year: int = int(self.request.GET["aa_start_year"])  # HACK: Cast to int, error checking is not performed
+        # noinspection PyTypeChecker
+        end_year: int = int(self.request.GET["aa_end_year"])  # HACK: Cast to int, error checking is not performed
+        return {
+            # repopulate form
+            "analytics_form": AnalyticsForm(
+                initial={
+                    "aa_difficulty_rating": difficulty_rating,
+                    "aa_teaching_quality": teaching_rating,
+                    "aa_assessment_quality": assessment_quality,
+                    "aa_overall_rating": overall_rating,
+                    "aa_start_year": start_year,
+                    "aa_end_year": end_year,
+                },
+            ),
+            # pass data to graph and make it
             # noinspection PyTypeChecker
-            action: str | None = self.request.GET.get("action", None)
-
-            if action != "generate_graph":
-                context_data["analytics_form"] = AnalyticsForm()
-            else:
-                # first extract all data
-
-                # noinspection PyTypeChecker
-                difficulty_rating: str | None = self.request.GET.get(
-                    "aa_difficulty_rating", None,
-                )
-                # noinspection PyTypeChecker
-                teaching_rating: str | None = self.request.GET.get(
-                    "aa_teaching_quality", None,
-                )
-                # noinspection PyTypeChecker
-                assessment_quality: str | None = self.request.GET.get(
-                    "aa_assessment_quality", None,
-                )
-                # noinspection PyTypeChecker
-                overall_rating: str | None = self.request.GET.get(
-                    "aa_overall_rating", None,
-                )
-                # note: warning for next two lines, should be put in as int, if not int, die
-                # noinspection PyTypeChecker
-                start_year: int = int(self.request.GET["aa_start_year"])
-                # noinspection PyTypeChecker
-                end_year: int = int(self.request.GET["aa_end_year"])
-                # repopulate form
-                context_data["analytics_form"] = AnalyticsForm(
-                    initial={
-                        "aa_difficulty_rating": difficulty_rating,
-                        "aa_teaching_quality": teaching_rating,
-                        "aa_assessment_quality": assessment_quality,
-                        "aa_overall_rating": overall_rating,
-                        "aa_start_year": start_year,
-                        "aa_end_year": end_year,
-                    },
-                )
-                # pass data to graph and make it
-                # noinspection PyTypeChecker
-                context_data["advanced_analytics_graph"] = mark_safe(  # noqa: S308
+            "advanced_analytics_graph": mark_safe(  # noqa: S308
+                re.sub(
+                    "#000002",  # NOTE: Defines colour of the border of the legend box
+                    "var(--button-hover)",
                     re.sub(
-                        "#000002",  # NOTE: defines colour of border of legend box
-                        "var(--button-hover)",
+                        "#000001",  # NOTE: Defines colour of the legend box
+                        "var(--secondary-color)",
                         re.sub(
-                            "#000001",  # NOTE: defines color of legend box
-                            "var(--secondary-color)",
-                            re.sub(
-                                "#aaaaaa",
-                                "var(--text-color)",
-                                graph_generators.advanced_analytics_graph(
-                                    module=Module.objects.get(
-                                        code=unquote_plus(self.request.GET["module"]),
-                                    ),
-                                    difficulty_rating=(difficulty_rating == "on"),
-                                    teaching_rating=(teaching_rating == "on"),
-                                    assessment_quality=(assessment_quality == "on"),
-                                    overall_rating=(overall_rating == "on"),
-                                    start_year=start_year,
-                                    end_year=end_year,
-                                ),
+                            "#aaaaaa",
+                            "var(--text-color)",
+                            graph_generators.advanced_analytics_graph(
+                                module=selected_module,
+                                difficulty_rating=(difficulty_rating == "on"),
+                                teaching_rating=(teaching_rating == "on"),
+                                assessment_quality=(assessment_quality == "on"),
+                                overall_rating=(overall_rating == "on"),
+                                start_year=start_year,
+                                end_year=end_year,
                             ),
                         ),
                     ),
-                )
+                ),
+            ),
+        }
 
-        return context_data
-
-    def _get_login_forms_context_data(self, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
-        if "login_form" not in context_data:
+    def _get_login_forms_context_data(self, *, login_form_already_in_context_data: bool, signup_form_already_in_context_data: bool) -> dict[str, object]:  # noqa: E501
+        if not login_form_already_in_context_data:
             if "login_form" not in self.request.session:
-                context_data["login_form"] = LoginForm(prefix="login")
+                return {"login_form": LoginForm(prefix="login")}
 
-            else:
-                login_form = LoginForm(
-                    data=self.request.session["login_form"]["data"],
-                    request=self.request,
-                    prefix="login",
-                )
-                login_form.is_valid()
+            login_form: LoginForm = LoginForm(  # type: ignore[no-any-unimported]
+                data=self.request.session["login_form"]["data"],
+                request=self.request,
+                prefix="login",
+            )
+            login_form.is_valid()
+            self.request.session.pop("login_form")
 
-                context_data["login_form"] = login_form
+            return {"login_form": login_form}
 
-                self.request.session.pop("login_form")
-
-        if "signup_form" not in context_data:
+        if not signup_form_already_in_context_data:
             if "signup_form" not in self.request.session:
-                context_data["signup_form"] = SignupForm(prefix="signup")
+                return {"signup_form": SignupForm(prefix="signup")}
 
-            else:
-                signup_form = SignupForm(
-                    data=self.request.session["signup_form"]["data"],
-                    prefix="signup",
-                )
-                signup_form.is_valid()
+            signup_form: SignupForm = SignupForm(
+                data=self.request.session["signup_form"]["data"],
+                request=self.request,
+                prefix="signup",
+            )
+            signup_form.is_valid()
+            self.request.session.pop("signup_form")
 
-                context_data["signup_form"] = signup_form
+            return {"signup_form": signup_form}
 
-                self.request.session.pop("signup_form")
+        return {}
 
-        return context_data
-
-    def _get_university_selection_context_data(self, university: University, context_data: dict[str, object]) -> dict[str, object]:  # noqa: E501
-        context_data["selected_university"] = university
-
+    def _get_university_selection_context_data(self, university: University) -> dict[str, object]:  # noqa: E501
         # noinspection PyArgumentList
         select_university_get_params: QueryDict = self.request.GET.copy()
         select_university_get_params["action"] = "select_university"
 
-        context_data["select_university_url"] = (
-            f"{self.request.path}?{select_university_get_params.urlencode()}"
-        )
+        return {
+            "selected_university": university,
+            "select_university_url": utils.get_reload_with_get_params_url(
+                self.request,
+                select_university_get_params,
+            ),
+        }
 
-        return context_data
+    def _get_university_from_context_data(self) -> University:
+        if self.request.user.is_authenticated:
+            if self.request.user.university:
+                return self.request.user.university
+
+            raise Course.DoesNotExist
+
+        try:
+            return University.objects.get(
+                pk=self.request.session.get("selected_university_pk", None),
+            )
+        except University.DoesNotExist:
+            raise RuntimeError from None
 
     @override
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context_data: dict[str, object] = super().get_context_data(**kwargs)
 
-        # noinspection PyUnusedLocal
-        university: University | None = None
-        if self.request.user.is_authenticated:
-            university = self.request.user.university
+        university: University = self._get_university_from_context_data()
 
-            if not university:
-                raise Course.DoesNotExist
+        if "selected_module_pk" not in self.request.session:
+            self.request.session["selected_module_pk"] = university.module_set.all()[0].pk
 
-        else:
-            try:
-                university = University.objects.get(
-                    pk=self.request.session.get("selected_university_pk", None),
-                )
-            except University.DoesNotExist:
-                raise RuntimeError from None
+        try:
+            # noinspection PyTypeChecker
+            selected_module: Module = Module.objects.get(
+                pk=self.request.session["selected_module_pk"],
+            )
+        except Module.DoesNotExist:
+            return {**context_data, "error": _("Error: Module Not Found")}
 
-        if not university:
-            raise RuntimeError
-
-        context_data["course_list"] = (
-            university.course_set.prefetch_related("module_set").all()
-        )
-        context_data = self._get_university_selection_context_data(university, context_data)
-
-        original_login_path: str
-        original_login_seperator: str
-        original_login_params: str
-        original_login_path, original_login_seperator, original_login_params = (
-            settings.LOGIN_URL.partition("?")
-        )
-
-        login_url_params: QueryDict = QueryDict("", mutable=True)
-        # noinspection PyArgumentList
-        login_url_params.update(
-            self.request.GET.dict() | QueryDict(original_login_params).dict()  # noqa: COM812
-        )
-        context_data["LOGIN_URL"] = (
-            f"{original_login_path}{original_login_seperator}{login_url_params.urlencode()}"
-        )
-
-        context_data = self._get_graphs_context_data(context_data)
-        context_data = self._get_post_list_context_data(context_data)
-        context_data = self._get_login_forms_context_data(context_data)
-        context_data = self._get_advanced_analytics_form_context_data(context_data)
-
-        return context_data  # noqa: RET504
+        return {
+            **context_data,
+            "LOGIN_URL": utils.get_login_url_from_request(self.request),
+            "course_list": university.course_set.prefetch_related("module_set").all(),
+            **self._get_university_selection_context_data(university),
+            **self._get_graphs_context_data(selected_module),
+            **self._get_post_list_context_data(selected_module),
+            **self._get_login_forms_context_data(
+                login_form_already_in_context_data="login_form" in context_data,
+                signup_form_already_in_context_data="signup_form" in context_data,
+            ),
+            **self._get_advanced_analytics_form_context_data(
+                selected_module,
+                analytics_form_already_in_context_data="analytics_form" in context_data,
+            ),
+        }
 
 
 class SubmitPostView(EnsureUserHasCoursesMixin, LoginRequiredMixin, CreateView[Post, PostForm]):  # noqa: E501
@@ -607,11 +689,13 @@ class SubmitPostView(EnsureUserHasCoursesMixin, LoginRequiredMixin, CreateView[P
 class TopicTagAutocompleteView(View):
     """A view for processing GET requests about topic tags."""
 
+    http_method_names = ("get",)
+
     # noinspection PyOverrides
     @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
         # noinspection PyTypeChecker
-        term = request.GET.get("term", "")
+        term = self.request.GET.get("term", "")
         tags = TopicTag.objects.filter(
             name__icontains=term,
             is_verified=True,
@@ -622,11 +706,13 @@ class TopicTagAutocompleteView(View):
 class ToolTagAutocompleteView(View):
     """A view for processing GET requests for Tool tags."""
 
+    http_method_names = ("get",)
+
     # noinspection PyOverrides
     @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
         # noinspection PyTypeChecker
-        term = request.GET.get("term", "")
+        term = self.request.GET.get("term", "")
         tags = ToolTag.objects.filter(
             name__icontains=term,
             is_verified=True,
@@ -637,11 +723,13 @@ class ToolTagAutocompleteView(View):
 class OtherTagAutocompleteView(View):
     """A view for processing GET requests for other tags."""
 
+    http_method_names = ("get",)
+
     # noinspection PyOverrides
     @override
-    def get(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
+    def get(self, *args: object, **kwargs: object) -> HttpResponse:  # type: ignore[misc]
         # noinspection PyTypeChecker
-        term = request.GET.get("term", "")
+        term = self.request.GET.get("term", "")
         tags = OtherTag.objects.filter(
             name__icontains=term,
             is_verified=True,
@@ -695,7 +783,7 @@ class ChangeCoursesView(LoginRequiredMixin, FormView[ChangeCoursesForm]):
         return form
 
     @override
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
         if not self.request.user.is_authenticated:
             raise RuntimeError
 
@@ -719,7 +807,7 @@ class ChangeCoursesView(LoginRequiredMixin, FormView[ChangeCoursesForm]):
 
         self.request.user.enrolled_course_set.set(submitted_enrolled_course_set)
 
-        return redirect(self.request.path)
+        return django.shortcuts.redirect(self.request.path)
 
 
 class DeleteAccountView(LoginRequiredMixin, View):
@@ -729,33 +817,38 @@ class DeleteAccountView(LoginRequiredMixin, View):
 
     # noinspection PyOverrides
     @override  # type: ignore[misc]
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
-        user: User | AnonymousUser = request.user
-        logout(request)
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        user: User | AnonymousUser = self.request.user
+        logout(self.request)
         if user.is_authenticated:
             user.delete()
-        return redirect("default")
+        return django.shortcuts.redirect("default")
 
 
-class SubmitReportView(View):
+class SubmitReportView(LoginRequiredMixin, View):
     """ReportSubmission for handling report submissions."""
 
     http_method_names = ("post",)
 
     # noinspection PyOverrides
     @override  # type: ignore[misc]
-    def post(self, request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
-        """Take in post request, Submit to form, Create in database."""
-        form = ReportForm(request.POST)
+    def post(self, *args: object, **kwargs: object) -> HttpResponse:
+        """Take in post-request, Submit to form, Create in the database."""
+        form = ReportForm(self.request.POST)
+
         if form.is_valid():
             report = form.save(commit=False)
-            if request.user.is_authenticated:
-                report.reporter = request.user
-            else:
-                report.reporter = User.objects.get(pk=1)  # TODO: Charlie: Make it not use an arbitrary user
-            report.post = Post.objects.get(pk=request.POST["post_pk"])
-            report.reason = request.POST["reason"]
+
+            if not self.request.user.is_authenticated:
+                raise RuntimeError
+
+            report.reporter = self.request.user
+
+            report.post = Post.objects.get(pk=self.request.POST["post_pk"])
+            report.reason = self.request.POST["reason"]
             report.save()
-            return HttpResponseRedirect("/")  # Redirect to the desired URL
+
+            return django.shortcuts.redirect("ratemymodule:home")
+
         # Handle invalid form submission
-        return HttpResponseRedirect("/")  # You can redirect to an error page
+        return django.shortcuts.redirect("ratemymodule:home")

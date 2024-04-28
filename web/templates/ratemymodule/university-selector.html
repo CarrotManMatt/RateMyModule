@@ -16,6 +16,11 @@
 
         <form id="university-form" method="get" class="university-form">
             <input type="hidden" name="action" value="select_university">
+            {% if "next" in request.GET %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% elif "next_action" in request.GET %}
+                <input type="hidden" name="next_action" value="{{ request.GET.next_action }}">
+            {% endif %}
             <label for="universitySelect" style="display: none;" class="university-label">Select a University:</label>
             <select name="university" id="universitySelect" required class="university-select">
                 <option value="" disabled selected>Select a University...
@@ -29,3 +34,6 @@
     </div>
 
 {% endblock content %}
+
+{% block modals %}{% endblock modals %}
+{% block scripts %}{% endblock scripts %}

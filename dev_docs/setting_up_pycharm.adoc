@@ -21,7 +21,7 @@ Now you can {url-pycharm-download}[download & install PyCharm Professional] for 
 
 . Install {labelled-url-git} for your desired OS
 
-. Configure your {url-wiki-line-seperators}[OS-dependent line separators] with the following commands:
+. Configure your {url-wiki-line-separators}[OS-dependent line separators] with the following commands:
 +
 --
 .On {labelled-url-wiki-microsoft-windows}

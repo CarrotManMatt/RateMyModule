@@ -17,17 +17,37 @@ from ratemymodule.models import Module
 register: template.Library = template.Library()
 
 
+# noinspection SpellCheckingInspection
 @register.filter(name="get_module_search_url", needs_autoescape=True, is_safe=True)
 def get_module_search_url(module: object, request: object, *, autoescape: bool = True) -> SafeString:  # noqa: E501
-    """Process a request to get the url for a module."""
+    """Process a request to get the URL for a given module instance."""
     url: str = ""
 
     if isinstance(module, Module) and isinstance(request, HttpRequest):
         url = re.sub(
-            r"&?action=[^&]*(?=&|$)",
-            "",
-            module.get_search_url(request=request),
-            count=1,
+            r"\?&",
+            "?",
+            re.sub(
+                r"&?tags=[^&]*(?=&|$)",
+                "",
+                re.sub(
+                    r"&?rating=[^&]*(?=&|$)",
+                    "",
+                    re.sub(
+                        r"&?year=[^&]*(?=&|$)",
+                        "",
+                        re.sub(
+                            r"&?q=[^&]*(?=&|$)",
+                            "",
+                            re.sub(
+                                r"&?action=[^&]*(?=&|$)",
+                                "",
+                                module.get_search_url(request=request),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         )
 
     if not autoescape:

@@ -26,7 +26,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.12"
 django = "~4.2"  # NOTE: Django is pinned below version 5.0 because the django-stubs package is not yet compatable with Django 5.0 (see https://github.com/typeddjango/django-stubs/issues/1493 for the tracked issue)
-django-allauth = "~0.61"  # TODO: select only the required social account providers (See https://allauth.org/news/2024/04/django-allauth-0.62.0-release)
+django-allauth = {extras = ["socialaccount"], version = "^0.62"}
 django-environ = "^0.11"
 django-admin-rangefilter = "^0.12"
 django-admin-inline-paginator = "^0.4"

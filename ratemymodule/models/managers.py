@@ -163,7 +163,7 @@ class ModuleOrRequestVisiblePostsManager(Manager["Post"]):
         queryset: QuerySet["Post"] = self._post_model.objects.all()
 
         if self._module:
-            queryset = queryset & self._module.post_set.all()
+            queryset = queryset.filter(module=self._module)
 
         if not self._request or not self._request.user.is_staff:
             queryset = queryset.annotate(
